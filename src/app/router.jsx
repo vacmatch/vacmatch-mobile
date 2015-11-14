@@ -4,12 +4,14 @@ import { default as Router, Route, IndexRoute } from 'react-router'
 
 import Layout from './components/layout'
 import Home from './components/home'
+import ReportList from './components/report/ReportList'
 
 // Routes
 let routes = (
   <Route path='/' component={Layout}>
     <IndexRoute component={Home} />
     <Route path='/home' component={Home}/>
+    <Route path='/reports' component={ReportList}/>
   </Route>
 )
 
