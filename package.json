@@ -40,6 +40,7 @@
     "gulp": "~3.9.0",
     "gulp-webserver": "~0.9.1",
     "vinyl-source-stream": "~1.1.0",
-    "react-intl": "~1.2.1"
+    "react-intl": "~1.2.1",
+    "pouchdb": "~5.1.0"
   }
 }
