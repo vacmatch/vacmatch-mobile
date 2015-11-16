@@ -12,6 +12,7 @@ let routes = (
     <IndexRoute component={Home} />
     <Route path='/home' component={Home}/>
     <Route path='/reports' component={ReportList}/>
+    <Route path='/report/:id' component={Home}/>
   </Route>
 )
 

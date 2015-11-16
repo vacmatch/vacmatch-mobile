@@ -1,17 +1,20 @@
 import React from 'react'
 import mui from 'material-ui'
+import { History } from 'react-router'
 
 let ListItem = mui.ListItem
 let Avatar = mui.Avatar
 
 let ReportItem = React.createClass({
+  mixins: [History],
+
   propTypes: {
     key: React.PropTypes.number,
     report: React.PropTypes.object
   },
 
   handleClick: function (id) {
-    return id
+    this.history.pushState(null, '/report/' + id)
   },
 
   render: function () {

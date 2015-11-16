@@ -19,11 +19,11 @@ let ReportDao = {
   save: function (report, callback) {
     db.post(report).then(function (response) {
       db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-        callback(doc.rows[0])
+        callback(doc.rows[0], null)
       })
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(err)
+      callback(null, err)
     })
   },
 

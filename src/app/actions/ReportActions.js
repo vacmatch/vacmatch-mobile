@@ -1,7 +1,7 @@
 import Reflux from 'reflux'
 
 let ReportActions = Reflux.createActions([
-  'updateList',
+  'updateLists',
   'addReport',
   'deleteReport'
 ])
