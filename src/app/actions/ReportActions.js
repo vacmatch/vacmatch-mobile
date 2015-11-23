@@ -4,6 +4,7 @@ let ReportActions = Reflux.createActions([
   'updateLists',
   'addReport',
   'deleteReport',
+  'updateReportTeams',
   'updateTime',
   'resetTime',
   'updateTerm'

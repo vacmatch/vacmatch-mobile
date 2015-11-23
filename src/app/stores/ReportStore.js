@@ -2,12 +2,21 @@ import Reflux from 'reflux'
 import Stopwatch from 'timer-stopwatch'
 
 import ReportActions from '../actions/ReportActions'
+import ReportDao from '../dao/ReportDao'
 
 let ReportStore = Reflux.createStore({
   listenables: ReportActions,
 
   init: function () {
     this.state = {
+      localTeam: {
+        id: null,
+        teamName: 'Local'
+      },
+      visitorTeam: {
+        id: null,
+        teamName: 'Visitor'
+      },
       isPlaying: false,
       timer: new Stopwatch(1200000),
       time: this.milisecondsToString(1200000),
@@ -17,6 +26,14 @@ let ReportStore = Reflux.createStore({
 
   getInitialState: function () {
     return this.state
+  },
+
+  onUpdateReportTeams: function (reportId) {
+    ReportDao.find(reportId, (report) => {
+      this.state.localTeam = report.doc.localTeam
+      this.state.visitorTeam = report.doc.visitorTeam
+      this.trigger(this.state)
+    })
   },
 
   // Parse crono string and convert it to milisecond

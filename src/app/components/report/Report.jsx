@@ -14,16 +14,26 @@ let RaisedButton = mui.RaisedButton
 let Report = React.createClass({
   mixins: [Reflux.connect(ReportStore, 'report')],
 
+  propTypes: {
+    params: React.PropTypes.shape({
+      id: React.PropTypes.string
+    })
+  },
+
+  componentWillMount: function () {
+    ReportActions.updateReportTeams(this.props.params.id)
+  },
+
   render: function () {
     let playButtonLabel = 'Play'
-    if (this.state.crono.isPlaying) {
+    if (this.state.report.isPlaying) {
       playButtonLabel = 'Stop'
     }
 
     return <div>
       <div style={style.center}>
-        <FlatButton label='Local' secondary={true} />
-        <FlatButton label='Visitor' secondary=	{true} />
+        <FlatButton label={this.state.report.localTeam.teamName} secondary={true} />
+        <FlatButton label={this.state.report.visitorTeam.teamName} secondary=	{true} />
         <ReportProperty value={'0 - 2'} isTitle={true} />
       </div>
       <div style={style.container}>

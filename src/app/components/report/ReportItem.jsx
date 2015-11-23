@@ -25,7 +25,7 @@ let ReportItem = React.createClass({
           secondaryText={ this.props.report.date + ' - ' + this.props.report.place }
           leftAvatar={<Avatar src= { this.props.report.localAvatarUrl } />}
           rightAvatar={<Avatar src={ this.props.report.localAvatarUrl } />}
-          onClick={(ev) => this.handleClick(this.props.report.id)}
+          onClick={(ev) => this.handleClick(this.props.report._id)}
         />
     )
   }
