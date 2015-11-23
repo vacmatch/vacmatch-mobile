@@ -10,6 +10,18 @@ let RaisedButton = mui.RaisedButton
 
 let Report = React.createClass({
 
+  getInitialState: function () {
+    return {
+      term: 1
+    }
+  },
+
+  _modifyTerm: function (newTerm) {
+    this.setState({
+      term: newTerm
+    })
+  },
+
   render: function () {
     return <div>
       <div style={style.center}>
@@ -18,11 +30,11 @@ let Report = React.createClass({
         <ReportProperty value={'0 - 2'} isTitle={true} />
       </div>
       <div style={style.container}>
-        <ReportProperty name={'Term'} value={'2ª'} isPrimary={false} />
+        <ReportProperty name={'Term'} value={this.state.term} isPrimary={false} />
         <ReportProperty name={'Fouls'} value={'3 - 3'} isPrimary={false} />
       </div>
       <div style={style.center}>
-        <Crono initTime={1200000}/>
+        <Crono initTime={1200000} term={this.state.term} termUpdate={this._modifyTerm}/>
       </div>
       <hr/>
       <div style={style.center}>

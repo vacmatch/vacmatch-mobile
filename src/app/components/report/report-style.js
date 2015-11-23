@@ -2,7 +2,8 @@
 module.exports =
 {
   container: {
-    marginLeft: '35%'
+    marginLeft: '35%',
+    textAlign: 'left'
   },
 
   center: {

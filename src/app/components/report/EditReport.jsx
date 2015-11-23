@@ -1,6 +1,8 @@
 import React from 'react'
 import mui from 'material-ui'
 
+import style from './report-style'
+
 let FlatButton = mui.FlatButton
 let Dialog = mui.Dialog
 let TextField = mui.TextField
@@ -8,7 +10,9 @@ let TextField = mui.TextField
 let EditReport = React.createClass({
   propTypes: {
     cronoUpdate: React.PropTypes.func,
-    time: React.PropTypes.string
+    termUpdate: React.PropTypes.func,
+    time: React.PropTypes.string,
+    term: React.PropTypes.number
   },
 
   _showDialog: function () {
@@ -25,16 +29,18 @@ let EditReport = React.createClass({
     this.refs.editDialog.dismiss()
   },
 
+  _handleModifyTerm: function () {
+    let term = this.refs.term.getValue()
+    this.props.termUpdate(parseInt(term, 10))
+    this.refs.editDialog.dismiss()
+  },
+
   render: function () {
     let customActions = [
       <FlatButton
         label='Cancel'
         secondary={true}
-        onTouchTap={this._handleCancel} />,
-      <FlatButton
-        label='Submit'
-        primary={true}
-        onTouchTap={this._handleCronoUpdate} />
+        onTouchTap={this._handleCancel} />
     ]
 
     return (
@@ -44,10 +50,25 @@ let EditReport = React.createClass({
           title='Edit report'
           actions={customActions}
           isOpen={customActions}>
-          <TextField ref='time'
-            hintText='Insert time'
-            floatingLabelText='Reset match time'
-            defaultValue={this.props.time} />
+          <div style={style.container}>
+            <TextField ref='time'
+              hintText='Insert time'
+              floatingLabelText='Reset match time'
+              defaultValue={this.props.time} />
+            <FlatButton
+              label='Modify time'
+              primary={true}
+              onTouchTap={this._handleCronoUpdate} />
+            <br/>
+            <TextField ref='term'
+              hintText='Insert new term'
+              floatingLabelText='Modify term'
+              defaultValue={this.props.term} />
+            <FlatButton
+              label='Modify term'
+              primary={true}
+              onTouchTap={this._handleModifyTerm} />
+          </div>
         </Dialog>
       </div>
     )

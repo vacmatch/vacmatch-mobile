@@ -10,7 +10,9 @@ let FlatButton = mui.FlatButton
 let Crono = React.createClass({
 
   propTypes: {
-    initTime: React.PropTypes.number
+    initTime: React.PropTypes.number,
+    term: React.PropTypes.number,
+    termUpdate: React.PropTypes.func
   },
 
   getInitialState: function () {
@@ -63,7 +65,7 @@ let Crono = React.createClass({
     return <div>
       <ReportProperty value={this.state.time} isPrimary={true} />
       <FlatButton label={playButtonLabel} primary={true} onClick={this._togglePlay} />
-      <EditReport cronoUpdate={this._resetPlay} time={this.state.time}/>
+      <EditReport cronoUpdate={this._resetPlay} time={this.state.time} termUpdate={this.props.termUpdate} term={this.props.term}/>
     </div>
   }
 })
