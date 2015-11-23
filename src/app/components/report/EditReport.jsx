@@ -12,7 +12,7 @@ let EditReport = React.createClass({
     cronoUpdate: React.PropTypes.func,
     termUpdate: React.PropTypes.func,
     time: React.PropTypes.string,
-    term: React.PropTypes.number
+    term: React.PropTypes.string
   },
 
   _showDialog: function () {

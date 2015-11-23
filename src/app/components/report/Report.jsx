@@ -1,28 +1,25 @@
 import React from 'react'
+import Reflux from 'reflux'
 import mui from 'material-ui'
 
 import style from './report-style'
 import ReportProperty from './ReportProperty'
-import Crono from './Crono'
+import EditReport from './EditReport'
+import ReportStore from '../../stores/ReportStore'
+import ReportActions from '../../actions/ReportActions'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
 
 let Report = React.createClass({
-
-  getInitialState: function () {
-    return {
-      term: 1
-    }
-  },
-
-  _modifyTerm: function (newTerm) {
-    this.setState({
-      term: newTerm
-    })
-  },
+  mixins: [Reflux.connect(ReportStore, 'report')],
 
   render: function () {
+    let playButtonLabel = 'Play'
+    if (this.state.crono.isPlaying) {
+      playButtonLabel = 'Stop'
+    }
+
     return <div>
       <div style={style.center}>
         <FlatButton label='Local' secondary={true} />
@@ -30,11 +27,14 @@ let Report = React.createClass({
         <ReportProperty value={'0 - 2'} isTitle={true} />
       </div>
       <div style={style.container}>
-        <ReportProperty name={'Term'} value={this.state.term} isPrimary={false} />
+        <ReportProperty name={'Term'} value={this.state.report.term} isPrimary={false} />
         <ReportProperty name={'Fouls'} value={'3 - 3'} isPrimary={false} />
       </div>
       <div style={style.center}>
-        <Crono initTime={1200000} term={this.state.term} termUpdate={this._modifyTerm}/>
+        <ReportProperty value={this.state.report.time} isPrimary={true} />
+        <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
+        <EditReport cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
+           termUpdate={ReportActions.updateTerm} term={this.state.report.term}/>
       </div>
       <hr/>
       <div style={style.center}>
