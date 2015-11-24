@@ -4,8 +4,8 @@ import { default as Router, Route, IndexRoute } from 'react-router'
 
 import Layout from './components/layout'
 import Home from './components/home'
-import ReportList from './components/report/ReportList'
-import Report from './components/report/Report'
+import ReportList from './components/report/list/ReportList'
+import Report from './components/report/show/Report'
 
 // Routes
 let routes = (

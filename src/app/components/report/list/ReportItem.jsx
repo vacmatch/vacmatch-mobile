@@ -1,6 +1,7 @@
 import React from 'react'
 import mui from 'material-ui'
 import { History } from 'react-router'
+import urls from '../../../api/urls'
 
 let ListItem = mui.ListItem
 let Avatar = mui.Avatar
@@ -14,7 +15,7 @@ let ReportItem = React.createClass({
   },
 
   handleClick: function (id) {
-    this.history.pushState(null, '/report/' + id)
+    this.history.pushState(null, urls.report.show(id))
   },
 
   render: function () {

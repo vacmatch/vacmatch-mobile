@@ -3,8 +3,8 @@ import Reflux from 'reflux'
 import mui from 'material-ui'
 
 import ReportItem from './ReportItem'
-import ReportListStore from '../../stores/ReportListStore'
-import ReportActions from '../../actions/ReportActions'
+import ReportListStore from '../../../stores/ReportListStore'
+import ReportActions from '../../../actions/ReportActions'
 
 let List = mui.List
 let FlatButton = mui.FlatButton

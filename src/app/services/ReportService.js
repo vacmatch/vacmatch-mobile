@@ -2,7 +2,7 @@ import PouchDB from 'pouchdb'
 
 var db = new PouchDB('reports')
 
-let ReportDao = {
+let ReportService = {
 
   find: function (id, callback) {
     db.allDocs({key: id, include_docs: true}).then(function (doc) {
@@ -39,4 +39,4 @@ let ReportDao = {
   }
 }
 
-module.exports = ReportDao
+module.exports = ReportService

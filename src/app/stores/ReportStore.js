@@ -2,7 +2,7 @@ import Reflux from 'reflux'
 import Stopwatch from 'timer-stopwatch'
 
 import ReportActions from '../actions/ReportActions'
-import ReportDao from '../dao/ReportDao'
+import ReportService from '../services/ReportService'
 
 let ReportStore = Reflux.createStore({
   listenables: ReportActions,
@@ -29,7 +29,7 @@ let ReportStore = Reflux.createStore({
   },
 
   onUpdateReportTeams: function (reportId) {
-    ReportDao.find(reportId, (report) => {
+    ReportService.find(reportId, (report) => {
       this.state.localTeam = report.doc.localTeam
       this.state.visitorTeam = report.doc.visitorTeam
       this.trigger(this.state)
