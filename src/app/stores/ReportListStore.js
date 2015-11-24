@@ -1,7 +1,7 @@
 import Reflux from 'reflux'
 
 import ReportActions from '../actions/ReportActions'
-import ReportDao from '../dao/ReportDao'
+import ReportService from '../services/ReportService'
 
 let ReportListStore = Reflux.createStore({
   listenables: ReportActions,
@@ -18,7 +18,7 @@ let ReportListStore = Reflux.createStore({
   },
 
   onUpdateLists: function () {
-    ReportDao.findAll((data) => {
+    ReportService.findAll((data) => {
       let newState = {
         nextReports: data.rows,
         lastReports: data.rows
@@ -29,7 +29,7 @@ let ReportListStore = Reflux.createStore({
   },
 
   onAddReport: function (report) {
-    ReportDao.save(report, (doc, err) => {
+    ReportService.save(report, (doc, err) => {
       if (err == null) {
         this.onUpdateLists()
       }
@@ -37,7 +37,7 @@ let ReportListStore = Reflux.createStore({
   },
 
   onDeleteReport: function (id) {
-    ReportDao.delete(id, (res, err) => {
+    ReportService.delete(id, (res, err) => {
       if (err == null) {
         this.onUpdateLists()
       }

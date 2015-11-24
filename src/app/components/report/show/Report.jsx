@@ -5,8 +5,8 @@ import mui from 'material-ui'
 import style from './report-style'
 import ReportProperty from './ReportProperty'
 import EditReport from './EditReport'
-import ReportStore from '../../stores/ReportStore'
-import ReportActions from '../../actions/ReportActions'
+import ReportStore from '../../../stores/ReportStore'
+import ReportActions from '../../../actions/ReportActions'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
