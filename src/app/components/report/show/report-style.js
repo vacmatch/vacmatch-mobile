@@ -6,6 +6,11 @@ module.exports =
     textAlign: 'left'
   },
 
+  containerDialog: {
+    marginLeft: '5%',
+    textAlign: 'left'
+  },
+
   center: {
     marginLeft: 'auto',
     marginRight: 'auto',
