@@ -6,6 +6,11 @@ let urls = {
     show: function (reportId) {
       return 'report/' + reportId
     }
+  },
+  event: {
+    add: function (reportId, eventType) {
+      return 'addEvent/' + reportId + '/' + eventType
+    }
   }
 }
 

@@ -1,12 +1,14 @@
 import React from 'react'
 import Reflux from 'reflux'
 import mui from 'material-ui'
+import { Link } from 'react-router'
 
 import style from './report-style'
 import ReportProperty from './ReportProperty'
 import EditReport from './EditReport'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
+import urls from '../../../api/urls'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
@@ -49,8 +51,12 @@ let Report = React.createClass({
       <hr/>
       <div style={style.center}>
         <div style={style.buttonRow}>
-          <RaisedButton label='Goal' primary={true} style={style.button} />
-          <RaisedButton label='Foul' primary={true} style={style.button} />
+          <Link to={urls.event.add(this.props.params.id, 'goal')}>
+            <RaisedButton label='Goal' primary={true} style={style.button} />
+          </Link>
+          <Link to={urls.event.add(this.props.params.id, 'foul')}>
+            <RaisedButton label='Foul' primary={true} style={style.button} />
+          </Link>
         </div>
         <div style={style.buttonRow}>
           <RaisedButton label='Yellow card' primary={true} style={style.button} />
