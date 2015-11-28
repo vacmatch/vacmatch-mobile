@@ -26,8 +26,8 @@ let TabList = React.createClass({
         return <Tab key={'tab-' + index} label={tab}>
           <List key={'list-' + index}>
           {
-            this.props.tabsItems[index].map(item => {
-              return <Item key={item.id}>{item}</Item>
+            this.props.tabsItems[index].map((item, itemIndex) => {
+              return <Item key={index + '-' + itemIndex} id={index + '-' + itemIndex}>{item}</Item>
             })
           }
           </List>

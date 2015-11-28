@@ -2,11 +2,12 @@ import React from 'react'
 
 let Item = React.createClass({
   propTypes: {
-    children: React.PropTypes.element
+    children: React.PropTypes.arrayOf(React.PropTypes.element),
+    id: React.PropTypes.string
   },
 
   render: function () {
-    return <div>{this.props.children}</div>
+    return <div key={'item-' + this.props.id}>{this.props.children}</div>
   }
 })
 
