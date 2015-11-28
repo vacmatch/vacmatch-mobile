@@ -15,24 +15,26 @@ let EditReport = React.createClass({
     term: React.PropTypes.string
   },
 
-  _showDialog: function () {
-    this.refs.editDialog.show()
+  getInitialState: function () {
+    return {
+      dialogIsOpen: false
+    }
   },
 
-  _handleCancel: function () {
-    this.refs.editDialog.dismiss()
+  toggleDialog: function () {
+    this.setState({dialogIsOpen: !this.state.dialogIsOpen})
   },
 
   _handleCronoUpdate: function () {
     let time = this.refs.time.getValue()
     this.props.cronoUpdate(time)
-    this.refs.editDialog.dismiss()
+    this.toggleDialog()
   },
 
   _handleModifyTerm: function () {
     let term = this.refs.term.getValue()
-    this.props.termUpdate(parseInt(term, 10))
-    this.refs.editDialog.dismiss()
+    this.props.termUpdate(term)
+    this.toggleDialog()
   },
 
   render: function () {
@@ -40,17 +42,17 @@ let EditReport = React.createClass({
       <FlatButton
         label='Cancel'
         secondary={true}
-        onTouchTap={this._handleCancel} />
+        onTouchTap={this.toggleDialog} />
     ]
 
     return (
       <div>
-        <FlatButton label='Edit' primary={true} onClick={this._showDialog} />
+        <FlatButton label='Edit' primary={true} onClick={this.toggleDialog} />
         <Dialog ref='editDialog'
           title='Edit report'
           actions={customActions}
-          isOpen={customActions}>
-          <div style={style.container}>
+          open={this.state.dialogIsOpen}>
+          <div style={style.containerDialog}>
             <TextField ref='time'
               hintText='Insert time'
               floatingLabelText='Reset match time'
