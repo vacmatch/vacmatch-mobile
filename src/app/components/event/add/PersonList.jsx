@@ -5,7 +5,6 @@ import { History } from 'react-router'
 import PersonListStore from '../../../stores/PersonListStore'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
-import SportActions from '../../../actions/SportActions'
 
 import TabList from '../../generic/TabList'
 import urls from '../../../api/urls'
@@ -36,8 +35,6 @@ let PersonList = React.createClass({
     // Update players lists (local and visitor)
     ReportActions.updatePlayers(this.props.params.reportId,
       this.state.report.localTeam.id, this.state.report.visitorTeam.id)
-    // Update component for the required eventType
-    SportActions.updateEventComponent(this.props.params.eventType)
     // Update team names from this report
     ReportActions.updateReportTeams(this.props.params.reportId)
   },
@@ -52,26 +49,34 @@ let PersonList = React.createClass({
     let items = [
       [
         this.state.personList.localPeople.map(person => {
-          let element = this.state.sport.eventComponent
+          let event = this.state.sport.getEventByType(this.props.params.eventType)
           let properties =
             {
-              key: 'event-' + person.id,
+              key: 'eventLocal-' + person.id,
               person: person,
+              eventTitle: event.title,
+              eventSubtitle: event.subtitle,
+              eventType: event.type,
+              causeList: event.causes,
               handleEventSubmit: this._handleEventSubmit
             }
-          return React.cloneElement(element, properties)
+          return React.cloneElement(event.component, properties)
         })
       ],
       [
         this.state.personList.visitorPeople.map(person => {
-          let element = this.state.sport.eventComponent
+          let event = this.state.sport.getEventByType(this.props.params.eventType)
           let properties =
             {
-              key: 'event-' + person.id,
+              key: 'eventVisitor-' + person.id,
               person: person,
+              eventTitle: event.title,
+              eventSubtitle: event.subtitle,
+              eventType: event.type,
+              causeList: event.causes,
               handleEventSubmit: this._handleEventSubmit
             }
-          return React.cloneElement(element, properties)
+          return React.cloneElement(event.component, properties)
         })
       ]
     ]
