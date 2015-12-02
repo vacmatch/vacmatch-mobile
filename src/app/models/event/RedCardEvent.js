@@ -1,5 +1,5 @@
 import React from 'react'
-import Event from '../../components/eventType/Event'
+import EventWithCause from '../../components/eventType/EventWithCause'
 import SportEvent from './SportEvent'
 
 class RedCardEvent extends SportEvent {
@@ -8,8 +8,8 @@ class RedCardEvent extends SportEvent {
     this.type = 'red-card'
     this.title = 'Red Card'
     this.subtitle = 'red card'
-    this.causes = []
-    this.component = <Event/>
+    this.causes = ['Insult', 'Aggression', 'Kick', 'Referee aggression']
+    this.component = <EventWithCause/>
   }
 }
 

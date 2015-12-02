@@ -27,7 +27,6 @@ let PersonList = React.createClass({
   },
 
   _handleEventSubmit: function () {
-    // TODO: Add a snackbar
     this.history.pushState(null, urls.report.show(this.props.params.reportId))
   },
 
@@ -53,6 +52,8 @@ let PersonList = React.createClass({
           let properties =
             {
               key: 'eventLocal-' + person.id,
+              reportId: this.props.params.reportId,
+              matchTime: this.state.report.timer.ms,
               person: person,
               eventTitle: event.title,
               eventSubtitle: event.subtitle,
@@ -69,6 +70,8 @@ let PersonList = React.createClass({
           let properties =
             {
               key: 'eventVisitor-' + person.id,
+              reportId: this.props.params.reportId,
+              matchTime: this.state.report.timer.ms,
               person: person,
               eventTitle: event.title,
               eventSubtitle: event.subtitle,
