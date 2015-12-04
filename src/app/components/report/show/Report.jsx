@@ -9,12 +9,13 @@ import EditReport from './EditReport'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
 import urls from '../../../api/urls'
+import SportStore from '../../../stores/SportStore'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
 
 let Report = React.createClass({
-  mixins: [Reflux.connect(ReportStore, 'report')],
+  mixins: [Reflux.connect(ReportStore, 'report'), Reflux.connect(SportStore, 'sport')],
 
   propTypes: {
     params: React.PropTypes.shape({
@@ -31,6 +32,21 @@ let Report = React.createClass({
     if (this.state.report.isPlaying) {
       playButtonLabel = 'Stop'
     }
+
+    let events = (
+      this.state.sport.getEvents().map((e, index) => {
+        if (index % 2) {
+          return <Link to={urls.event.add(this.props.params.id, e.type)}>
+              <RaisedButton label={e.title} primary={true} style={style.button}/>
+              <br/><br/>
+            </Link>
+        } else {
+          return <Link to={urls.event.add(this.props.params.id, e.type)}>
+              <RaisedButton label={e.title} primary={true} style={style.button}/>
+            </Link>
+        }
+      })
+    )
 
     return <div>
       <div style={style.center}>
@@ -51,16 +67,7 @@ let Report = React.createClass({
       <hr/>
       <div style={style.center}>
         <div style={style.buttonRow}>
-          <Link to={urls.event.add(this.props.params.id, 'goal')}>
-            <RaisedButton label='Goal' primary={true} style={style.button} />
-          </Link>
-          <Link to={urls.event.add(this.props.params.id, 'foul')}>
-            <RaisedButton label='Foul' primary={true} style={style.button} />
-          </Link>
-        </div>
-        <div style={style.buttonRow}>
-          <RaisedButton label='Yellow card' primary={true} style={style.button} />
-          <RaisedButton label='Red card' primary={true} style={style.button} />
+          {events}
         </div>
       </div>
     </div>

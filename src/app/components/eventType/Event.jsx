@@ -7,10 +7,14 @@ let Avatar = mui.Avatar
 let ListItem = mui.ListItem
 let FlatButton = mui.FlatButton
 
-let Goal = React.createClass({
+let Event = React.createClass({
 
   propTypes: {
     person: React.PropTypes.object,
+    eventTitle: React.PropTypes.string,
+    eventSubtitle: React.PropTypes.string,
+    eventType: React.PropTypes.string,
+    causeList: React.PropTypes.array,
     handleEventSubmit: React.PropTypes.func,
     params: React.PropTypes.shape({
       reportId: React.PropTypes.string
@@ -39,10 +43,10 @@ let Goal = React.createClass({
     let avatarUrl = this.props.person.avatarUrl
 
     return (
-    <div key={'goal-' + this.props.person.id}>
+    <div key={'event-' + this.props.person.id}>
       <Dialog
         ref='eventDialog'
-        title='Goal'
+        title={this.props.eventTitle}
         open={this.state.dialogIsOpen}
         actions={
           [
@@ -61,7 +65,7 @@ let Goal = React.createClass({
         actionFocus='submit'>
         <hr/>
         <p>
-          You are going to add a <b>goal</b> to:</p>
+          You are going to add a <b>{this.props.eventSubtitle}</b> to:</p>
         <h4>Dorsal: {personDorsal}</h4>
         <h4>{personName}</h4>
       </Dialog>
@@ -74,4 +78,4 @@ let Goal = React.createClass({
   }
 })
 
-module.exports = Goal
+module.exports = Event
