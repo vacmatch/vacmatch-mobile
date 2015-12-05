@@ -8,6 +8,9 @@ let urls = {
     }
   },
   event: {
+    list: function (reportId) {
+      return 'events/' + reportId + '/'
+    },
     add: function (reportId, eventType) {
       return 'addEvent/' + reportId + '/' + eventType
     }

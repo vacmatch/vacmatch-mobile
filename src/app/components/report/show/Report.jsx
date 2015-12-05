@@ -63,6 +63,9 @@ let Report = React.createClass({
         <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
         <EditReport cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
            termUpdate={ReportActions.updateTerm} term={this.state.report.term}/>
+         <Link to={urls.event.list(this.props.params.id)}>
+          <RaisedButton label='Events' secondary={true} style={style.button}/>
+        </Link>
       </div>
       <hr/>
       <div style={style.center}>

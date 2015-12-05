@@ -7,6 +7,7 @@ import Home from './components/home'
 import ReportList from './components/report/list/ReportList'
 import Report from './components/report/show/Report'
 import PersonList from './components/event/add/PersonList'
+import EventList from './components/event/list/EventList'
 
 // Routes
 let routes = (
@@ -16,6 +17,7 @@ let routes = (
     <Route path='/reports' component={ReportList}/>
     <Route path='/report/:id' component={Report}/>
     <Route path='/addEvent/:reportId/:eventType' component={PersonList}/>
+    <Route path='/events/:reportId' component={EventList}/>
   </Route>
 )
 
