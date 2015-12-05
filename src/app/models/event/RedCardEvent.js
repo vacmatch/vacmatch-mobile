@@ -9,6 +9,7 @@ class RedCardEvent extends SportEvent {
     this.title = 'Red Card'
     this.subtitle = 'red card'
     this.causes = ['Insult', 'Aggression', 'Kick', 'Referee aggression']
+    this.iconClass = 'fa fa-sticky-note'
     this.component = <EventWithCause/>
   }
 }

@@ -29,6 +29,18 @@ class Soccer extends Sport {
     })
     return event
   }
+
+  getIconByType (eventType) {
+    // By default returns a Goal Event
+    let event = 'fa fa-times-circle'
+    this.events.map(e => {
+      if (e.areYou(eventType)) {
+        event = e
+      }
+    })
+    return event.iconClass
+  }
+
 }
 
 module.exports = Soccer
