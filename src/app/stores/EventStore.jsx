@@ -21,9 +21,9 @@ let EventStore = Reflux.createStore({
     })
   },
 
-  onAddEvent: function (reportId, eventType, matchTime, cause, callback) {
+  onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
     let timestamp = Date.now()
-    EventService.save(reportId, eventType, matchTime, cause, timestamp, function (data, err) {
+    EventService.save(reportId, person, team, eventType, matchTime, cause, timestamp, function (data, err) {
       if (!err) {
         callback(data)
       }

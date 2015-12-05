@@ -10,6 +10,8 @@ let PersonService = {
         'id': '1',
         'name': 'Fulano local',
         'dorsal': '1',
+        'teamId': '1',
+        'teamName': 'Carnicería Ángel',
         'reportId': '1',
         'avatarUrl': 'http://lorempixel.com/200/200/sports/'
       }
