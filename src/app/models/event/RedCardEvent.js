@@ -12,6 +12,10 @@ class RedCardEvent extends SportEvent {
     this.iconClass = 'fa fa-sticky-note'
     this.component = <EventWithCause/>
   }
+
+  isControl () {
+    return false
+  }
 }
 
 module.exports = RedCardEvent

@@ -3,12 +3,17 @@ import mui from 'material-ui'
 
 import style from './report-style'
 
+import ChangeTermEvent from '../../../models/event/control/ChangeTermEvent'
+
+import EventActions from '../../../actions/EventActions'
+
 let FlatButton = mui.FlatButton
 let Dialog = mui.Dialog
 let TextField = mui.TextField
 
 let EditReport = React.createClass({
   propTypes: {
+    reportId: React.PropTypes.string,
     cronoUpdate: React.PropTypes.func,
     termUpdate: React.PropTypes.func,
     time: React.PropTypes.string,
@@ -33,8 +38,11 @@ let EditReport = React.createClass({
 
   _handleModifyTerm: function () {
     let term = this.refs.term.getValue()
-    this.props.termUpdate(term)
-    this.toggleDialog()
+    let event = new ChangeTermEvent()
+    EventActions.addControlEvent(this.props.reportId, event.type, this.props.time, term, () => {
+      this.props.termUpdate(term)
+      this.toggleDialog()
+    })
   },
 
   render: function () {

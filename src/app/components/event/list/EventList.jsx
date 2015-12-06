@@ -31,19 +31,33 @@ let PersonList = React.createClass({
   render: function () {
     let items = [
       this.state.events.map(event => {
-        return <ListItem
-          leftAvatar={
-            <FontIcon className={this.state.sport.getIconByType(event.type)} />
-          }
-          primaryText={<b>{'(' + event.person.dorsal + ') ' + event.person.name}</b>}
-          secondaryTextLines={2}
-          secondaryText={
-            <p>
-              {event.team.name}
-            <br/>
-              <i>{CronoUtils.milisecondsToString(event.matchTime) + ' - ' + event.text}</i>
-            </p>
-          } />
+        let element = this.state.sport.getEventByType(event.type)
+        // Control events
+        if (element.isControl()) {
+          return <ListItem
+            leftAvatar={
+              <FontIcon className={this.state.sport.getIconByType(event.type)} />
+            }
+            primaryText={<b>{element.title}
+            </b>}
+            secondaryText={event.text}
+            />
+        // Sport events
+        } else {
+          return <ListItem
+            leftAvatar={
+              <FontIcon className={this.state.sport.getIconByType(event.type)} />
+            }
+            primaryText={<b>{'(' + event.person.dorsal + ') ' + event.person.name}</b>}
+            secondaryTextLines={2}
+            secondaryText={
+              <p>
+                {event.team.name}
+              <br/>
+                <i>{CronoUtils.milisecondsToString(event.matchTime) + ' - ' + event.text}</i>
+              </p>
+            } />
+        }
       })
     ]
     return <List>

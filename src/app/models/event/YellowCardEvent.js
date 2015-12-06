@@ -12,6 +12,10 @@ class YellowCardEvent extends SportEvent {
     this.iconClass = 'fa fa-sticky-note-o'
     this.component = <EventWithCause/>
   }
+
+  isControl () {
+    return false
+  }
 }
 
 module.exports = YellowCardEvent

@@ -7,6 +7,8 @@ class SportEvent {
   areYou (eventType) {
     return eventType === this.type
   }
+
+  isControl () {}
 }
 
 module.exports = SportEvent

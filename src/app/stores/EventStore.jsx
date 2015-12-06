@@ -28,8 +28,16 @@ let EventStore = Reflux.createStore({
         callback(data)
       }
     })
-  }
+  },
 
+  onAddControlEvent: function (reportId, eventType, matchTime, text, callback) {
+    let timestamp = Date.now()
+    EventService.saveControl(reportId, eventType, matchTime, text, timestamp, function (data, err) {
+      if (!err) {
+        callback(data)
+      }
+    })
+  }
 })
 
 module.exports = EventStore

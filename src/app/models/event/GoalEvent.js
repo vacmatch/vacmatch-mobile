@@ -12,6 +12,10 @@ class GoalEvent extends SportEvent {
     this.iconClass = 'fa fa-futbol-o'
     this.component = <Event/>
   }
+
+  isControl () {
+    return false
+  }
 }
 
 module.exports = GoalEvent

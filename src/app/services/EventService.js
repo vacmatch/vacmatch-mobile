@@ -37,6 +37,28 @@ let EventService = {
     })
   },
 
+  saveControl: function (reportId, eventType, matchTime, text, timestamp, callback) {
+    this.getLastId(function (id) {
+      let element = {
+        '_id': id.toString(),
+        'type': eventType,
+        'matchTime': matchTime,
+        'text': text,
+        'reportId': reportId,
+        // TODO: Add user which create the event
+        'timestamp': timestamp
+      }
+      db.put(element).then(function (response) {
+        db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
+          callback(doc.rows[0], null)
+        })
+      }).catch(function (err) {
+        console.log('err: ', err)
+        callback(null, err)
+      })
+    })
+  },
+
   getLastId: function (callback) {
     db.allDocs({limit: 0}).then(function (doc) {
       callback(doc.total_rows)
