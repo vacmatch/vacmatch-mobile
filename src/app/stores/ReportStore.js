@@ -3,6 +3,9 @@ import Stopwatch from 'timer-stopwatch'
 
 import ReportActions from '../actions/ReportActions'
 import ReportService from '../services/ReportService'
+import EventService from '../services/EventService'
+
+import ChangeTermEvent from '../models/event/control/ChangeTermEvent'
 
 import CronoUtils from './CronoUtils'
 
@@ -31,10 +34,16 @@ let ReportStore = Reflux.createStore({
   },
 
   onUpdateReportTeams: function (reportId) {
-    ReportService.find(reportId, (report) => {
-      this.state.localTeam = report.doc.localTeam
-      this.state.visitorTeam = report.doc.visitorTeam
-      this.trigger(this.state)
+    let event = new ChangeTermEvent()
+    // Update term
+    EventService.findAllByReportIdAndEventType(reportId, event.type, (events) => {
+      this.state.term = events[0].text
+      // Update Teams
+      ReportService.find(reportId, (report) => {
+        this.state.localTeam = report.doc.localTeam
+        this.state.visitorTeam = report.doc.visitorTeam
+        this.trigger(this.state)
+      })
     })
   },
 

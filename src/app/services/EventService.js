@@ -65,12 +65,19 @@ let EventService = {
     })
   },
 
-  findAllByReportID: function (reportId, callback) {
+  findAllByReportId: function (reportId, callback) {
     db.createIndex({
-      index: {fields: ['reportId']}
+      index: {fields: ['timestamp', 'reportId']}
     }).then(function () {
       return db.find({
-        selector: {reportId: {$eq: reportId}}
+        selector: {
+          timestamp: {$exists: true},
+          reportId: {$eq: reportId}
+        },
+        sort: [
+          {'timestamp': 'desc'},
+          {'reportId': 'asc'}
+        ]
       })
     }).then(function (result) {
       callback(result.docs)
@@ -79,16 +86,24 @@ let EventService = {
 
   findAllByReportIdAndEventType: function (reportId, eventType, callback) {
     db.createIndex({
-      index: {fields: ['reportId', 'type']}
+      index: {
+        fields: ['timestamp', 'reportId', 'type']
+      }
     }).then(function () {
       return db.find({
         selector: {
+          timestamp: {$exists: true},
           reportId: {$eq: reportId},
           type: {$eq: eventType}
-        }
+        },
+        sort: [
+          {'timestamp': 'desc'},
+          {'reportId': 'asc'},
+          {'type': 'asc'}
+        ]
       })
     }).then(function (result) {
-      callback(result)
+      callback(result.docs)
     })
   }
 }
