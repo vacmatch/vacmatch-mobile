@@ -6,6 +6,7 @@ import RedCardEvent from '../event/RedCardEvent'
 
 import ChangeTermEvent from '../event/control/ChangeTermEvent'
 import StartMatchEvent from '../event/control/StartMatchEvent'
+import EndMatchEvent from '../event/control/EndMatchEvent'
 
 import Sport from './Sport'
 
@@ -20,7 +21,8 @@ class Soccer extends Sport {
     ]
     this.controlEvents = [
       new ChangeTermEvent(),
-      new StartMatchEvent()
+      new StartMatchEvent(),
+      new EndMatchEvent()
     ]
   }
 

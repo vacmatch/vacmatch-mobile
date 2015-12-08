@@ -14,6 +14,12 @@ let EventStore = Reflux.createStore({
     return this.state
   },
 
+  onGetEventsByReportIdAndType: function (reportId, eventType, callback) {
+    EventService.findAllByReportIdAndEventType(reportId, eventType, function (data) {
+      callback(data)
+    })
+  },
+
   onUpdateEventList: function (reportId) {
     EventService.findAllByReportId(reportId, (data) => {
       this.state = data

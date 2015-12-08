@@ -12,13 +12,20 @@ import EventActions from '../../../actions/EventActions'
 import urls from '../../../api/urls'
 import SportStore from '../../../stores/SportStore'
 import StartMatchEvent from '../../../models/event/control/StartMatchEvent'
+import MenuStore from '../../../stores/MenuStore'
+import MenuActions from '../../../actions/MenuActions'
+import EndMatchDialog from './EndMatchDialog'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
 let Snackbar = mui.Snackbar
 
 let Report = React.createClass({
-  mixins: [Reflux.connect(ReportStore, 'report'), Reflux.connect(SportStore, 'sport')],
+  mixins: [
+    Reflux.connect(ReportStore, 'report'),
+    Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(MenuStore, 'menu')
+  ],
 
   propTypes: {
     params: React.PropTypes.shape({
@@ -27,10 +34,24 @@ let Report = React.createClass({
   },
 
   getInitialState: function () {
-    return {snackbarMessage: ''}
+    return {
+      snackbarMessage: ''
+    }
+  },
+
+  // Add elements to the rigth menu in the AppBar
+  addRigthMenuElements: function (elements) {
+    let rightMenuElements = []
+    elements.map(e => rightMenuElements.push(e))
+    // Set right menu buttons in AppBar
+    MenuActions.setRightMenu(rightMenuElements)
   },
 
   componentWillMount: function () {
+    let rightMenuElements = []
+    // Set right menu buttons in AppBar
+    this.addRigthMenuElements(rightMenuElements)
+    // Update report state
     ReportActions.updateReport(this.props.params.id)
   },
 
@@ -102,6 +123,9 @@ let Report = React.createClass({
         ref='snack'
         message={this.state.snackbarMessage}
         autoHideDuration={4000} />
+
+      <EndMatchDialog reportId={this.props.params.id}
+        matchTime={this.state.report.timer.ms} addMenuElements={this.addRigthMenuElements}/>
     </div>
   }
 

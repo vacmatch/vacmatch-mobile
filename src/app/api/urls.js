@@ -5,6 +5,9 @@ let urls = {
     list: 'reports/',
     show: function (reportId) {
       return 'report/' + reportId
+    },
+    end: function (reportId) {
+      return 'end/report/' + reportId
     }
   },
   event: {
