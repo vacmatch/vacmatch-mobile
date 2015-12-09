@@ -24,12 +24,14 @@ let ReportService = {
       localTeam: {
         id: localTeam.id,
         teamName: localTeam.teamName,
-        result: localTeam.result
+        result: localTeam.result,
+        secondaryField: localTeam.secondaryField
       },
       visitorTeam: {
         id: visitorTeam.id,
         teamName: visitorTeam.teamName,
-        result: visitorTeam.result
+        result: visitorTeam.result,
+        secondaryField: visitorTeam.secondaryField
       }
     }
     db.post(report).then(function (response) {
@@ -49,9 +51,11 @@ let ReportService = {
       element.localTeam.id = localTeam.id
       element.localTeam.teamName = localTeam.teamName
       element.localTeam.result = localTeam.result
+      element.localTeam.secondaryField = localTeam.secondaryField
       element.visitorTeam.id = visitorTeam.id
       element.visitorTeam.teamName = visitorTeam.teamName
       element.visitorTeam.result = visitorTeam.result
+      element.visitorTeam.secondaryField = visitorTeam.secondaryField
 
       db.put(element).then(function (response) {
         db.allDocs({key: response.id, include_docs: true}).then(function (docs) {

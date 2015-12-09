@@ -34,12 +34,14 @@ let ReportList = React.createClass({
       localTeam: {
         id: 1,
         teamName: 'Carnicería Angel',
-        result: 0
+        result: 0,
+        secondaryField: 0
       },
       visitorTeam: {
         id: 2,
         teamName: 'Aspic',
-        result: 0
+        result: 0,
+        secondaryField: 0
       }
     }
     ReportActions.addReport(defaultReport.date, defaultReport.location,

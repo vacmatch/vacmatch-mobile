@@ -9,6 +9,7 @@ import EventService from '../services/EventService'
 import ChangeTermEvent from '../models/event/control/ChangeTermEvent'
 import StartMatchEvent from '../models/event/control/StartMatchEvent'
 import GoalEvent from '../models/event/GoalEvent'
+import FoulEvent from '../models/event/FoulEvent'
 
 import CronoUtils from './CronoUtils'
 
@@ -23,12 +24,14 @@ let ReportStore = Reflux.createStore({
       localTeam: {
         id: null,
         teamName: 'Local',
-        result: 0
+        result: 0,
+        secondaryField: 0
       },
       visitorTeam: {
         id: null,
         teamName: 'Visitor',
-        result: 0
+        result: 0,
+        secondaryField: 0
       },
       isPlaying: false,
       hasStarted: false,
@@ -92,24 +95,50 @@ let ReportStore = Reflux.createStore({
     this.trigger(this.state)
   },
 
+  updateGoals: function (reportId, team) {
+    // New result, state is updated when DB is updated too
+    if (team.id === this.state.localTeam.id) {
+      this.state.localTeam.result = this.state.localTeam.result + 1
+    }
+    if (team.id === this.state.visitorTeam.id) {
+      this.state.visitorTeam.result = this.state.visitorTeam.result + 1
+    }
+    // Update result in DB
+    ReportService.update(reportId, this.state.date, this.state.location,
+      this.state.localTeam, this.state.visitorTeam, (newReport) => {
+        // Update state
+        this.state.localTeam.result = newReport.localTeam.result
+        this.state.visitorTeam.result = newReport.visitorTeam.result
+        this.trigger(this.state)
+      })
+  },
+
+  updateFouls: function (reportId, team) {
+    // New result, state is updated when DB is updated too
+    if (team.id === this.state.localTeam.id) {
+      this.state.localTeam.secondaryField = this.state.localTeam.secondaryField + 1
+    }
+    if (team.id === this.state.visitorTeam.id) {
+      this.state.visitorTeam.secondaryField = this.state.visitorTeam.secondaryField + 1
+    }
+    // Update result in DB
+    ReportService.update(reportId, this.state.date, this.state.location,
+      this.state.localTeam, this.state.visitorTeam, (newReport) => {
+        // Update state
+        this.state.localTeam.secondaryField = newReport.localTeam.secondaryField
+        this.state.visitorTeam.secondaryField = newReport.visitorTeam.secondaryField
+        this.trigger(this.state)
+      })
+  },
+
   onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
     let goalEvent = new GoalEvent()
     if (eventType === goalEvent.type) {
-      // New result, state is updated when DB is updated too
-      if (team.id === this.state.localTeam.id) {
-        this.state.localTeam.result = this.state.localTeam.result + 1
-      }
-      if (team.id === this.state.visitorTeam.id) {
-        this.state.visitorTeam.result = this.state.visitorTeam.result + 1
-      }
-      // Update result in DB
-      ReportService.update(reportId, this.state.date, this.state.location,
-        this.state.localTeam, this.state.visitorTeam, (newReport) => {
-          // Update state
-          this.state.localTeam.result = newReport.localTeam.result
-          this.state.visitorTeam.result = newReport.visitorTeam.result
-          this.trigger(this.state)
-        })
+      this.updateGoals(reportId, team)
+    }
+    let foulEvent = new FoulEvent()
+    if (eventType === foulEvent.type) {
+      this.updateFouls(reportId, team)
     }
   }
 

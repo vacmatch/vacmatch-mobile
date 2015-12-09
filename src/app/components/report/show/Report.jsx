@@ -104,7 +104,9 @@ let Report = React.createClass({
       </div>
       <div style={style.container}>
         <ReportProperty name={'Term'} value={this.state.report.term} isPrimary={false} />
-        <ReportProperty name={'Fouls'} value={'3 - 3'} isPrimary={false} />
+        <ReportProperty name={'Fouls'}
+          value={this.state.report.localTeam.secondaryField + ' - ' + this.state.report.visitorTeam.secondaryField}
+          isPrimary={false} />
       </div>
       <div style={style.center}>
         <ReportProperty value={this.state.report.time} isPrimary={true} />
