@@ -29,14 +29,21 @@ let ReportList = React.createClass({
 
   handleAdd: function () {
     let defaultReport = {
-      'localTeam': {
-        'teamName': 'Carnicería Angel'
+      date: '',
+      location: '',
+      localTeam: {
+        id: 1,
+        teamName: 'Carnicería Angel',
+        result: 0
       },
-      'visitorTeam': {
-        'teamName': 'Aspic'
+      visitorTeam: {
+        id: 2,
+        teamName: 'Aspic',
+        result: 0
       }
     }
-    ReportActions.addReport(defaultReport)
+    ReportActions.addReport(defaultReport.date, defaultReport.location,
+      defaultReport.localTeam, defaultReport.visitorTeam)
   },
 
   handleDelete: function (id) {
