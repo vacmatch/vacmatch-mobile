@@ -6,6 +6,7 @@ import ReportService from '../services/ReportService'
 import EventService from '../services/EventService'
 
 import ChangeTermEvent from '../models/event/control/ChangeTermEvent'
+import StartMatchEvent from '../models/event/control/StartMatchEvent'
 
 import CronoUtils from './CronoUtils'
 
@@ -23,6 +24,7 @@ let ReportStore = Reflux.createStore({
         teamName: 'Visitor'
       },
       isPlaying: false,
+      hasStarted: false,
       timer: new Stopwatch(1200000),
       time: CronoUtils.milisecondsToString(1200000),
       term: '1'
@@ -33,16 +35,21 @@ let ReportStore = Reflux.createStore({
     return this.state
   },
 
-  onUpdateReportTeams: function (reportId) {
-    let event = new ChangeTermEvent()
-    // Update term
-    EventService.findAllByReportIdAndEventType(reportId, event.type, (events) => {
-      this.state.term = events[0].text
-      // Update Teams
-      ReportService.find(reportId, (report) => {
-        this.state.localTeam = report.doc.localTeam
-        this.state.visitorTeam = report.doc.visitorTeam
-        this.trigger(this.state)
+  onUpdateReport: function (reportId) {
+    let termEvent = new ChangeTermEvent()
+    let startEvent = new StartMatchEvent()
+    // Check if match has started
+    EventService.findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
+      this.state.hasStarted = (startEvents.length > 0)
+      // Update term
+      EventService.findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
+        this.state.term = termEvents[0].text
+        // Update Teams
+        ReportService.find(reportId, (report) => {
+          this.state.localTeam = report.doc.localTeam
+          this.state.visitorTeam = report.doc.visitorTeam
+          this.trigger(this.state)
+        })
       })
     })
   },
@@ -68,6 +75,11 @@ let ReportStore = Reflux.createStore({
 
   onUpdateTerm: function (newTerm) {
     this.state.term = newTerm
+    this.trigger(this.state)
+  },
+
+  onToggleStartMatch: function () {
+    this.state.hasStarted = !this.state.hasStarted
     this.trigger(this.state)
   }
 

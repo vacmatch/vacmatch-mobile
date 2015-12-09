@@ -8,14 +8,24 @@ import ReportProperty from './ReportProperty'
 import EditReport from './EditReport'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
+import EventActions from '../../../actions/EventActions'
 import urls from '../../../api/urls'
 import SportStore from '../../../stores/SportStore'
+import StartMatchEvent from '../../../models/event/control/StartMatchEvent'
+import MenuStore from '../../../stores/MenuStore'
+import MenuActions from '../../../actions/MenuActions'
+import EndMatchDialog from './EndMatchDialog'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
+let Snackbar = mui.Snackbar
 
 let Report = React.createClass({
-  mixins: [Reflux.connect(ReportStore, 'report'), Reflux.connect(SportStore, 'sport')],
+  mixins: [
+    Reflux.connect(ReportStore, 'report'),
+    Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(MenuStore, 'menu')
+  ],
 
   propTypes: {
     params: React.PropTypes.shape({
@@ -23,16 +33,52 @@ let Report = React.createClass({
     })
   },
 
+  getInitialState: function () {
+    return {
+      snackbarMessage: ''
+    }
+  },
+
+  // Add elements to the rigth menu in the AppBar
+  addRigthMenuElements: function (elements) {
+    let rightMenuElements = []
+    elements.map(e => rightMenuElements.push(e))
+    // Set right menu buttons in AppBar
+    MenuActions.setRightMenu(rightMenuElements)
+  },
+
   componentWillMount: function () {
-    ReportActions.updateReportTeams(this.props.params.id)
+    let rightMenuElements = []
+    // Set right menu buttons in AppBar
+    this.addRigthMenuElements(rightMenuElements)
+    // Update report state
+    ReportActions.updateReport(this.props.params.id)
+  },
+
+  _handleStartMatch: function () {
+    // Create start match control event
+    let event = new StartMatchEvent()
+    EventActions.addControlEvent(this.props.params.id, event.type, this.state.report.timer.ms, '', () => {
+      // Set match has started in state
+      ReportActions.toggleStartMatch()
+      this.setState({snackbarMessage: 'Match started'})
+      this.refs.snack.show()
+    })
   },
 
   render: function () {
-    let playButtonLabel = 'Play'
-    if (this.state.report.isPlaying) {
-      playButtonLabel = 'Stop'
+    // For start match event creation
+    let playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
+    // If Match has started
+    if (this.state.report.hasStarted) {
+      let playButtonLabel = 'Play'
+      if (this.state.report.isPlaying) {
+        playButtonLabel = 'Stop'
+      }
+      playButton = <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
     }
 
+    // Create Sport Events, only 2 for each row
     let events = (
       this.state.sport.getEvents().map((e, index) => {
         if (index % 2) {
@@ -60,7 +106,7 @@ let Report = React.createClass({
       </div>
       <div style={style.center}>
         <ReportProperty value={this.state.report.time} isPrimary={true} />
-        <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
+        {playButton}
         <EditReport reportId={this.props.params.id} cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
            termUpdate={ReportActions.updateTerm} term={this.state.report.term}/>
          <Link to={urls.event.list(this.props.params.id)}>
@@ -73,6 +119,13 @@ let Report = React.createClass({
           {events}
         </div>
       </div>
+      <Snackbar
+        ref='snack'
+        message={this.state.snackbarMessage}
+        autoHideDuration={4000} />
+
+      <EndMatchDialog reportId={this.props.params.id}
+        matchTime={this.state.report.timer.ms} addMenuElements={this.addRigthMenuElements}/>
     </div>
   }
 

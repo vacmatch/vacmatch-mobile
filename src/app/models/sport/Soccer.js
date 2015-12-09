@@ -1,9 +1,12 @@
+import SportEvent from '../event/SportEvent'
 import GoalEvent from '../event/GoalEvent'
 import FoulEvent from '../event/FoulEvent'
 import YellowCardEvent from '../event/YellowCardEvent'
 import RedCardEvent from '../event/RedCardEvent'
 
 import ChangeTermEvent from '../event/control/ChangeTermEvent'
+import StartMatchEvent from '../event/control/StartMatchEvent'
+import EndMatchEvent from '../event/control/EndMatchEvent'
 
 import Sport from './Sport'
 
@@ -17,7 +20,9 @@ class Soccer extends Sport {
       new RedCardEvent()
     ]
     this.controlEvents = [
-      new ChangeTermEvent()
+      new ChangeTermEvent(),
+      new StartMatchEvent(),
+      new EndMatchEvent()
     ]
   }
 
@@ -26,8 +31,8 @@ class Soccer extends Sport {
   }
 
   getEventByType (eventType) {
-    // By default returns a Goal Event
-    let event = new GoalEvent()
+    // By default returns a SportEvent
+    let event = new SportEvent()
     this.events.map(e => {
       if (e.areYou(eventType)) {
         event = e

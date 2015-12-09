@@ -35,7 +35,7 @@ let PersonList = React.createClass({
     ReportActions.updatePlayers(this.props.params.reportId,
       this.state.report.localTeam.id, this.state.report.visitorTeam.id)
     // Update team names from this report
-    ReportActions.updateReportTeams(this.props.params.reportId)
+    ReportActions.updateReport(this.props.params.reportId)
   },
 
   render: function () {

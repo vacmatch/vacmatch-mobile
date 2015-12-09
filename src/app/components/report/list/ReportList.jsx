@@ -5,6 +5,8 @@ import mui from 'material-ui'
 import ReportItem from './ReportItem'
 import ReportListStore from '../../../stores/ReportListStore'
 import ReportActions from '../../../actions/ReportActions'
+import MenuStore from '../../../stores/MenuStore'
+import MenuActions from '../../../actions/MenuActions'
 
 let List = mui.List
 let FlatButton = mui.FlatButton
@@ -12,9 +14,16 @@ let Tabs = mui.Tabs
 let Tab = mui.Tab
 
 let ReportList = React.createClass({
-  mixins: [Reflux.connect(ReportListStore, 'reportList')],
+  mixins: [
+    Reflux.connect(ReportListStore, 'reportList'),
+    Reflux.connect(MenuStore, 'menu')
+  ],
 
   componentWillMount: function () {
+    let rightMenuElements = []
+    // Set right menu buttons in AppBar
+    MenuActions.setRightMenu(rightMenuElements)
+    // Update report lists
     ReportActions.updateLists()
   },
 
