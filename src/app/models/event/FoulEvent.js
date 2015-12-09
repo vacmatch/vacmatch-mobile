@@ -12,6 +12,10 @@ class FoulEvent extends SportEvent {
     this.iconClass = 'fa fa-gavel'
     this.component = <Event/>
   }
+
+  isControl () {
+    return false
+  }
 }
 
 module.exports = FoulEvent
