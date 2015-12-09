@@ -9,6 +9,7 @@ class FoulEvent extends SportEvent {
     this.title = 'Foul'
     this.subtitle = 'foul'
     this.causes = []
+    this.iconClass = 'fa fa-gavel'
     this.component = <Event/>
   }
 }

@@ -5,16 +5,26 @@ var db = new PouchDB('events')
 
 let EventService = {
 
-  save: function (reportId, eventType, matchTime, cause, timestamp, callback) {
+  save: function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
     this.getLastId(function (id) {
       let element = {
         '_id': id.toString(),
-        'reportId': reportId,
         'type': eventType,
         'matchTime': matchTime,
         'text': cause,
-        'timestamp': timestamp
+        'reportId': reportId,
+        'person': {
+          'id': person.id,
+          'name': person.name,
+          'dorsal': person.dorsal,
+          'avatarUrl': person.avatarUrl
+        },
+        'team': {
+          'id': team.id,
+          'name': team.teamName
+        },
         // TODO: Add user which create the event
+        'timestamp': timestamp
       }
       db.put(element).then(function (response) {
         db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
@@ -59,7 +69,6 @@ let EventService = {
       callback(result)
     })
   }
-
 }
 
 module.exports = EventService

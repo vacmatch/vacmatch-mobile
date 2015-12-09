@@ -21,6 +21,7 @@ let EventWithCause = React.createClass({
     reportId: React.PropTypes.string,
     matchTime: React.PropTypes.number,
     person: React.PropTypes.object,
+    team: React.PropTypes.object,
     eventTitle: React.PropTypes.string,
     eventSubtitle: React.PropTypes.string,
     eventType: React.PropTypes.string,
@@ -41,9 +42,9 @@ let EventWithCause = React.createClass({
 
   _onDialogSubmit: function () {
     // Add event to the db
-    EventActions.addEvent(this.props.reportId, this.props.eventType, this.props.matchTime, this.state.cause, (event) => {
+    EventActions.addEvent(this.props.reportId, this.props.person, this.props.team, this.props.eventType, this.props.matchTime, this.state.cause, (event) => {
       this.toggleDialog()
-      this.props.handleEventSubmit(event.type)
+      this.props.handleEventSubmit()
     })
   },
 

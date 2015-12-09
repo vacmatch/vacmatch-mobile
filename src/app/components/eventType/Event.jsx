@@ -6,24 +6,26 @@ let Dialog = mui.Dialog
 let Avatar = mui.Avatar
 let ListItem = mui.ListItem
 let FlatButton = mui.FlatButton
+import EventActions from '../../actions/EventActions'
 
 let Event = React.createClass({
 
   propTypes: {
+    reportId: React.PropTypes.string,
+    matchTime: React.PropTypes.number,
     person: React.PropTypes.object,
+    team: React.PropTypes.object,
     eventTitle: React.PropTypes.string,
     eventSubtitle: React.PropTypes.string,
     eventType: React.PropTypes.string,
     causeList: React.PropTypes.array,
-    handleEventSubmit: React.PropTypes.func,
-    params: React.PropTypes.shape({
-      reportId: React.PropTypes.string
-    })
+    handleEventSubmit: React.PropTypes.func
   },
 
   getInitialState: function () {
     return {
-      dialogIsOpen: false
+      dialogIsOpen: false,
+      cause: ''
     }
   },
 
@@ -32,9 +34,11 @@ let Event = React.createClass({
   },
 
   _onDialogSubmit: function () {
-    this.toggleDialog()
-    // TODO: Add event to the db
-    this.props.handleEventSubmit()
+    // Add event to the db
+    EventActions.addEvent(this.props.reportId, this.props.person, this.props.team, this.props.eventType, this.props.matchTime, this.state.cause, (event) => {
+      this.toggleDialog()
+      this.props.handleEventSubmit()
+    })
   },
 
   render: function () {
