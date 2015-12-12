@@ -82,12 +82,12 @@ let Report = React.createClass({
     let events = (
       this.state.sport.getEvents().map((e, index) => {
         if (index % 2) {
-          return <Link to={urls.event.add(this.props.params.id, e.type)}>
+          return <Link key={index} to={urls.event.add(this.props.params.id, e.type)}>
               <RaisedButton label={e.title} primary={true} style={style.button}/>
               <br/><br/>
             </Link>
         } else {
-          return <Link to={urls.event.add(this.props.params.id, e.type)}>
+          return <Link key={index} to={urls.event.add(this.props.params.id, e.type)}>
               <RaisedButton label={e.title} primary={true} style={style.button}/>
             </Link>
         }

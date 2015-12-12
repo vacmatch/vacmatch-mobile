@@ -48,33 +48,39 @@ let EditReport = React.createClass({
   render: function () {
     let customActions = [
       <FlatButton
+        key={'dialog-cancel'}
         label='Cancel'
         secondary={true}
         onTouchTap={this.toggleDialog} />
     ]
 
     return (
-      <div>
+      <div key={'dialog-div'}>
         <FlatButton label='Edit' primary={true} onClick={this.toggleDialog} />
-        <Dialog ref='editDialog'
+        <Dialog key={'dialog-edit-report'}
+          ref='editDialog'
           title='Edit report'
           actions={customActions}
           open={this.state.dialogIsOpen}>
           <div style={style.containerDialog}>
             <TextField ref='time'
+              key={'dialog-time-field'}
               hintText='Insert time'
               floatingLabelText='Reset match time'
               defaultValue={this.props.time} />
             <FlatButton
+              key={'dialog-time'}
               label='Modify time'
               primary={true}
               onTouchTap={this._handleCronoUpdate} />
             <br/>
             <TextField ref='term'
+              key={'dialog-term-field'}
               hintText='Insert new term'
               floatingLabelText='Modify term'
               defaultValue={this.props.term} />
             <FlatButton
+              key={'dialog-term'}
               label='Modify term'
               primary={true}
               onTouchTap={this._handleModifyTerm} />
