@@ -52,7 +52,7 @@ let Report = React.createClass({
     // Set right menu buttons in AppBar
     this.addRigthMenuElements(rightMenuElements)
     // Update report state
-    ReportActions.updateReport(this.props.params.id)
+    ReportActions.updateReport(this.props.params.id, function () {})
   },
 
   _handleStartMatch: function () {

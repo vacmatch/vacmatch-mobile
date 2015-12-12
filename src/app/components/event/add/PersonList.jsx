@@ -31,11 +31,12 @@ let PersonList = React.createClass({
   },
 
   componentWillMount: function () {
-    // Update players lists (local and visitor)
-    ReportActions.updatePlayers(this.props.params.reportId,
-      this.state.report.localTeam.id, this.state.report.visitorTeam.id)
-    // Update team names from this report
-    ReportActions.updateReport(this.props.params.reportId)
+    // Update teams from this report
+    ReportActions.updateReport(this.props.params.reportId, () => {
+      // Update players lists (local and visitor)
+      ReportActions.updatePlayers(this.props.params.reportId,
+        this.state.report.localTeam.id, this.state.report.visitorTeam.id)
+    })
   },
 
   render: function () {

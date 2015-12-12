@@ -45,9 +45,15 @@ let ReportStore = Reflux.createStore({
     return this.state
   },
 
-  onUpdateReport: function (reportId) {
+  onUpdateReport: function (reportId, callback) {
     let termEvent = new ChangeTermEvent()
     let startEvent = new StartMatchEvent()
+    // Update Teams
+    ReportService.find(reportId, (report) => {
+      this.state.localTeam = report.localTeam
+      this.state.visitorTeam = report.visitorTeam
+      this.trigger(this.state)
+    })
     // Check if match has started
     EventService.findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
       this.state.hasStarted = (startEvents.length > 0)
@@ -56,13 +62,9 @@ let ReportStore = Reflux.createStore({
         if (termEvents.length) {
           this.state.term = termEvents[0].text
         }
-        // Update Teams
-        ReportService.find(reportId, (report) => {
-          this.state.localTeam = report.localTeam
-          this.state.visitorTeam = report.visitorTeam
-          this.trigger(this.state)
-        })
+        this.trigger(this.state)
       })
+      callback()
     })
   },
 
