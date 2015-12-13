@@ -32,7 +32,8 @@ let EventWithCause = React.createClass({
   getInitialState: function () {
     return {
       dialogIsOpen: false,
-      cause: ''
+      causeIndex: 0,
+      causeValue: ''
     }
   },
 
@@ -42,18 +43,22 @@ let EventWithCause = React.createClass({
 
   _onDialogSubmit: function () {
     // Add event to the db
-    EventActions.addEvent(this.props.reportId, this.props.person, this.props.team, this.props.eventType, this.props.matchTime, this.state.cause, (event) => {
-      this.toggleDialog()
-      this.props.handleEventSubmit()
-    })
+    EventActions.addEvent(this.props.reportId, this.props.person, this.props.team,
+      this.props.eventType, this.props.matchTime, this.state.causeValue, (event) => {
+        this.toggleDialog()
+        this.props.handleEventSubmit()
+      })
   },
 
   _handleSelectValueChange: function (e, index, element) {
-    this.setState({cause: element.text})
+    this.setState({
+      causeIndex: index,
+      causeValue: element.text
+    })
   },
 
   getMenuItems: function (items) {
-    let elements = [{payload: '1', text: ''}]
+    let elements = [{payload: 1, text: ''}]
     items.map((c, index) => {
       elements.push({ payload: (index + 2).toString(), text: c })
     })
@@ -96,8 +101,7 @@ let EventWithCause = React.createClass({
           ref='test'
           floatingLabelText='Select cause'
           menuItems={menuItems}
-          valueMember='text'
-          value={this.state.cause}
+          selectedIndex={this.state.causeIndex}
           onChange={this._handleSelectValueChange} />
       </Dialog>
       <ListItem key={'listItem-' + this.props.person.id}
