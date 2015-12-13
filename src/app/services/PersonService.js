@@ -4,20 +4,73 @@ var db = new PouchDB('players')
 
 let PersonService = {
 
-  findByReportIdAndTeamId: function (reportId, team, callback) {
-    let elements = [
-      {
-        'id': '1',
-        'name': 'Fulano local',
-        'dorsal': '1',
-        'teamId': '1',
-        'teamName': 'Carnicería Ángel',
-        'reportId': '1',
-        'avatarUrl': 'http://lorempixel.com/200/200/sports/'
-      }
-    ]
-    callback(null, elements)
+  /**
+    * Get an unique Person from a team in this report
+    */
+  findByPersonIdReportIdAndTeamId: function (personId, reportId, teamId, callback) {
+    db.createIndex({
+      index: {fields: ['id', 'reportId', 'teamId']}
+    }).then(function () {
+      return db.find({
+        selector: {
+          id: {$eq: personId},
+          reportId: {$eq: reportId},
+          teamId: {$eq: teamId}
+        }
+      })
+    }).then(function (result) {
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
+  /**
+    * Get a list of People from a team in this report
+    */
+  findByReportIdAndTeamId: function (reportId, teamId, callback) {
+    db.createIndex({
+      index: {fields: ['reportId', 'teamId']}
+    }).then(function () {
+      return db.find({
+        selector: {
+          reportId: {$eq: reportId},
+          teamId: {$eq: teamId}
+        }
+      })
+    }).then(function (result) {
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
+  /**
+    * Create a new Person
+    */
+  save: function (name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
+    let person = {
+      name: name,
+      cardId: cardId,
+      dorsal: dorsal,
+      avatarUrl: avatarUrl,
+      isCalled: isCalled,
+      reportId: reportId,
+      teamId: teamId,
+      userId: userId
+    }
+    db.post(person).then(function (response) {
+      db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
+        callback(doc.rows[0], null)
+      })
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
   }
+
 }
 
 module.exports = PersonService

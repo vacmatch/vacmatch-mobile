@@ -28,10 +28,11 @@ let ReportListStore = Reflux.createStore({
     })
   },
 
-  onAddReport: function (date, location, localTeam, visitorTeam) {
+  onAddReport: function (date, location, localTeam, visitorTeam, callback) {
     ReportService.save(date, location, localTeam, visitorTeam, (doc, err) => {
       if (err == null) {
         this.onUpdateLists()
+        callback(doc, null)
       }
     })
   },
@@ -43,6 +44,7 @@ let ReportListStore = Reflux.createStore({
       }
     })
   }
+
 })
 
 module.exports = ReportListStore

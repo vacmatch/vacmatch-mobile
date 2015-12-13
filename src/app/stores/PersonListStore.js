@@ -18,7 +18,7 @@ let PersonListStore = Reflux.createStore({
   },
 
   onUpdatePlayers: function (reportId, localTeamId, visitorTeamId) {
-    PersonService.findByReportIdAndTeamId(reportId, localTeamId, (err, data) => {
+    PersonService.findByReportIdAndTeamId(reportId, localTeamId, (data, err) => {
       if (err) {
         console.log('Error: ', err)
       } else {
@@ -26,7 +26,7 @@ let PersonListStore = Reflux.createStore({
         this.trigger(this.state)
       }
     })
-    PersonService.findByReportIdAndTeamId(reportId, visitorTeamId, (err, data) => {
+    PersonService.findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {
       if (err) {
         console.log('Error: ', err)
       } else {
