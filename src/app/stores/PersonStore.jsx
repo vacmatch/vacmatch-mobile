@@ -7,7 +7,7 @@ let PersonStore = Reflux.createStore({
   listenables: PersonActions,
 
   onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
-    PersonService.save(name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, function (data, err) {
+    PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, function (data, err) {
       if (!err) {
         if (typeof callback === 'function') {
           callback(data, null)
@@ -17,6 +17,7 @@ let PersonStore = Reflux.createStore({
       }
     })
   }
+
 })
 
 module.exports = PersonStore

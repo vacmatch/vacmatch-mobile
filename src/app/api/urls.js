@@ -10,6 +10,11 @@ let urls = {
       return 'end/report/' + reportId
     }
   },
+  call: {
+    list: function (reportId) {
+      return 'call/report/' + reportId
+    }
+  },
   event: {
     list: function (reportId) {
       return 'events/' + reportId + '/'

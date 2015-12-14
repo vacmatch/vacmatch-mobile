@@ -1,7 +1,8 @@
 import Reflux from 'reflux'
 
 let PersonActions = Reflux.createActions([
-  'addPerson'
+  'addPerson',
+  'toggleCallPerson'
 ])
 
 module.exports = PersonActions
