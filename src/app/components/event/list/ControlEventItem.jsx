@@ -3,19 +3,22 @@ import mui from 'material-ui'
 
 let ListItem = mui.ListItem
 let FontIcon = mui.FontIcon
+let IconButton = mui.IconButton
 
 let ControlEventItem = React.createClass({
 
   propTypes: {
     typeIcon: React.PropTypes.string,
     event: React.PropTypes.shape({
+      _id: React.PropTypes.string,
       type: React.PropTypes.string,
       title: React.PropTypes.string,
       text: React.PropTypes.string
     }),
     eventType: React.PropTypes.shape({
       title: React.PropTypes.string
-    })
+    }),
+    handleDeleteEvent: React.PropTypes.func
   },
 
   render: function () {
@@ -26,7 +29,11 @@ let ControlEventItem = React.createClass({
       primaryText={<b>{this.props.eventType.title}
       </b>}
       secondaryText={this.props.event.text}
-      />
+      rightIcon={
+        <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event._id)}>
+          <i className='material-icons'>delete</i>
+        </IconButton>
+      } />
   }
 })
 

@@ -4,7 +4,8 @@ let EventActions = Reflux.createActions([
   'getEventsByReportIdAndType',
   'updateEventList',
   'addControlEvent',
-  'addEvent'
+  'addEvent',
+  'deleteEvent'
 ])
 
 module.exports = EventActions

@@ -27,6 +27,10 @@ let PersonList = React.createClass({
     EventActions.updateEventList(this.props.params.reportId)
   },
 
+  handleDeleteEvent: function (eventId) {
+    EventActions.deleteEvent(eventId, function (event, err) {})
+  },
+
   render: function () {
     let items = [
       this.state.events.map(event => {
@@ -34,11 +38,11 @@ let PersonList = React.createClass({
         // Control events
         if (eventType.isControl()) {
           return <ControlEventItem typeIcon={this.state.sport.getIconByType(event.type)}
-            event={event} eventType={eventType}/>
+            event={event} eventType={eventType} handleDeleteEvent={this.handleDeleteEvent}/>
         // Sport events
         } else {
           return <SportEventItem typeIcon={this.state.sport.getIconByType(event.type)}
-            event={event}/>
+            event={event} handleDeleteEvent={this.handleDeleteEvent}/>
         }
       })
     ]

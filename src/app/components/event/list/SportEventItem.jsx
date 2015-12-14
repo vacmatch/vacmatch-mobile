@@ -5,12 +5,14 @@ import CronoUtils from '../../../stores/CronoUtils'
 
 let ListItem = mui.ListItem
 let FontIcon = mui.FontIcon
+let IconButton = mui.IconButton
 
 let SportEventItem = React.createClass({
 
   propTypes: {
     typeIcon: React.PropTypes.string,
     event: React.PropTypes.shape({
+      _id: React.PropTypes.string,
       type: React.PropTypes.string,
       person: React.PropTypes.shape({
         name: React.PropTypes.string,
@@ -21,7 +23,8 @@ let SportEventItem = React.createClass({
       }),
       matchTime: React.PropTypes.number,
       text: React.PropTypes.string
-    })
+    }),
+    handleDeleteEvent: React.PropTypes.func
   },
 
   render: function () {
@@ -37,6 +40,11 @@ let SportEventItem = React.createClass({
         <br/>
           <i>{CronoUtils.milisecondsToString(this.props.event.matchTime) + ' - ' + this.props.event.text}</i>
         </p>
+      }
+      rightIcon={
+        <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event._id)}>
+          <i className='material-icons'>delete</i>
+        </IconButton>
       } />
   }
 })

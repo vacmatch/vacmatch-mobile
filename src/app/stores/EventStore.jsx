@@ -43,7 +43,20 @@ let EventStore = Reflux.createStore({
         callback(data)
       }
     })
+  },
+
+  onDeleteEvent: function (eventId, callback) {
+    EventService.deleteEvent(eventId, (data, err) => {
+      if (!err) {
+        // Delete from state this event
+        let filterList = this.state.filter(function (e) { return e._id !== eventId })
+        this.state = filterList
+        this.trigger(this.state)
+      }
+      callback(data, err)
+    })
   }
+
 })
 
 module.exports = EventStore

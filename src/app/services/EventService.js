@@ -65,6 +65,15 @@ let EventService = {
     })
   },
 
+  findById: function (eventId, callback) {
+    db.get(eventId).then(function (doc) {
+      callback(doc, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
   findAllByReportId: function (reportId, callback) {
     db.createIndex({
       index: {fields: ['timestamp', 'reportId']}
@@ -104,6 +113,15 @@ let EventService = {
       })
     }).then(function (result) {
       callback(result.docs)
+    })
+  },
+
+  deleteEvent: function (eventId, callback) {
+    this.findById(eventId, function (data, err) {
+      // Remove it
+      db.remove(data, function () {
+        callback(data, err)
+      })
     })
   }
 }
