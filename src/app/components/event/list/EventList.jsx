@@ -6,11 +6,10 @@ import EventActions from '../../../actions/EventActions'
 import EventStore from '../../../stores/EventStore'
 import SportStore from '../../../stores/SportStore'
 
-import CronoUtils from '../../../stores/CronoUtils'
+import ControlEventItem from './ControlEventItem'
+import SportEventItem from './SportEventItem'
 
-let ListItem = mui.ListItem
 let List = mui.List
-let FontIcon = mui.FontIcon
 
 let PersonList = React.createClass({
   mixins: [
@@ -31,32 +30,15 @@ let PersonList = React.createClass({
   render: function () {
     let items = [
       this.state.events.map(event => {
-        let element = this.state.sport.getEventByType(event.type)
+        let eventType = this.state.sport.getEventByType(event.type)
         // Control events
-        if (element.isControl()) {
-          return <ListItem
-            leftAvatar={
-              <FontIcon className={this.state.sport.getIconByType(event.type)} />
-            }
-            primaryText={<b>{element.title}
-            </b>}
-            secondaryText={event.text}
-            />
+        if (eventType.isControl()) {
+          return <ControlEventItem typeIcon={this.state.sport.getIconByType(event.type)}
+            event={event} eventType={eventType}/>
         // Sport events
         } else {
-          return <ListItem
-            leftAvatar={
-              <FontIcon className={this.state.sport.getIconByType(event.type)} />
-            }
-            primaryText={<b>{'(' + event.person.dorsal + ') ' + event.person.name}</b>}
-            secondaryTextLines={2}
-            secondaryText={
-              <p>
-                {event.team.name}
-              <br/>
-                <i>{CronoUtils.milisecondsToString(event.matchTime) + ' - ' + event.text}</i>
-              </p>
-            } />
+          return <SportEventItem typeIcon={this.state.sport.getIconByType(event.type)}
+            event={event}/>
         }
       })
     ]
