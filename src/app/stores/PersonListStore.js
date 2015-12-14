@@ -57,27 +57,16 @@ let PersonListStore = Reflux.createStore({
       this.state.visitorPeople[index] = person
     }
     this.trigger(this.state)
-    callback()
+    if (typeof callback === 'function') {
+      callback()
+    }
   },
 
   onToggleCallPerson: function (personId, reportId, teamId, newValue) {
     // Set new call state in DB
     PersonService.setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
-      // Update player in local Team list
-      if (teamId === this.state.localTeamId) {
-        let index = this.state.localPeople.findIndex(function (e, index) {
-          return (e.id === person.id)
-        })
-        this.state.localPeople[index].isCalled = person.isCalled
-      }
-      // Update player in visitor Team list
-      if (teamId === this.state.visitorTeamId) {
-        let index = this.state.visitorPeople.findIndex(function (e, index) {
-          return (e.id === person.id)
-        })
-        this.state.visitorPeople[index].isCalled = person.isCalled
-      }
-      this.trigger(this.state)
+      // Update call state in person list
+      this.updatePersonInLists(person, teamId)
     })
   },
 
