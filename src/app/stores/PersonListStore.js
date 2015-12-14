@@ -41,6 +41,25 @@ let PersonListStore = Reflux.createStore({
     })
   },
 
+  updatePersonInLists: function (person, teamId, callback) {
+    // Update player in local Team list
+    if (teamId === this.state.localTeamId) {
+      let index = this.state.localPeople.findIndex(function (e, index) {
+        return (e.id === person.id)
+      })
+      this.state.localPeople[index] = person
+    }
+    // Update player in visitor Team list
+    if (teamId === this.state.visitorTeamId) {
+      let index = this.state.visitorPeople.findIndex(function (e, index) {
+        return (e.id === person.id)
+      })
+      this.state.visitorPeople[index] = person
+    }
+    this.trigger(this.state)
+    callback()
+  },
+
   onToggleCallPerson: function (personId, reportId, teamId, newValue) {
     // Set new call state in DB
     PersonService.setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
@@ -59,6 +78,16 @@ let PersonListStore = Reflux.createStore({
         this.state.visitorPeople[index].isCalled = person.isCalled
       }
       this.trigger(this.state)
+    })
+  },
+
+  onUpdatePersonDorsal: function (personId, reportId, teamId, newDorsal, callback) {
+    // Set new dorsal in DB
+    PersonService.setDorsal(personId, reportId, teamId, newDorsal, (person, err) => {
+      // Update dorsal in person list
+      this.updatePersonInLists(person, teamId, function () {
+        callback(person, err)
+      })
     })
   }
 

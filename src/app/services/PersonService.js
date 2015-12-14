@@ -98,6 +98,19 @@ let PersonService = {
   },
 
   /**
+    * Set a new value to dorsal property
+    */
+  setDorsal: function (personId, reportId, teamId, newDorsal, callback) {
+    // Get person
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
+      person.dorsal = newDorsal
+      this.save(person, function (data, err) {
+        callback(data, err)
+      })
+    })
+  },
+
+  /**
     * Get number of documents in the DB to use it as next Person identifier
     */
   getLastId: function (callback) {
