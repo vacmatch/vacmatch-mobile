@@ -49,40 +49,44 @@ let PersonList = React.createClass({
     let items = [
       [
         this.state.personList.localPeople.map(person => {
-          let event = this.state.sport.getEventByType(this.props.params.eventType)
-          let properties =
-            {
-              key: 'eventLocal-' + person.id,
-              reportId: this.props.params.reportId,
-              matchTime: this.state.report.timer.ms,
-              person: person,
-              team: this.state.report.localTeam,
-              eventTitle: event.title,
-              eventSubtitle: event.subtitle,
-              eventType: event.type,
-              causeList: event.causes,
-              handleEventSubmit: this._handleEventSubmit
-            }
-          return React.cloneElement(event.component, properties)
+          if (person.isCalled) {
+            let event = this.state.sport.getEventByType(this.props.params.eventType)
+            let properties =
+              {
+                key: 'eventLocal-' + person.id,
+                reportId: this.props.params.reportId,
+                matchTime: this.state.report.timer.ms,
+                person: person,
+                team: this.state.report.localTeam,
+                eventTitle: event.title,
+                eventSubtitle: event.subtitle,
+                eventType: event.type,
+                causeList: event.causes,
+                handleEventSubmit: this._handleEventSubmit
+              }
+            return React.cloneElement(event.component, properties)
+          }
         })
       ],
       [
         this.state.personList.visitorPeople.map(person => {
-          let event = this.state.sport.getEventByType(this.props.params.eventType)
-          let properties =
-            {
-              key: 'eventVisitor-' + person.id,
-              reportId: this.props.params.reportId,
-              matchTime: this.state.report.timer.ms,
-              person: person,
-              team: this.state.report.visitorTeam,
-              eventTitle: event.title,
-              eventSubtitle: event.subtitle,
-              eventType: event.type,
-              causeList: event.causes,
-              handleEventSubmit: this._handleEventSubmit
-            }
-          return React.cloneElement(event.component, properties)
+          if (person.isCalled) {
+            let event = this.state.sport.getEventByType(this.props.params.eventType)
+            let properties =
+              {
+                key: 'eventVisitor-' + person.id,
+                reportId: this.props.params.reportId,
+                matchTime: this.state.report.timer.ms,
+                person: person,
+                team: this.state.report.visitorTeam,
+                eventTitle: event.title,
+                eventSubtitle: event.subtitle,
+                eventType: event.type,
+                causeList: event.causes,
+                handleEventSubmit: this._handleEventSubmit
+              }
+            return React.cloneElement(event.component, properties)
+          }
         })
       ]
     ]
