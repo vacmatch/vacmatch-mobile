@@ -42,7 +42,7 @@ let SportEventItem = React.createClass({
         </p>
       }
       rightIcon={
-        <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event._id)}>
+        <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
           <i className='material-icons'>delete</i>
         </IconButton>
       } />

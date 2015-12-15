@@ -5,6 +5,8 @@ import mui from 'material-ui'
 import EventActions from '../../../actions/EventActions'
 import EventStore from '../../../stores/EventStore'
 import SportStore from '../../../stores/SportStore'
+import ReportStore from '../../../stores/ReportStore'
+import ReportActions from '../../../actions/ReportActions'
 
 import ControlEventItem from './ControlEventItem'
 import SportEventItem from './SportEventItem'
@@ -14,7 +16,8 @@ let List = mui.List
 let PersonList = React.createClass({
   mixins: [
     Reflux.connect(EventStore, 'events'),
-    Reflux.connect(SportStore, 'sport')
+    Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(ReportStore, 'report')
   ],
 
   propTypes: {
@@ -24,11 +27,19 @@ let PersonList = React.createClass({
   },
 
   componentWillMount: function () {
+    // Update report state
+    ReportActions.updateReport(this.props.params.reportId, function () {})
+    // Update event list
     EventActions.updateEventList(this.props.params.reportId)
   },
 
-  handleDeleteEvent: function (eventId) {
-    EventActions.deleteEvent(eventId, function (event, err) {})
+  handleDeleteEvent: function (event) {
+    // Delete event
+    EventActions.deleteEvent(event, (ev, err) => {
+      // Update result in report
+      ReportActions.updateResultFields(event, this.state.sport, function (report, err) {
+      })
+    })
   },
 
   render: function () {

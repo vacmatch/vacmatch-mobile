@@ -133,6 +133,24 @@ let ReportStore = Reflux.createStore({
       })
   },
 
+  updateTeam: function (reportId, newTeam) {
+    // New result, state is updated when DB is updated too
+    if (newTeam.id === this.state.localTeam.id) {
+      this.state.localTeam = newTeam
+    }
+    if (newTeam.id === this.state.visitorTeam.id) {
+      this.state.visitorTeam = newTeam
+    }
+    // Update result in DB
+    ReportService.update(reportId, this.state.date, this.state.location,
+      this.state.localTeam, this.state.visitorTeam, (newReport) => {
+        // Update state
+        this.state.localTeam = newReport.localTeam
+        this.state.visitorTeam = newReport.visitorTeam
+        this.trigger(this.state)
+      })
+  },
+
   onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
     let goalEvent = new GoalEvent()
     if (eventType === goalEvent.type) {
@@ -142,6 +160,38 @@ let ReportStore = Reflux.createStore({
     if (eventType === foulEvent.type) {
       this.updateFouls(reportId, team)
     }
+  },
+
+  onUpdateResultFields: function (event, sport, callback) {
+    // Get all events
+    EventService.findAllByReportIdAndEventType(event.reportId, event.type, (events, err) => {
+      if (event.type === 'goal') {
+        // Get the new value from Sport
+        let newValue = sport.getPrimaryFieldValue(events, event.team.id)
+        // Update team in report with new result
+        if (event.team.id === this.state.localTeam.id) {
+          this.state.localTeam.result = newValue
+          this.updateTeam(event.reportId, this.state.localTeam)
+        }
+        if (event.team.id === this.state.visitorTeam.id) {
+          this.state.visitorTeam.result = newValue
+          this.updateTeam(event.reportId, this.state.visitorTeam)
+        }
+      }
+      if (event.type === 'foul') {
+        // Get the new value from Sport
+        let newValue = sport.getSecondaryFieldValue(events, event.team.id)
+        // Update team in report with new secondary result
+        if (event.team.id === this.state.localTeam.id) {
+          this.state.localTeam.secondaryField = newValue
+          this.updateTeam(event.reportId, this.state.localTeam)
+        }
+        if (event.team.id === this.state.visitorTeam.id) {
+          this.state.visitorTeam.secondaryField = newValue
+          this.updateTeam(event.reportId, this.state.visitorTeam)
+        }
+      }
+    })
   }
 
 })
