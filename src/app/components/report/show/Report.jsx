@@ -96,8 +96,12 @@ let Report = React.createClass({
 
     return <div>
       <div style={style.center}>
-        <FlatButton label={this.state.report.localTeam.teamName} secondary={true} />
-        <FlatButton label={this.state.report.visitorTeam.teamName} secondary=	{true} />
+        <Link to={urls.call.list(this.props.params.id)}>
+          <FlatButton label={this.state.report.localTeam.teamName} secondary={true} />
+        </Link>
+        <Link to={urls.call.list(this.props.params.id)}>
+          <FlatButton label={this.state.report.visitorTeam.teamName} secondary={true} />
+        </Link>
         <ReportProperty
           value={this.state.report.localTeam.result + ' - ' + this.state.report.visitorTeam.result}
           isTitle={true} />
