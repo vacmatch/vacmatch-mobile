@@ -5,17 +5,19 @@ import mui from 'material-ui'
 import EventActions from '../../../actions/EventActions'
 import EventStore from '../../../stores/EventStore'
 import SportStore from '../../../stores/SportStore'
+import ReportStore from '../../../stores/ReportStore'
+import ReportActions from '../../../actions/ReportActions'
 
-import CronoUtils from '../../../stores/CronoUtils'
+import ControlEventItem from './ControlEventItem'
+import SportEventItem from './SportEventItem'
 
-let ListItem = mui.ListItem
 let List = mui.List
-let FontIcon = mui.FontIcon
 
 let PersonList = React.createClass({
   mixins: [
     Reflux.connect(EventStore, 'events'),
-    Reflux.connect(SportStore, 'sport')
+    Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(ReportStore, 'report')
   ],
 
   propTypes: {
@@ -25,38 +27,36 @@ let PersonList = React.createClass({
   },
 
   componentWillMount: function () {
+    // Update report state
+    ReportActions.updateReport(this.props.params.reportId, function () {})
+    // Update event list
     EventActions.updateEventList(this.props.params.reportId)
+  },
+
+  handleDeleteEvent: function (event) {
+    // Delete event
+    EventActions.deleteEvent(event, (ev, err) => {
+      // Only if it's a sport event (not a control event)
+      if (!this.state.sport.getEventByType(event.type).isControl()) {
+        // Update result in report
+        ReportActions.updateResultFields(event, this.state.sport, function (report, err) {
+        })
+      }
+    })
   },
 
   render: function () {
     let items = [
       this.state.events.map(event => {
-        let element = this.state.sport.getEventByType(event.type)
+        let eventType = this.state.sport.getEventByType(event.type)
         // Control events
-        if (element.isControl()) {
-          return <ListItem
-            leftAvatar={
-              <FontIcon className={this.state.sport.getIconByType(event.type)} />
-            }
-            primaryText={<b>{element.title}
-            </b>}
-            secondaryText={event.text}
-            />
+        if (eventType.isControl()) {
+          return <ControlEventItem typeIcon={this.state.sport.getIconByType(event.type)}
+            event={event} eventType={eventType} handleDeleteEvent={this.handleDeleteEvent}/>
         // Sport events
         } else {
-          return <ListItem
-            leftAvatar={
-              <FontIcon className={this.state.sport.getIconByType(event.type)} />
-            }
-            primaryText={<b>{'(' + event.person.dorsal + ') ' + event.person.name}</b>}
-            secondaryTextLines={2}
-            secondaryText={
-              <p>
-                {event.team.name}
-              <br/>
-                <i>{CronoUtils.milisecondsToString(event.matchTime) + ' - ' + event.text}</i>
-              </p>
-            } />
+          return <SportEventItem typeIcon={this.state.sport.getIconByType(event.type)}
+            event={event} handleDeleteEvent={this.handleDeleteEvent}/>
         }
       })
     ]

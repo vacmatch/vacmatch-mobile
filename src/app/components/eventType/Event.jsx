@@ -6,7 +6,6 @@ let Dialog = mui.Dialog
 let Avatar = mui.Avatar
 let ListItem = mui.ListItem
 let FlatButton = mui.FlatButton
-import EventActions from '../../actions/EventActions'
 
 let Event = React.createClass({
 
@@ -34,11 +33,8 @@ let Event = React.createClass({
   },
 
   _onDialogSubmit: function () {
-    // Add event to the db
-    EventActions.addEvent(this.props.reportId, this.props.person, this.props.team, this.props.eventType, this.props.matchTime, this.state.cause, (event) => {
-      this.toggleDialog()
-      this.props.handleEventSubmit()
-    })
+    this.props.handleEventSubmit(this.props.reportId, this.props.person, this.props.team,
+      this.props.eventType, this.props.matchTime, this.state.cause)
   },
 
   render: function () {

@@ -8,7 +8,7 @@ let PersonStore = Reflux.createStore({
 
   onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
     PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, function (data, err) {
-      if (!err) {
+      if (err == null) {
         if (typeof callback === 'function') {
           callback(data, null)
         }

@@ -30,7 +30,7 @@ let EndReport = React.createClass({
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
     // Update report state
-    ReportActions.updateReport(this.props.params.reportId)
+    ReportActions.updateReport(this.props.params.reportId, function () {})
   },
 
   render: function () {

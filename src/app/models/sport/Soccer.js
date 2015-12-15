@@ -57,6 +57,14 @@ class Soccer extends Sport {
     return event.iconClass
   }
 
+  getPrimaryFieldValue (eventList, teamId) {
+    return eventList.length
+  }
+
+  getSecondaryFieldValue (eventList, teamId) {
+    return eventList.length
+  }
+
 }
 
 module.exports = Soccer
