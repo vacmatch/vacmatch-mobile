@@ -17,7 +17,6 @@ let ReportStore = Reflux.createStore({
   listenables: ReportActions,
 
   init: function () {
-    this.listenTo(EventActions.addEvent, this.onAddEvent)
     this.state = {
       date: '',
       location: '',
@@ -97,42 +96,6 @@ let ReportStore = Reflux.createStore({
     this.trigger(this.state)
   },
 
-  updateGoals: function (reportId, team) {
-    // New result, state is updated when DB is updated too
-    if (team.id === this.state.localTeam.id) {
-      this.state.localTeam.result = this.state.localTeam.result + 1
-    }
-    if (team.id === this.state.visitorTeam.id) {
-      this.state.visitorTeam.result = this.state.visitorTeam.result + 1
-    }
-    // Update result in DB
-    ReportService.update(reportId, this.state.date, this.state.location,
-      this.state.localTeam, this.state.visitorTeam, (newReport) => {
-        // Update state
-        this.state.localTeam.result = newReport.localTeam.result
-        this.state.visitorTeam.result = newReport.visitorTeam.result
-        this.trigger(this.state)
-      })
-  },
-
-  updateFouls: function (reportId, team) {
-    // New result, state is updated when DB is updated too
-    if (team.id === this.state.localTeam.id) {
-      this.state.localTeam.secondaryField = this.state.localTeam.secondaryField + 1
-    }
-    if (team.id === this.state.visitorTeam.id) {
-      this.state.visitorTeam.secondaryField = this.state.visitorTeam.secondaryField + 1
-    }
-    // Update result in DB
-    ReportService.update(reportId, this.state.date, this.state.location,
-      this.state.localTeam, this.state.visitorTeam, (newReport) => {
-        // Update state
-        this.state.localTeam.secondaryField = newReport.localTeam.secondaryField
-        this.state.visitorTeam.secondaryField = newReport.visitorTeam.secondaryField
-        this.trigger(this.state)
-      })
-  },
-
   updateTeam: function (reportId, newTeam) {
     // New result, state is updated when DB is updated too
     if (newTeam.id === this.state.localTeam.id) {
@@ -151,21 +114,11 @@ let ReportStore = Reflux.createStore({
       })
   },
 
-  onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
-    let goalEvent = new GoalEvent()
-    if (eventType === goalEvent.type) {
-      this.updateGoals(reportId, team)
-    }
-    let foulEvent = new FoulEvent()
-    if (eventType === foulEvent.type) {
-      this.updateFouls(reportId, team)
-    }
-  },
-
   onUpdateResultFields: function (event, sport, callback) {
     // Get all events
     EventService.findAllByReportIdAndEventType(event.reportId, event.type, (events, err) => {
-      if (event.type === 'goal') {
+      let goalEvent = new GoalEvent()
+      if (event.type === goalEvent.type) {
         // Get the new value from Sport
         let newValue = sport.getPrimaryFieldValue(events, event.team.id)
         // Update team in report with new result
@@ -178,7 +131,8 @@ let ReportStore = Reflux.createStore({
           this.updateTeam(event.reportId, this.state.visitorTeam)
         }
       }
-      if (event.type === 'foul') {
+      let foulEvent = new FoulEvent()
+      if (event.type === foulEvent.type) {
         // Get the new value from Sport
         let newValue = sport.getSecondaryFieldValue(events, event.team.id)
         // Update team in report with new secondary result
@@ -191,6 +145,7 @@ let ReportStore = Reflux.createStore({
           this.updateTeam(event.reportId, this.state.visitorTeam)
         }
       }
+      callback()
     })
   }
 

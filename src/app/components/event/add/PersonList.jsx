@@ -5,6 +5,7 @@ import { History } from 'react-router'
 import PersonListStore from '../../../stores/PersonListStore'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
+import EventActions from '../../../actions/EventActions'
 
 import TabList from '../../generic/TabList'
 import urls from '../../../api/urls'
@@ -26,8 +27,15 @@ let PersonList = React.createClass({
     })
   },
 
-  _handleEventSubmit: function () {
-    this.history.pushState(null, urls.report.show(this.props.params.reportId))
+  _handleEventSubmit: function (reportId, person, team, eventType, matchTime, cause) {
+    // Add event to the db
+    EventActions.addEvent(reportId, person, team, eventType, matchTime, cause, (event) => {
+      // Update result in report
+      ReportActions.updateResultFields(event, this.state.sport, () => {
+        // Go to show report view
+        this.history.pushState(null, urls.report.show(this.props.params.reportId))
+      })
+    })
   },
 
   componentWillMount: function () {

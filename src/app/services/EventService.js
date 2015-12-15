@@ -2,6 +2,7 @@ import PouchDB from 'pouchdb'
 PouchDB.plugin(require('pouchdb-find'))
 
 var db = new PouchDB('events')
+db.sync('http://localhost:5984/events', {live: true})
 
 let EventService = {
 
@@ -14,7 +15,7 @@ let EventService = {
         'text': cause,
         'reportId': reportId,
         'person': {
-          'id': person.id,
+          'id': person._id,
           'name': person.name,
           'dorsal': person.dorsal,
           'avatarUrl': person.avatarUrl
@@ -28,7 +29,7 @@ let EventService = {
       }
       db.put(element).then(function (response) {
         db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-          callback(doc.rows[0], null)
+          callback(doc.rows[0].doc, null)
         })
       }).catch(function (err) {
         console.log('err: ', err)
@@ -50,7 +51,7 @@ let EventService = {
       }
       db.put(element).then(function (response) {
         db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-          callback(doc.rows[0], null)
+          callback(doc.rows[0].doc, null)
         })
       }).catch(function (err) {
         console.log('err: ', err)

@@ -36,9 +36,12 @@ let PersonList = React.createClass({
   handleDeleteEvent: function (event) {
     // Delete event
     EventActions.deleteEvent(event, (ev, err) => {
-      // Update result in report
-      ReportActions.updateResultFields(event, this.state.sport, function (report, err) {
-      })
+      // Only if it's a sport event (not a control event)
+      if (!this.state.sport.getEventByType(event.type).isControl()) {
+        // Update result in report
+        ReportActions.updateResultFields(event, this.state.sport, function (report, err) {
+        })
+      }
     })
   },
 

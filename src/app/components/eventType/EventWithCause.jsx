@@ -2,7 +2,6 @@ import React from 'react'
 import Reflux from 'reflux'
 import mui from 'material-ui'
 
-import EventActions from '../../actions/EventActions'
 import EventStore from '../../stores/EventStore'
 
 // Components
@@ -42,12 +41,8 @@ let EventWithCause = React.createClass({
   },
 
   _onDialogSubmit: function () {
-    // Add event to the db
-    EventActions.addEvent(this.props.reportId, this.props.person, this.props.team,
-      this.props.eventType, this.props.matchTime, this.state.causeValue, (event) => {
-        this.toggleDialog()
-        this.props.handleEventSubmit()
-      })
+    this.props.handleEventSubmit(this.props.reportId, this.props.person, this.props.team,
+      this.props.eventType, this.props.matchTime, this.state.causeValue)
   },
 
   _handleSelectValueChange: function (e, index, element) {
