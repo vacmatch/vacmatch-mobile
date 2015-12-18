@@ -26,12 +26,17 @@ let ReportList = React.createClass({
 
   getInitialState: function () {
     return {
-      dialogIsOpen: false
+      editDialogIsOpen: false,
+      createDialogIsOpen: false
     }
   },
 
-  toggleDialog: function () {
-    this.setState({dialogIsOpen: !this.state.dialogIsOpen})
+  toggleEditDialog: function () {
+    this.setState({editDialogIsOpen: !this.state.editDialogIsOpen})
+  },
+
+  toggleCreateDialog: function () {
+    this.setState({createDialogIsOpen: !this.state.createDialogIsOpen})
   },
 
   componentWillMount: function () {
@@ -42,7 +47,7 @@ let ReportList = React.createClass({
     ReportActions.updateLists()
   },
 
-  handleAdd: function () {
+  handleAdd2: function () {
     let defaultReport = {
       date: '',
       location: '',
@@ -77,25 +82,40 @@ let ReportList = React.createClass({
       })
   },
 
+  handleCreate: function () {
+    this.toggleCreateDialog()
+  },
+
+  handleCreateConfirm: function (newReport) {
+    // Save new changes in report
+    ReportActions.addReport(newReport.date, newReport.location,
+      newReport.localTeam, newReport.visitorTeam, (result, err) => {
+        // Update report list
+        ReportActions.updateLists(() => {
+          this.toggleCreateDialog()
+        })
+      })
+  },
+
   handleEdit: function (reportId) {
     // Update report state
     ReportActions.updateReport(reportId, () => {
-      this.toggleDialog()
+      this.toggleEditDialog()
     })
   },
 
-  handleUpdate: function (report) {
+  handleEditConfirm: function (report) {
     // Save new changes in report
     ReportActions.editReport(report.id, report.date, report.location,
       report.localTeam, report.visitorTeam, (result, err) => {
         // Update report list
         ReportActions.updateLists(() => {
-          this.toggleDialog()
+          this.toggleEditDialog()
         })
       })
   },
 
-  handleDelete: function (id) {
+  handleDeleteConfirm: function (id) {
     ReportActions.deleteReport(id)
   },
 
@@ -112,7 +132,7 @@ let ReportList = React.createClass({
           return <ReportItem key={'next-' + element.id}
             report={element.doc}
             editDialog={this.handleEdit}
-            deleteDialog={this.handleDelete}/>
+            deleteDialog={this.handleDeleteConfirm}/>
         })
       ],
       [
@@ -120,21 +140,47 @@ let ReportList = React.createClass({
           return <ReportItem key={'last-' + element.id}
             report={element.doc}
             editDialog={this.handleEdit}
-            deleteDialog={this.handleDelete}/>
+            deleteDialog={this.handleDeleteConfirm}/>
         })
       ]
     ]
+
+    // Empty report to host a new report
+    let emptyReport = {
+      date: '',
+      location: '',
+      localTeam: {
+        id: null,
+        teamName: '',
+        result: 0,
+        secondaryField: 0
+      },
+      visitorTeam: {
+        id: null,
+        teamName: '',
+        result: 0,
+        secondaryField: 0
+      }
+    }
+
     return (
       <div>
         <TabList tabsNames={tabs} tabsItems={items}/>
-        <FloatingActionButton onClick={this.handleAdd}>
+        <FloatingActionButton onClick={this.handleCreate}>
           <i className='material-icons'>add</i>
         </FloatingActionButton>
         <EditReport
           report={this.state.report}
-          dialogIsOpen={this.state.dialogIsOpen}
-          toggleDialog={this.toggleDialog}
-          handleUpdate={this.handleUpdate} />
+          title='Edit report'
+          dialogIsOpen={this.state.editDialogIsOpen}
+          toggleDialog={this.toggleEditDialog}
+          handleUpdate={this.handleEditConfirm} />
+        <EditReport
+          report={emptyReport}
+          title='Create report'
+          dialogIsOpen={this.state.createDialogIsOpen}
+          toggleDialog={this.toggleCreateDialog}
+          handleUpdate={this.handleCreateConfirm} />
       </div>
     )
   }
