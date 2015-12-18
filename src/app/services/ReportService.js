@@ -17,7 +17,6 @@ let ReportService = {
   },
 
   save: function (date, location, localTeam, visitorTeam, callback) {
-    console.log(date, location, localTeam, visitorTeam)
     let report = {
       date: date,
       location: location,

@@ -10,7 +10,8 @@ let ReportActions = Reflux.createActions([
   'updateTerm',
   'updatePlayers',
   'toggleStartMatch',
-  'updateResultFields'
+  'updateResultFields',
+  'editReport'
 ])
 
 module.exports = ReportActions

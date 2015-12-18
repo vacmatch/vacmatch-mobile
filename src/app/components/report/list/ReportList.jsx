@@ -5,22 +5,34 @@ import mui from 'material-ui'
 import ReportItem from './ReportItem'
 import ReportListStore from '../../../stores/ReportListStore'
 import ReportActions from '../../../actions/ReportActions'
+import ReportStore from '../../../stores/ReportStore'
 import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
 import PersonActions from '../../../actions/PersonActions'
 import PersonStore from '../../../stores/PersonStore'
 
-let List = mui.List
-let FlatButton = mui.FlatButton
-let Tabs = mui.Tabs
-let Tab = mui.Tab
+import TabList from '../../generic/TabList'
+import EditReport from '../add/EditReport'
+
+let FloatingActionButton = mui.FloatingActionButton
 
 let ReportList = React.createClass({
   mixins: [
     Reflux.connect(ReportListStore, 'reportList'),
     Reflux.connect(PersonStore, 'person'),
+    Reflux.connect(ReportStore, 'report'),
     Reflux.connect(MenuStore, 'menu')
   ],
+
+  getInitialState: function () {
+    return {
+      dialogIsOpen: false
+    }
+  },
+
+  toggleDialog: function () {
+    this.setState({dialogIsOpen: !this.state.dialogIsOpen})
+  },
 
   componentWillMount: function () {
     let rightMenuElements = []
@@ -65,42 +77,64 @@ let ReportList = React.createClass({
       })
   },
 
+  handleEdit: function (reportId) {
+    // Update report state
+    ReportActions.updateReport(reportId, () => {
+      this.toggleDialog()
+    })
+  },
+
+  handleUpdate: function (report) {
+    // Save new changes in report
+    ReportActions.editReport(report.id, report.date, report.location,
+      report.localTeam, report.visitorTeam, (result, err) => {
+        // Update report list
+        ReportActions.updateLists(() => {
+          this.toggleDialog()
+        })
+      })
+  },
+
   handleDelete: function (id) {
     ReportActions.deleteReport(id)
   },
 
   render: function () {
-    let nextReportsContent = (
-      this.state.reportList.nextReports.map(element => {
-        return <div key={element.id} >
-          <ReportItem report={element.doc}/>
-          <FlatButton label='Delete' onClick={this.handleDelete.bind(this, element.id)}/>
-        </div>
-      })
-    )
+    let tabs =
+      [
+        'Next reports',
+        'Last reports'
+      ]
 
-    let lastReportsContent = (
-      this.state.reportList.lastReports.map(element => {
-        return <div key={element.id} >
-          <ReportItem report={element.doc}/>
-          <FlatButton label='Delete' onClick={this.handleDelete.bind(this, element.id)}/>
-        </div>
-      })
-    )
-
+    let items = [
+      [
+        this.state.reportList.nextReports.map(element => {
+          return <ReportItem key={'next-' + element.id}
+            report={element.doc}
+            editDialog={this.handleEdit}
+            deleteDialog={this.handleDelete}/>
+        })
+      ],
+      [
+        this.state.reportList.lastReports.map(element => {
+          return <ReportItem key={'last-' + element.id}
+            report={element.doc}
+            editDialog={this.handleEdit}
+            deleteDialog={this.handleDelete}/>
+        })
+      ]
+    ]
     return (
       <div>
-        <Tabs>
-          <Tab label='Next reports'>
-            <List>
-              {nextReportsContent}
-            </List>
-          </Tab>
-          <Tab label='Last reports'>
-            {lastReportsContent}
-          </Tab>
-        </Tabs>
-        <FlatButton label='Add' onClick={this.handleAdd}/>
+        <TabList tabsNames={tabs} tabsItems={items}/>
+        <FloatingActionButton onClick={this.handleAdd}>
+          <i className='material-icons'>add</i>
+        </FloatingActionButton>
+        <EditReport
+          report={this.state.report}
+          dialogIsOpen={this.state.dialogIsOpen}
+          toggleDialog={this.toggleDialog}
+          handleUpdate={this.handleUpdate} />
       </div>
     )
   }

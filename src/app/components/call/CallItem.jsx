@@ -29,7 +29,7 @@ let Event = React.createClass({
     }
   },
 
-  toggleDialog: function () {
+  toggleDialog: function (report) {
     this.setState({dialogIsOpen: !this.state.dialogIsOpen})
   },
 

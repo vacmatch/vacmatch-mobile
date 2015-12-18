@@ -3,7 +3,6 @@ import Stopwatch from 'timer-stopwatch'
 
 import ReportActions from '../actions/ReportActions'
 import ReportService from '../services/ReportService'
-import EventActions from '../actions/EventActions'
 import EventService from '../services/EventService'
 
 import ChangeTermEvent from '../models/event/control/ChangeTermEvent'
@@ -18,6 +17,7 @@ let ReportStore = Reflux.createStore({
 
   init: function () {
     this.state = {
+      id: '',
       date: '',
       location: '',
       localTeam: {
@@ -49,6 +49,9 @@ let ReportStore = Reflux.createStore({
     let startEvent = new StartMatchEvent()
     // Update Teams
     ReportService.find(reportId, (report) => {
+      this.state._id = report._id
+      this.state.date = report.date
+      this.state.location = report.location
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
       this.trigger(this.state)
@@ -146,6 +149,18 @@ let ReportStore = Reflux.createStore({
         }
       }
       callback()
+    })
+  },
+
+  onEditReport: function (reportId, date, location, localTeam, visitorTeam, callback) {
+    ReportService.update(reportId, date, location, localTeam, visitorTeam, (report, err) => {
+      // Update state
+      this.state.location = report.location
+      this.state.date = report.date
+      this.state.localTeam = report.localTeam
+      this.state.visitorTeam = report.visitorTeam
+      this.trigger(this.state)
+      callback(report, err)
     })
   }
 

@@ -11,7 +11,7 @@ let TextField = mui.TextField
 let EditPerson = React.createClass({
   propTypes: {
     person: React.PropTypes.object,
-    dialogIsOpen: React.PropTypes.boolean,
+    dialogIsOpen: React.PropTypes.bool,
     toggleDialog: React.PropTypes.func
   },
 
