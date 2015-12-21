@@ -20,7 +20,7 @@ let PersonListStore = Reflux.createStore({
     return this.state
   },
 
-  onUpdatePlayers: function (reportId, localTeamId, visitorTeamId) {
+  onUpdatePlayers: function (reportId, localTeamId, visitorTeamId, callback) {
     PersonService.findByReportIdAndTeamId(reportId, localTeamId, (data, err) => {
       if (err) {
         console.log('Error: ', err)
@@ -28,6 +28,9 @@ let PersonListStore = Reflux.createStore({
         this.state.localPeople = data
         this.state.localTeamId = localTeamId
         this.trigger(this.state)
+      }
+      if (typeof callback === 'function') {
+        callback()
       }
     })
     PersonService.findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {

@@ -85,6 +85,27 @@ let PersonService = {
   },
 
   /**
+    * Update a Person
+    */
+  update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
+    // Get person
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
+      person.name = name
+      person.cardId = cardId
+      person.dorsal = dorsal
+      person.avatarUrl = avatarUrl
+      person.isCalled = isCalled
+      person.reportId = reportId
+      person.teamId = teamId
+      person.userId = userId
+      // Save it
+      this.save(person, function (data, err) {
+        callback(data, err)
+      })
+    })
+  },
+
+  /**
     * Set a new value to isCalled property
     */
   setCalledValue: function (personId, reportId, teamId, newValue, callback) {
