@@ -8,8 +8,6 @@ import ReportActions from '../../../actions/ReportActions'
 import ReportStore from '../../../stores/ReportStore'
 import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
-import PersonActions from '../../../actions/PersonActions'
-import PersonStore from '../../../stores/PersonStore'
 
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
@@ -19,7 +17,6 @@ let FloatingActionButton = mui.FloatingActionButton
 let ReportList = React.createClass({
   mixins: [
     Reflux.connect(ReportListStore, 'reportList'),
-    Reflux.connect(PersonStore, 'person'),
     Reflux.connect(ReportStore, 'report'),
     Reflux.connect(MenuStore, 'menu')
   ],
@@ -45,41 +42,6 @@ let ReportList = React.createClass({
     MenuActions.setRightMenu(rightMenuElements)
     // Update report lists
     ReportActions.updateLists()
-  },
-
-  handleAdd2: function () {
-    let defaultReport = {
-      date: '',
-      location: '',
-      localTeam: {
-        id: 1,
-        teamName: 'Carnicería Angel',
-        result: 0,
-        secondaryField: 0
-      },
-      visitorTeam: {
-        id: 2,
-        teamName: 'Aspic',
-        result: 0,
-        secondaryField: 0
-      }
-    }
-    ReportActions.addReport(defaultReport.date, defaultReport.location,
-      defaultReport.localTeam, defaultReport.visitorTeam, (report) => {
-        let defaultPerson = {
-          name: 'Fulano local',
-          cardId: '33445566Z',
-          dorsal: '1',
-          avatarUrl: 'http://lorempixel.com/100/100/sports/',
-          isCalled: false,
-          reportId: report.id,
-          teamId: 1,
-          userId: 1
-        }
-        PersonActions.addPerson(defaultPerson.name, defaultPerson.cardId, defaultPerson.dorsal,
-          defaultPerson.avatarUrl, defaultPerson.isCalled, defaultPerson.reportId,
-          defaultPerson.teamId, defaultPerson.userId, (person, err) => {})
-      })
   },
 
   handleCreate: function () {
