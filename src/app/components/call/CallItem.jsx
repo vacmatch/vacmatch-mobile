@@ -20,8 +20,8 @@ let Event = React.createClass({
       avatarUrl: React.PropTypes.string,
       isCalled: React.PropTypes.boolean,
       reportId: React.PropTypes.string,
-      teamId: React.PropTypes.number,
-      userId: React.PropTypes.number
+      teamId: React.PropTypes.string,
+      userId: React.PropTypes.string
     })
   },
 

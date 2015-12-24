@@ -33,19 +33,19 @@ let PersonStore = Reflux.createStore({
   },
 
   onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
-    PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, function (data, err) {
-      if (err == null) {
-        if (typeof callback === 'function') {
-          callback(data, null)
-        }
-      } else {
-        callback(null, err)
+    PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, (person, err) => {
+      if (err === null) {
+        this.state = person
+        this.trigger(this.state)
+      }
+      if (typeof callback === 'function') {
+        callback(person, err)
       }
     })
   },
 
-  onEditPerson: function (personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
-    PersonService.update(personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, (person, err) => {
+  onEditPerson: function (personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, oldTeamId, teamId, userId, callback) {
+    PersonService.update(personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, oldTeamId, teamId, userId, (person, err) => {
       this.state = person
       this.trigger(this.state)
       callback(person, err)

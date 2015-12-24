@@ -48,18 +48,19 @@ let PersonListStore = Reflux.createStore({
     // Update player in local Team list
     if (teamId === this.state.localTeamId) {
       let index = this.state.localPeople.findIndex(function (e, index) {
-        return (e.id === person.id)
+        return (e._id === person._id)
       })
       this.state.localPeople[index] = person
+      this.trigger(this.state)
     }
     // Update player in visitor Team list
     if (teamId === this.state.visitorTeamId) {
       let index = this.state.visitorPeople.findIndex(function (e, index) {
-        return (e.id === person.id)
+        return (e._id === person._id)
       })
       this.state.visitorPeople[index] = person
+      this.trigger(this.state)
     }
-    this.trigger(this.state)
     if (typeof callback === 'function') {
       callback()
     }

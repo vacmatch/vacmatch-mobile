@@ -29,12 +29,17 @@ let CallList = React.createClass({
 
   getInitialState: function () {
     return {
-      editDialogIsOpen: false
+      editDialogIsOpen: false,
+      createDialogIsOpen: false
     }
   },
 
   toggleEditDialog: function (report) {
     this.setState({editDialogIsOpen: !this.state.editDialogIsOpen})
+  },
+
+  toggleCreateDialog: function (report) {
+    this.setState({createDialogIsOpen: !this.state.createDialogIsOpen})
   },
 
   componentWillMount: function () {
@@ -51,6 +56,22 @@ let CallList = React.createClass({
     PersonActions.toggleCallPerson(personId, this.props.params.reportId, teamId, newValue)
   },
 
+  handleCreate: function (personId, reportId, teamId) {
+    this.toggleCreateDialog()
+  },
+
+  handleCreateConfirm: function (oldTeamId, person) {
+    // Add person and update it in state
+    PersonActions.addPerson(person.name, person.cardId, person.dorsal, person.avatarUrl,
+      person.isCalled, person.reportId, person.teamId, person.userId, (data, err) => {
+        // Update person list
+        ReportActions.updatePlayers(this.props.params.reportId,
+          this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+            this.toggleCreateDialog()
+          })
+      })
+  },
+
   handleEdit: function (personId, reportId, teamId) {
     // Update report state
     PersonActions.updatePerson(personId, reportId, teamId, (person, err) => {
@@ -58,10 +79,10 @@ let CallList = React.createClass({
     })
   },
 
-  handleEditConfirm: function (person) {
+  handleEditConfirm: function (oldTeamId, person) {
     // Save new changes in person
     PersonActions.editPerson(person._id, person.name, person.cardId, person.dorsal,
-      person.avatarUrl, person.isCalled, person.reportId, person.teamId, person.userId, (updatedPerson, err) => {
+      person.avatarUrl, person.isCalled, person.reportId, oldTeamId, person.teamId, person.userId, (updatedPerson, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
           this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
@@ -80,7 +101,7 @@ let CallList = React.createClass({
     let items = [
       [
         this.state.personList.localPeople.map(person => {
-          return <CallItem key={'local-' + person.id}
+          return <CallItem key={'local-' + person._id}
             person={person}
             dialogIsOpen={this.state.editDialogIsOpen}
             toggleDialog={this.handleEdit}
@@ -89,7 +110,7 @@ let CallList = React.createClass({
       ],
       [
         this.state.personList.visitorPeople.map(person => {
-          return <CallItem key={'visitor-' + person.id}
+          return <CallItem key={'visitor-' + person._id}
             person={person}
             dialogIsOpen={this.state.editDialogIsOpen}
             toggleDialog={this.handleEdit}
@@ -98,14 +119,39 @@ let CallList = React.createClass({
       ]
     ]
 
+    let emptyPerson = {
+      _id: '',
+      name: '',
+      dorsal: '',
+      avatarUrl: '',
+      isCalled: false,
+      reportId: this.state.report._id,
+      teamId: this.state.report.localTeam.id,
+      userId: ''
+    }
+
+    let teams =
+      [
+        {payload: 1, text: this.state.report.localTeam.teamName, value: this.state.report.localTeam.id},
+        {payload: 2, text: this.state.report.visitorTeam.teamName, value: this.state.report.visitorTeam.id}
+      ]
+
     return (
       <div>
         <EditPerson person={this.state.person}
+          title='Edit person'
           dialogIsOpen={this.state.editDialogIsOpen}
           toggleDialog={this.toggleEditDialog}
-          handleUpdate={this.handleEditConfirm}/>
+          handleUpdate={this.handleEditConfirm}
+          teams={teams}/>
+        <EditPerson person={emptyPerson}
+          title='Create person'
+          dialogIsOpen={this.state.createDialogIsOpen}
+          toggleDialog={this.toggleCreateDialog}
+          handleUpdate={this.handleCreateConfirm}
+          teams={teams}/>
         <TabList tabsNames={tabs} tabsItems={items}/>
-        <FloatingActionButton>
+        <FloatingActionButton onClick={this.handleCreate}>
           <i className='material-icons'>add</i>
         </FloatingActionButton>
       </div>
