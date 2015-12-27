@@ -70,7 +70,7 @@ let Report = React.createClass({
     // For start match event creation
     let playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
     // If Match has started
-    if (this.state.report.hasStarted) {
+    if (this.state.report.hasFinished) {
       let playButtonLabel = 'Play'
       if (this.state.report.isPlaying) {
         playButtonLabel = 'Stop'

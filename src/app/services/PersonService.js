@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb'
 
 var db = new PouchDB('players')
+db.sync('http://localhost:5984/players', {live: true})
 
 let PersonService = {
 
@@ -77,6 +78,27 @@ let PersonService = {
         teamId: teamId,
         userId: userId
       }
+      // Save it
+      this.save(person, function (data, err) {
+        callback(data, err)
+      })
+    })
+  },
+
+  /**
+    * Update a Person
+    */
+  update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, oldTeamId, teamId, userId, callback) {
+    // Get person
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, oldTeamId, (person, err) => {
+      person.name = name
+      person.cardId = cardId
+      person.dorsal = dorsal
+      person.avatarUrl = avatarUrl
+      person.isCalled = isCalled
+      person.reportId = reportId
+      person.teamId = teamId
+      person.userId = userId
       // Save it
       this.save(person, function (data, err) {
         callback(data, err)

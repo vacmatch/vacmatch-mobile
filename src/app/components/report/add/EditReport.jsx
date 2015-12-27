@@ -7,6 +7,7 @@ let TextField = mui.TextField
 
 let EditReport = React.createClass({
   propTypes: {
+    title: React.PropTypes.string,
     report: React.PropTypes.shape({
       _id: React.PropTypes.string,
       localTeam: React.PropTypes.shape({
@@ -50,7 +51,7 @@ let EditReport = React.createClass({
       <div key={'dialog-div'}>
         <Dialog key={'dialog-edit-report'}
           ref='editDialog'
-          title='Edit report'
+          title={this.props.title}
           actions={customActions}
           open={this.props.dialogIsOpen}>
             <div>

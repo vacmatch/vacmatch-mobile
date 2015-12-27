@@ -3,6 +3,7 @@ PouchDB.plugin(require('pouchdb-find'))
 
 var db = new PouchDB('events')
 db.sync('http://localhost:5984/events', {live: true})
+window.PouchDB = PouchDB
 
 let EventService = {
 
