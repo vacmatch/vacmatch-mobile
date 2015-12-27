@@ -16,10 +16,28 @@ let ReportService = {
     })
   },
 
-  save: function (date, location, localTeam, visitorTeam, callback) {
+  findAllByFinished: function (hasFinished, callback) {
+    db.createIndex({
+      index: {fields: ['hasFinished']}
+    }).then(function () {
+      return db.find({
+        selector: {
+          hasFinished: {$eq: hasFinished}
+        }
+      })
+    }).then(function (result) {
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
+  save: function (date, location, hasFinished, localTeam, visitorTeam, callback) {
     let report = {
       date: date,
       location: location,
+      hasFinished: hasFinished,
       localTeam: {
         id: localTeam.id,
         teamName: localTeam.teamName,
@@ -43,10 +61,11 @@ let ReportService = {
     })
   },
 
-  update: function (reportId, date, location, localTeam, visitorTeam, callback) {
+  update: function (reportId, date, hasFinished, location, localTeam, visitorTeam, callback) {
     this.find(reportId, (element) => {
       element.date = date
       element.location = location
+      element.hasFinished = hasFinished
       element.localTeam.id = localTeam.id
       element.localTeam.teamName = localTeam.teamName
       element.localTeam.result = localTeam.result

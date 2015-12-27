@@ -3,6 +3,10 @@ import Reflux from 'reflux'
 import EventService from '../services/EventService'
 import EventActions from '../actions/EventActions'
 
+import ReportService from '../services/ReportService'
+
+import EndMatchEvent from '../models/event/control/EndMatchEvent'
+
 let EventStore = Reflux.createStore({
   listenables: EventActions,
 
@@ -40,7 +44,19 @@ let EventStore = Reflux.createStore({
     let timestamp = Date.now()
     EventService.saveControl(reportId, eventType, matchTime, text, timestamp, function (data, err) {
       if (err == null) {
-        callback(data)
+        let end = new EndMatchEvent()
+        // Check if this Event is a end event to modify report state if it's necessary
+        if (eventType === end.type) {
+          let hasFinished = true
+          // Find report
+          ReportService.find(reportId, function (report) {
+            // Update report state with new value
+            ReportService.update(reportId, report.date, hasFinished, report.location,
+              report.localTeam, report.visitorTeam, function () {
+                callback(data)
+              })
+          })
+        }
       }
     })
   },
@@ -52,6 +68,19 @@ let EventStore = Reflux.createStore({
         let filterList = this.state.filter(function (e) { return e._id !== event._id })
         this.state = filterList
         this.trigger(this.state)
+        let end = new EndMatchEvent()
+        // Check if this Event is a end event to modify report state if it's necessary
+        if (event.type === end.type) {
+          let hasFinished = false
+          // Find report
+          ReportService.find(event.reportId, function (report) {
+            // Update report state with new value
+            ReportService.update(event.reportId, report.date, hasFinished, report.location,
+              report.localTeam, report.visitorTeam, function () {
+                callback(data)
+              })
+          })
+        }
       }
       callback(data, err)
     })

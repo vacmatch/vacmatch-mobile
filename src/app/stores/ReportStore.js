@@ -33,7 +33,7 @@ let ReportStore = Reflux.createStore({
         secondaryField: 0
       },
       isPlaying: false,
-      hasStarted: false,
+      hasFinished: false,
       timer: new Stopwatch(1200000),
       time: CronoUtils.milisecondsToString(1200000),
       term: '1'
@@ -52,13 +52,14 @@ let ReportStore = Reflux.createStore({
       this.state._id = report._id
       this.state.date = report.date
       this.state.location = report.location
+      this.state.hasFinished = report.hasFinished
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
       this.trigger(this.state)
     })
     // Check if match has started
     EventService.findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
-      this.state.hasStarted = (startEvents.length > 0)
+      this.state.hasFinished = (startEvents.length > 0)
       // Update term
       EventService.findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
         if (termEvents.length) {
@@ -95,7 +96,7 @@ let ReportStore = Reflux.createStore({
   },
 
   onToggleStartMatch: function () {
-    this.state.hasStarted = !this.state.hasStarted
+    this.state.hasFinished = !this.state.hasFinished
     this.trigger(this.state)
   },
 
@@ -108,7 +109,7 @@ let ReportStore = Reflux.createStore({
       this.state.visitorTeam = newTeam
     }
     // Update result in DB
-    ReportService.update(reportId, this.state.date, this.state.location,
+    ReportService.update(reportId, this.state.date, this.state.hasFinished, this.state.location,
       this.state.localTeam, this.state.visitorTeam, (newReport) => {
         // Update state
         this.state.localTeam = newReport.localTeam
@@ -152,8 +153,8 @@ let ReportStore = Reflux.createStore({
     })
   },
 
-  onEditReport: function (reportId, date, location, localTeam, visitorTeam, callback) {
-    ReportService.update(reportId, date, location, localTeam, visitorTeam, (report, err) => {
+  onEditReport: function (reportId, date, location, hasFinished, localTeam, visitorTeam, callback) {
+    ReportService.update(reportId, date, location, hasFinished, localTeam, visitorTeam, (report, err) => {
       // Update state
       this.state.location = report.location
       this.state.date = report.date

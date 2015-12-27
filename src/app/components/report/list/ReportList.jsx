@@ -68,7 +68,7 @@ let ReportList = React.createClass({
 
   handleEditConfirm: function (report) {
     // Save new changes in report
-    ReportActions.editReport(report.id, report.date, report.location,
+    ReportActions.editReport(report.id, report.date, report.location, report.hasFinished,
       report.localTeam, report.visitorTeam, (result, err) => {
         // Update report list
         ReportActions.updateLists(() => {
@@ -91,16 +91,16 @@ let ReportList = React.createClass({
     let items = [
       [
         this.state.reportList.nextReports.map(element => {
-          return <ReportItem key={'next-' + element.id}
-            report={element.doc}
+          return <ReportItem key={'next-' + element._id}
+            report={element}
             editDialog={this.handleEdit}
             deleteDialog={this.handleDeleteConfirm}/>
         })
       ],
       [
         this.state.reportList.lastReports.map(element => {
-          return <ReportItem key={'last-' + element.id}
-            report={element.doc}
+          return <ReportItem key={'last-' + element._id}
+            report={element}
             editDialog={this.handleEdit}
             deleteDialog={this.handleDeleteConfirm}/>
         })
