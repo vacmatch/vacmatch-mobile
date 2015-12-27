@@ -17,7 +17,7 @@ let ReportListStore = Reflux.createStore({
     return this.state
   },
 
-  onUpdateLists: function () {
+  onUpdateLists: function (callback) {
     ReportService.findAll((data) => {
       let newState = {
         nextReports: data.rows,
@@ -25,6 +25,9 @@ let ReportListStore = Reflux.createStore({
       }
       this.state = newState
       this.trigger(this.state)
+      if (typeof callback === 'function') {
+        callback()
+      }
     })
   },
 
