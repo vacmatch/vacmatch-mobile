@@ -63,7 +63,7 @@ let CallList = React.createClass({
   handleCreateConfirm: function (oldTeamId, person) {
     // Add person and update it in state
     PersonActions.addPerson(person.name, person.cardId, person.dorsal, person.avatarUrl,
-      person.isCalled, person.reportId, person.teamId, person.userId, (data, err) => {
+      person.isCalled, person.isStaff, person.reportId, person.teamId, person.userId, (data, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
           this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
@@ -82,7 +82,7 @@ let CallList = React.createClass({
   handleEditConfirm: function (oldTeamId, person) {
     // Save new changes in person
     PersonActions.editPerson(person._id, person.name, person.cardId, person.dorsal,
-      person.avatarUrl, person.isCalled, person.reportId, oldTeamId, person.teamId, person.userId, (updatedPerson, err) => {
+      person.avatarUrl, person.isCalled, person.isStaff, person.reportId, oldTeamId, person.teamId, person.userId, (updatedPerson, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
           this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
@@ -125,6 +125,7 @@ let CallList = React.createClass({
       dorsal: '',
       avatarUrl: '',
       isCalled: false,
+      isStaff: false,
       reportId: this.state.report._id,
       teamId: this.state.report.localTeam.id,
       userId: ''

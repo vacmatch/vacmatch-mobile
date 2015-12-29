@@ -32,8 +32,8 @@ let PersonStore = Reflux.createStore({
     })
   },
 
-  onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
-    PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, (person, err) => {
+  onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
+    PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, (person, err) => {
       if (err === null) {
         this.state = person
         this.trigger(this.state)
@@ -44,8 +44,8 @@ let PersonStore = Reflux.createStore({
     })
   },
 
-  onEditPerson: function (personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, oldTeamId, teamId, userId, callback) {
-    PersonService.update(personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, oldTeamId, teamId, userId, (person, err) => {
+  onEditPerson: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
+    PersonService.update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, (person, err) => {
       this.state = person
       this.trigger(this.state)
       callback(person, err)

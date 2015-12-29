@@ -65,7 +65,7 @@ let PersonService = {
   /**
     * Create a new Person
     */
-  create: function (name, cardId, dorsal, avatarUrl, isCalled, reportId, teamId, userId, callback) {
+  create: function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
     this.getLastId((id) => {
       let person = {
         _id: id.toString(),
@@ -74,6 +74,7 @@ let PersonService = {
         dorsal: dorsal,
         avatarUrl: avatarUrl,
         isCalled: isCalled,
+        isStaff: isStaff,
         reportId: reportId,
         teamId: teamId,
         userId: userId
@@ -88,7 +89,7 @@ let PersonService = {
   /**
     * Update a Person
     */
-  update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, reportId, oldTeamId, teamId, userId, callback) {
+  update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
     // Get person
     this.findByPersonIdReportIdAndTeamId(personId, reportId, oldTeamId, (person, err) => {
       person.name = name
@@ -96,6 +97,7 @@ let PersonService = {
       person.dorsal = dorsal
       person.avatarUrl = avatarUrl
       person.isCalled = isCalled
+      person.isStaff = isStaff
       person.reportId = reportId
       person.teamId = teamId
       person.userId = userId

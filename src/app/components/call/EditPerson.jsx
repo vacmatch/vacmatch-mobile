@@ -7,6 +7,7 @@ let FlatButton = mui.FlatButton
 let Dialog = mui.Dialog
 let TextField = mui.TextField
 let SelectField = require('material-ui/lib/select-field')
+import Checkbox from 'material-ui/lib/checkbox'
 
 let EditPerson = React.createClass({
   propTypes: {
@@ -17,6 +18,7 @@ let EditPerson = React.createClass({
       dorsal: React.PropTypes.string,
       avatarUrl: React.PropTypes.string,
       isCalled: React.PropTypes.boolean,
+      isStaff: React.PropTypes.boolean,
       reportId: React.PropTypes.string,
       teamId: React.PropTypes.string,
       userId: React.PropTypes.string
@@ -59,6 +61,7 @@ let EditPerson = React.createClass({
     newPerson.name = this.refs.name.getValue()
     newPerson.dorsal = this.refs.dorsal.getValue()
     newPerson.teamId = this.state.teamId
+    newPerson.isStaff = this.refs.isStaff.isChecked()
     this.props.handleUpdate(oldTeamId, newPerson)
   },
 
@@ -102,6 +105,10 @@ let EditPerson = React.createClass({
               menuItems={this.props.teams}
               selectedIndex={this.state.index}
               onChange={this._handleSelectValueChange} />
+            <Checkbox
+              ref='isStaff'
+              label='Is staff'
+              defaultChecked={this.props.person.isStaff}/>
           </div>
         </Dialog>
       </div>
