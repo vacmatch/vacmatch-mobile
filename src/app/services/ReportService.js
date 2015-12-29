@@ -49,7 +49,8 @@ let ReportService = {
         teamName: visitorTeam.teamName,
         result: visitorTeam.result,
         secondaryField: visitorTeam.secondaryField
-      }
+      },
+      incidences: ''
     }
     db.post(report).then(function (response) {
       db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
@@ -61,7 +62,7 @@ let ReportService = {
     })
   },
 
-  update: function (reportId, date, hasFinished, location, localTeam, visitorTeam, callback) {
+  update: function (reportId, date, hasFinished, location, localTeam, visitorTeam, incidences, callback) {
     this.find(reportId, (element) => {
       element.date = date
       element.location = location
@@ -74,6 +75,7 @@ let ReportService = {
       element.visitorTeam.teamName = visitorTeam.teamName
       element.visitorTeam.result = visitorTeam.result
       element.visitorTeam.secondaryField = visitorTeam.secondaryField
+      element.incidences = incidences
 
       db.put(element).then(function (response) {
         db.allDocs({key: response.id, include_docs: true}).then(function (docs) {
