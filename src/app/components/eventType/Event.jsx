@@ -1,5 +1,6 @@
 import React from 'react'
 import mui from 'material-ui'
+import style from '../../../assets/style/generic-style'
 
 // Components
 let Dialog = mui.Dialog
@@ -40,6 +41,17 @@ let Event = React.createClass({
   render: function () {
     let personName = this.props.person.name
     let personDorsal = this.props.person.dorsal
+    let staffLabel = <span style={style.secondaryColor}>Player</span>
+    if (this.props.person.isStaff) {
+      staffLabel = <span style={style.primaryColor}>Staff</span>
+    }
+    let secondaryText = (
+      <div>
+        <span>{personDorsal}</span>
+        <br/>
+        <small>{staffLabel}</small>
+      </div>
+    )
     let avatarUrl = this.props.person.avatarUrl
 
     return (
@@ -71,7 +83,8 @@ let Event = React.createClass({
       </Dialog>
       <ListItem key={'listItem-' + this.props.person.id}
         primaryText={personName}
-        secondaryText={personDorsal}
+        secondaryTextLines={2}
+        secondaryText={secondaryText}
         leftAvatar={<Avatar src= {avatarUrl} />} onClick={this.toggleDialog}/>
     </div>
     )

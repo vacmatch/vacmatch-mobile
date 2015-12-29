@@ -61,7 +61,7 @@ let PersonList = React.createClass({
             let event = this.state.sport.getEventByType(this.props.params.eventType)
             let properties =
               {
-                key: 'eventLocal-' + person.id,
+                key: 'eventLocal-' + person._id,
                 reportId: this.props.params.reportId,
                 matchTime: this.state.report.timer.ms,
                 person: person,
@@ -82,7 +82,7 @@ let PersonList = React.createClass({
             let event = this.state.sport.getEventByType(this.props.params.eventType)
             let properties =
               {
-                key: 'eventVisitor-' + person.id,
+                key: 'eventVisitor-' + person._id,
                 reportId: this.props.params.reportId,
                 matchTime: this.state.report.timer.ms,
                 person: person,

@@ -3,6 +3,7 @@ import Reflux from 'reflux'
 import mui from 'material-ui'
 
 import EventStore from '../../stores/EventStore'
+import style from '../../../assets/style/generic-style'
 
 // Components
 let Dialog = mui.Dialog
@@ -63,6 +64,17 @@ let EventWithCause = React.createClass({
   render: function () {
     let personName = this.props.person.name
     let personDorsal = this.props.person.dorsal
+    let staffLabel = <span style={style.secondaryColor}>Player</span>
+    if (this.props.person.isStaff) {
+      staffLabel = <span style={style.primaryColor}>Staff</span>
+    }
+    let secondaryText = (
+      <div>
+        <span>{personDorsal}</span>
+        <br/>
+        <small>{staffLabel}</small>
+      </div>
+    )
     let avatarUrl = this.props.person.avatarUrl
     let menuItems = this.getMenuItems(this.props.causeList)
 
@@ -101,7 +113,8 @@ let EventWithCause = React.createClass({
       </Dialog>
       <ListItem key={'listItem-' + this.props.person.id}
         primaryText={personName}
-        secondaryText={personDorsal}
+        secondaryTextLines={2}
+        secondaryText={secondaryText}
         leftAvatar={<Avatar src= {avatarUrl} />} onClick={this.toggleDialog}/>
     </div>
     )
