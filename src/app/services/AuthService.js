@@ -5,33 +5,37 @@ var db = new PouchDB('http://localhost:5984/users')
 
 let AuthService = {
 
+  /*
+   * Login a user and returns an error if login fail
+   */
   login: function (username, password, callback) {
     db.login(username, password, function (err, response) {
-      if (err) {
+      if (err !== null) {
         console.log(err)
-        if (err.name === 'unauthorized') {
-          callback(null, err)
-          // name or password incorrect
-        } else {
-          callback(null, err)
-          // cosmic rays, a meteor, etc.
-        }
+        callback(null, err)
       } else {
-        console.log('Logued', username, password)
         callback(response, null)
       }
     })
   },
 
-  logout: function () {
+  /*
+  * Logout a user and returns an error if logout fail
+   */
+  logout: function (callback) {
     db.logout(function (err, response) {
-      if (err) {
+      if (err !== null) {
         console.log(err)
-        // network error
+        callback(null, err)
+      } else {
+        callback(response, null)
       }
     })
   },
 
+  /*
+  * Signup a new user and returns an error if signup fail
+   */
   signup: function (username, password, email, firstName, surname, cardId, callback) {
     db.signup(username, password, {
       metadata: {
@@ -40,35 +44,26 @@ let AuthService = {
         surname: surname,
         cardId: cardId
       }
-    }, function (err, response) {
-      if (err) {
+    }, (err, response) => {
+      if (err !== null) {
         console.log(err)
-        if (err.name === 'conflict') {
-          // "batman" already exists, choose another username
-        } else if (err.name === 'forbidden') {
-          // invalid username
-        } else {
-          // HTTP error, cosmic rays, etc.
-        }
+        callback(null, err)
       } else {
-        console.log('Signed up', username, password)
         this.login(username, password, callback)
       }
     })
   },
 
-  getUser: function (username) {
+  /*
+  * Get a user from de DB by Username
+   */
+  getUser: function (username, callback) {
     db.getUser(username, function (err, response) {
-      if (err) {
+      if (err !== null) {
         console.log(err)
-        if (err.name === 'not_found') {
-          // typo, or you don't have the privileges to see this user
-        } else {
-          // some other error
-        }
+        callback(null, err)
       } else {
-        console.log(response)
-        // response is the user object
+        callback(response, err)
       }
     })
   }
