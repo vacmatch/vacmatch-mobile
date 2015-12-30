@@ -11,6 +11,8 @@ import ReportActions from '../../../actions/ReportActions'
 import ControlEventItem from './ControlEventItem'
 import SportEventItem from './SportEventItem'
 
+import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+
 let List = mui.List
 
 let PersonList = React.createClass({
@@ -67,4 +69,4 @@ let PersonList = React.createClass({
 
 })
 
-module.exports = PersonList
+module.exports = AuthenticatedComponent(PersonList)
