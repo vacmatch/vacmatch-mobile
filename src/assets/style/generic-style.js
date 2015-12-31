@@ -11,5 +11,11 @@ module.exports =
     backgroundColor: '#00bcd4',
     padding: '2px',
     color: 'white'
+  },
+
+  center: {
+    marginTop: '15%',
+    textAlign: 'center'
   }
+
 }

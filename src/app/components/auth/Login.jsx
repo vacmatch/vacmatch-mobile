@@ -58,18 +58,6 @@ let Login = React.createClass({
     })
   },
 
-  handleLogOut: function () {
-    AuthActions.logOut((response, err) => {
-      if (err !== null) {
-        // Show logout error
-        this.setState({snackbarMessage: err.message})
-      } else {
-        this.setState({snackbarMessage: 'Logged out!'})
-      }
-      this.refs.snack.show()
-    })
-  },
-
   toggleSignUpDialog: function () {
     this.setState({dialogIsOpen: !this.state.dialogIsOpen})
   },
@@ -96,7 +84,6 @@ let Login = React.createClass({
           <div style={style.buttonRow}>
             <FlatButton style={style.button} label='Sign up' onClick={this.toggleSignUpDialog}/>
             <RaisedButton style={style.button} label='Login' primary={true} onClick={this.handleLogin} />
-            <FlatButton style={style.button} label='Log out' onClick={this.handleLogOut}/>
           </div>
         </div>
         <Snackbar
