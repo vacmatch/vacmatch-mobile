@@ -1,6 +1,9 @@
 
 let urls = {
   home: 'home',
+  login: {
+    show: 'login/'
+  },
   report: {
     list: 'reports/',
     show: function (reportId) {

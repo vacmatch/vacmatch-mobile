@@ -12,6 +12,8 @@ import urls from '../../../api/urls'
 
 import SportStore from '../../../stores/SportStore'
 
+import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+
 let PersonList = React.createClass({
   mixins: [
     Reflux.connect(PersonListStore, 'personList'),
@@ -103,4 +105,4 @@ let PersonList = React.createClass({
 
 })
 
-module.exports = PersonList
+module.exports = AuthenticatedComponent(PersonList)

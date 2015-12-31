@@ -4,6 +4,9 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 import mui from 'material-ui'
 import { History } from 'react-router'
 import MenuStore from '../stores/MenuStore'
+import AuthStore from '../stores/AuthStore'
+import AuthActions from '../actions/AuthActions'
+import urls from '../api/urls'
 
 // Components
 let AppBar = mui.AppBar
@@ -12,6 +15,10 @@ let LeftNav = mui.LeftNav
 let IconMenu = mui.IconMenu
 let MenuItem = require('material-ui/lib/menus/menu-item')
 let IconButton = mui.IconButton
+let FlatButton = mui.FlatButton
+let Snackbar = mui.Snackbar
+
+import style from '../../assets/style/generic-style'
 
 // Needed for onTouchTap
 // Can go away when react 1.0 release
@@ -25,6 +32,7 @@ injectTapEventPlugin()
 let Layout = React.createClass({
   mixins: [
     Reflux.connect(MenuStore, 'menu'),
+    Reflux.connect(AuthStore, 'auth'),
     History
   ],
 
@@ -32,7 +40,13 @@ let Layout = React.createClass({
     children: React.PropTypes.element.isRequired
   },
 
-  _handleTouchTap: function () {
+  getInitialState: function () {
+    return {
+      snackbarMessage: ''
+    }
+  },
+
+  handleLeftNavToggle: function () {
     this.refs.leftNav.toggle()
   },
 
@@ -47,16 +61,39 @@ let Layout = React.createClass({
     }
   },
 
+  handleLogOut: function () {
+    AuthActions.logOut((response, err) => {
+      if (err !== null) {
+        // Show logout error
+        this.setState({snackbarMessage: err.message})
+      } else {
+        this.handleLeftNavToggle()
+        this.history.pushState(null, urls.login.show)
+      }
+    })
+  },
+
   render: function () {
+    // Set right menu elements
     let rightMenuElements = (
       this.state.menu.rightMenu.map((element, index) => {
         return <MenuItem key={index} index={index} primaryText={element.text} onClick={this._handleClickRightMenu.bind(null, element)}/>
       })
     )
+    // Show logged info or not
+    let loggedInfo = <h4>Please, log in!</h4>
+    if (AuthStore.isLoggedIn()) {
+      loggedInfo = (
+        <div>
+          <h4>{this.state.auth.user.name}</h4>
+          <FlatButton label='Log out' primary={true} onClick={this.handleLogOut}/>
+        </div>
+      )
+    }
     return <div>
       <AppBar
         title='VACmatch'
-        onLeftIconButtonTouchTap={this._handleTouchTap}
+        onLeftIconButtonTouchTap={this.handleLeftNavToggle}
         iconElementRight={
           <IconMenu
             iconButtonElement={
@@ -68,8 +105,15 @@ let Layout = React.createClass({
         />
       <LeftNav ref='leftNav' docked={false} menuItems={[]}
         header={
+          <div style={style.center}>
             <Avatar src='assets/img/logos/vacmatch.png' size={100} />
+            {loggedInfo}
+          </div>
         }/>
+        <Snackbar
+          ref='snack'
+          message={this.state.snackbarMessage}
+          autoHideDuration={4000} />
       {this.props.children}
       </div>
   }

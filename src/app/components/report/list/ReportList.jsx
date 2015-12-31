@@ -12,6 +12,8 @@ import MenuActions from '../../../actions/MenuActions'
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
 
+import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+
 let FloatingActionButton = mui.FloatingActionButton
 
 let ReportList = React.createClass({
@@ -148,4 +150,4 @@ let ReportList = React.createClass({
   }
 })
 
-module.exports = ReportList
+module.exports = AuthenticatedComponent(ReportList)

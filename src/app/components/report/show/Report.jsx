@@ -16,6 +16,8 @@ import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
 import EndMatchDialog from './EndMatchDialog'
 
+import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
 let Snackbar = mui.Snackbar
@@ -139,4 +141,4 @@ let Report = React.createClass({
 
 })
 
-module.exports = Report
+module.exports = AuthenticatedComponent(Report)

@@ -8,6 +8,8 @@ import SportStore from '../../../stores/SportStore'
 import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
 
+import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+
 let Tabs = mui.Tabs
 let Tab = mui.Tab
 let FlatButton = mui.FlatButton
@@ -45,4 +47,4 @@ let EndReport = React.createClass({
 
 })
 
-module.exports = EndReport
+module.exports = AuthenticatedComponent(EndReport)

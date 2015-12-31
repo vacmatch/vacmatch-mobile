@@ -12,6 +12,8 @@ import TabList from '../generic/TabList'
 import CallItem from './CallItem'
 import EditPerson from './EditPerson'
 
+import AuthenticatedComponent from '../generic/AuthenticatedComponent'
+
 let FloatingActionButton = mui.FloatingActionButton
 
 let CallList = React.createClass({
@@ -161,4 +163,4 @@ let CallList = React.createClass({
 
 })
 
-module.exports = CallList
+module.exports = AuthenticatedComponent(CallList)
