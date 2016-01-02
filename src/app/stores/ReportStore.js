@@ -32,6 +32,7 @@ let ReportStore = Reflux.createStore({
         result: 0,
         secondaryField: 0
       },
+      incidences: '',
       isPlaying: false,
       hasFinished: false,
       timer: new Stopwatch(1200000),
@@ -53,6 +54,7 @@ let ReportStore = Reflux.createStore({
       this.state.date = report.date
       this.state.location = report.location
       this.state.hasFinished = report.hasFinished
+      this.state.incidences = report.incidences
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
       this.trigger(this.state)
@@ -66,8 +68,10 @@ let ReportStore = Reflux.createStore({
           this.state.term = termEvents[0].text
         }
         this.trigger(this.state)
+        if (typeof callback === 'function') {
+          callback()
+        }
       })
-      callback()
     })
   },
 
@@ -110,7 +114,7 @@ let ReportStore = Reflux.createStore({
     }
     // Update result in DB
     ReportService.update(reportId, this.state.date, this.state.hasFinished, this.state.location,
-      this.state.localTeam, this.state.visitorTeam, (newReport) => {
+      this.state.localTeam, this.state.visitorTeam, this.state.incidences, (newReport) => {
         // Update state
         this.state.localTeam = newReport.localTeam
         this.state.visitorTeam = newReport.visitorTeam
@@ -149,19 +153,25 @@ let ReportStore = Reflux.createStore({
           this.updateTeam(event.reportId, this.state.visitorTeam)
         }
       }
-      callback()
+      if (typeof callback === 'function') {
+        callback()
+      }
     })
   },
 
-  onEditReport: function (reportId, date, location, hasFinished, localTeam, visitorTeam, callback) {
-    ReportService.update(reportId, date, location, hasFinished, localTeam, visitorTeam, (report, err) => {
+  onEditReport: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
+    ReportService.update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, (report, err) => {
       // Update state
       this.state.location = report.location
       this.state.date = report.date
+      this.state.hasFinished = report.hasFinished
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
+      this.state.incidences = report.incidences
       this.trigger(this.state)
-      callback(report, err)
+      if (typeof callback === 'function') {
+        callback(report, err)
+      }
     })
   }
 

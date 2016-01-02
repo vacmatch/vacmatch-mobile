@@ -19,25 +19,22 @@ let EventStore = Reflux.createStore({
   },
 
   onGetEventsByReportIdAndType: function (reportId, eventType, callback) {
-    EventService.findAllByReportIdAndEventType(reportId, eventType, function (data) {
-      callback(data)
-    })
+    EventService.findAllByReportIdAndEventType(reportId, eventType, callback)
   },
 
-  onUpdateEventList: function (reportId) {
+  onUpdateEventList: function (reportId, callback) {
     EventService.findAllByReportId(reportId, (data) => {
       this.state = data
       this.trigger(this.state)
+      if (typeof callback === 'function') {
+        callback()
+      }
     })
   },
 
   onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
     let timestamp = Date.now()
-    EventService.save(reportId, person, team, eventType, matchTime, cause, timestamp, function (data, err) {
-      if (err == null) {
-        callback(data)
-      }
-    })
+    EventService.save(reportId, person, team, eventType, matchTime, cause, timestamp, callback)
   },
 
   onAddControlEvent: function (reportId, eventType, matchTime, text, callback) {
@@ -52,11 +49,15 @@ let EventStore = Reflux.createStore({
           ReportService.find(reportId, function (report) {
             // Update report state with new value
             ReportService.update(reportId, report.date, hasFinished, report.location,
-              report.localTeam, report.visitorTeam, function () {
-                callback(data)
+              report.localTeam, report.visitorTeam, report.incidences, function () {
+                callback(data, null)
               })
           })
+        } else {
+          callback(data, err)
         }
+      } else {
+        callback(data, err)
       }
     })
   },
