@@ -5,7 +5,8 @@ let PersonActions = Reflux.createActions([
   'toggleCallPerson',
   'updatePersonDorsal',
   'updatePerson',
-  'editPerson'
+  'editPerson',
+  'deletePerson'
 ])
 
 module.exports = PersonActions

@@ -6,13 +6,17 @@ let Avatar = mui.Avatar
 let ListItem = mui.ListItem
 let Toggle = mui.Toggle
 let IconButton = mui.IconButton
+let IconMenu = mui.IconMenu
+let MenuItem = require('material-ui/lib/menus/menu-item')
+
 import style from '../../../assets/style/generic-style'
 
 let Event = React.createClass({
 
   propTypes: {
     dialogIsOpen: React.PropTypes.bool,
-    toggleDialog: React.PropTypes.func,
+    editDialog: React.PropTypes.func,
+    deleteDialog: React.PropTypes.func,
     handleCallToggle: React.PropTypes.func,
     person: React.PropTypes.shape({
       _id: React.PropTypes.string,
@@ -41,6 +45,16 @@ let Event = React.createClass({
       </div>
     )
     let avatarUrl = this.props.person.avatarUrl
+    let menuElements = [
+      <MenuItem key={'edit'} index={0} primaryText={'Edit'}
+        onClick={
+          this.props.editDialog.bind(null, this.props.person._id, this.props.person.reportId, this.props.person.teamId)
+        }/>,
+      <MenuItem key={'delete'} index={1} primaryText={'Delete'}
+        onClick={
+          this.props.deleteDialog.bind(null, this.props.person._id, this.props.person.reportId, this.props.person.teamId)
+        }/>
+    ]
 
     return (
       <div>
@@ -57,10 +71,19 @@ let Event = React.createClass({
                 name={'toggle-' + this.props.person._id}
                 defaultToggled={this.props.person.isCalled}
                 onToggle={this.props.handleCallToggle.bind(null, this.props.person._id, this.props.person.teamId)} />
-              <IconButton tooltip='Edit'
-                onClick={this.props.toggleDialog.bind(null, this.props.person._id, this.props.person.reportId, this.props.person.teamId)}>
-                <i className='material-icons'>settings</i>
-              </IconButton>
+            </div>
+          }
+          rightIcon={
+            <div>
+              <br/>
+              <IconMenu
+                iconButtonElement={
+                  <IconButton tooltip='Edit'>
+                    <i className='material-icons'>more_vert</i>
+                  </IconButton>
+                }>
+                {menuElements}
+              </IconMenu>
             </div>
           }/>
       </div>

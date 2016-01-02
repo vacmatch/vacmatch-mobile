@@ -141,6 +141,18 @@ let PersonService = {
     db.allDocs({limit: 0}).then(function (doc) {
       callback(doc.total_rows)
     })
+  },
+
+  /*
+   * Delete a person indentified by personId, reportId and teamId
+   */
+  deletePerson: function (personId, reportId, teamId, callback) {
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, function (data, err) {
+      // Remove it
+      db.remove(data, function () {
+        callback(data, err)
+      })
+    })
   }
 }
 
