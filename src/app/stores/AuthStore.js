@@ -51,17 +51,17 @@ let AuthStore = Reflux.createStore({
     })
   },
 
-  onSignUp: function (username, password, email, firstName, surname, cardId, callback) {
-    AuthService.signup(username, password, email, firstName, surname, cardId, (user, err) => {
+  onSignUp: function (username, password, email, firstName, surname, cardId, signKey, callback) {
+    AuthService.signup(username, password, email, firstName, surname, cardId, signKey, (response, err) => {
       if (err === null) {
-        this.onLogIn(user.username, user.password, function (user, err) {
+        this.onLogIn(username, password, function (user, err) {
           if (typeof callback === 'function') {
             callback(user, err)
           }
         })
       } else {
         if (typeof callback === 'function') {
-          callback(user, err)
+          callback(response, err)
         }
       }
     })

@@ -24,7 +24,7 @@ let EditUser = React.createClass({
     this.props.handleUpdate(
       this.refs.username.getValue(), this.refs.password.getValue(),
       this.refs.email.getValue(), this.refs.name.getValue(), this.refs.surname.getValue(),
-      this.refs.cardid.getValue()
+      this.refs.cardid.getValue(), this.refs.signKey.getValue()
     )
   },
 
@@ -59,6 +59,12 @@ let EditUser = React.createClass({
               key={'dialog-password-field'}
               hintText='Insert password'
               floatingLabelText='Password'
+              type='password'/>
+            <br/>
+            <TextField ref='signKey'
+              key={'dialog-signKey-field'}
+              hintText='Insert PIN'
+              floatingLabelText='PIN'
               type='password'/>
             <br/>
             <TextField ref='name'

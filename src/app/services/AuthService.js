@@ -1,7 +1,13 @@
 import PouchDB from 'pouchdb'
 PouchDB.plugin(require('pouchdb-authentication'))
 
+import Hashes from 'jshashes'
+
 var db = new PouchDB('http://localhost:5984/users')
+
+// Create a local users database and sync the remote database
+let localdb = new PouchDB('localUsers')
+db.sync(localdb, {live: true})
 
 let AuthService = {
 
@@ -36,21 +42,22 @@ let AuthService = {
   /*
   * Signup a new user and returns an error if signup fail
    */
-  signup: function (username, password, email, firstName, surname, cardId, callback) {
+  signup: function (username, password, email, firstName, surname, cardId, signKey, callback) {
+    let hashKey = new Hashes.SHA512().hex(signKey)
     db.signup(username, password, {
       metadata: {
         email: email,
         firstName: firstName,
         surname: surname,
-        cardId: cardId
+        cardId: cardId,
+        signKey: hashKey
       }
     }, (err, response) => {
       if (err !== null) {
         console.log(err)
-        callback(null, err)
-      } else {
-        this.login(username, password, callback)
       }
+      console.log('response', response)
+      callback(response, err)
     })
   },
 
@@ -65,6 +72,36 @@ let AuthService = {
       } else {
         callback(response, err)
       }
+    })
+  },
+
+  /* -----------------------------------------------------------
+  * ------------------- LOCAL DB FUNCTIONS --------------------
+  * -----------------------------------------------------------
+  */
+
+  /*
+   * Get user from local DB by ID
+   */
+  findById: function (userId, callback) {
+    localdb.get(userId).then(function (doc) {
+      callback(doc, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
+  /*
+   * Check if signKey si valid, return a boolean value
+   */
+  checkSignKey: function (userId, signKey, callback) {
+    this.findById(userId, (user, err) => {
+      let value = false
+      if (err === null) {
+        value = (user.signKey === new Hashes.SHA512().hex(signKey))
+      }
+      callback(value, err)
     })
   }
 }

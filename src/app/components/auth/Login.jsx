@@ -44,8 +44,8 @@ let Login = React.createClass({
     })
   },
 
-  handleSignUp: function (username, password, email, firstName, surname, cardId) {
-    AuthActions.signUp(username, password, email, firstName, surname, cardId, (user, err) => {
+  handleSignUp: function (username, password, email, firstName, surname, cardId, signKey) {
+    AuthActions.signUp(username, password, email, firstName, surname, cardId, signKey, (user, err) => {
       if (err === null) {
         // Go to report list
         this.toggleSignUpDialog()

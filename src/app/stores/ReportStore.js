@@ -17,7 +17,7 @@ let ReportStore = Reflux.createStore({
 
   init: function () {
     this.state = {
-      id: '',
+      _id: null,
       date: '',
       location: '',
       localTeam: {
