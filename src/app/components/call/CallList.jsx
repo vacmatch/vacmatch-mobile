@@ -130,7 +130,7 @@ let CallList = React.createClass({
       isStaff: false,
       reportId: this.state.report._id,
       teamId: this.state.report.localTeam.id,
-      userId: ''
+      userId: null
     }
 
     let teams =
