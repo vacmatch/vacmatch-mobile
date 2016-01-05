@@ -34,7 +34,7 @@ let ReportService = {
     })
   },
 
-  save: function (date, location, hasFinished, localTeam, visitorTeam, callback) {
+  save: function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
     let report = {
       date: date,
       location: location,
@@ -51,7 +51,8 @@ let ReportService = {
         result: visitorTeam.result,
         secondaryField: visitorTeam.secondaryField
       },
-      incidences: ''
+      incidences: '',
+      refereeList: refereeList
     }
     db.post(report).then(function (response) {
       db.allDocs({key: response.id, include_docs: true}).then(function (doc) {

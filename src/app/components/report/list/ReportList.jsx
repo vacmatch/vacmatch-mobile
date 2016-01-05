@@ -8,6 +8,9 @@ import ReportActions from '../../../actions/ReportActions'
 import ReportStore from '../../../stores/ReportStore'
 import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
+import AuthStore from '../../../stores/AuthStore'
+import RefereeActions from '../../../actions/RefereeActions'
+import RefereeStore from '../../../stores/RefereeStore'
 
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
@@ -20,7 +23,9 @@ let ReportList = React.createClass({
   mixins: [
     Reflux.connect(ReportListStore, 'reportList'),
     Reflux.connect(ReportStore, 'report'),
-    Reflux.connect(MenuStore, 'menu')
+    Reflux.connect(MenuStore, 'menu'),
+    Reflux.connect(RefereeStore, 'referee'),
+    Reflux.connect(AuthStore, 'auth')
   ],
 
   getInitialState: function () {
@@ -51,14 +56,27 @@ let ReportList = React.createClass({
   },
 
   handleCreateConfirm: function (newReport) {
-    // Save new changes in report
-    ReportActions.addReport(newReport.date, newReport.location,
-      newReport.localTeam, newReport.visitorTeam, (result, err) => {
-        // Update report list
-        ReportActions.updateLists(() => {
-          this.toggleCreateDialog()
-        })
-      })
+    let userId = ''
+    if (this.state.auth.user !== null) {
+      userId = this.state.auth.user._id
+    }
+    // TODO: Add more referees
+    // Find Referee from logged User
+    RefereeActions.findByUserId(userId, (referee, err) => {
+      if (err === null) {
+        let refereeList = [referee]
+        // Save new changes in report
+        ReportActions.addReport(newReport.date, newReport.location,
+          newReport.localTeam, newReport.visitorTeam, refereeList, (result, err) => {
+            if (err === null) {
+              // Update report list
+              ReportActions.updateLists(() => {
+                this.toggleCreateDialog()
+              })
+            }
+          })
+      }
+    })
   },
 
   handleEdit: function (reportId) {

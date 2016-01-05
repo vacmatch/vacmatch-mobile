@@ -17,6 +17,27 @@ let RefereeService = {
     })
   },
 
+  /*
+   * Find a unique Referee by userId
+   * TODO: Add federationId when federation feature is added
+   */
+  findByUserId: function (userId, callback) {
+    db.createIndex({
+      index: {fields: ['userId']}
+    }).then(function () {
+      return db.find({
+        selector: {
+          userId: {$eq: userId}
+        }
+      })
+    }).then(function (result) {
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
   /**
     * Save a referee
     */
