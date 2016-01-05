@@ -2,6 +2,7 @@ import Reflux from 'reflux'
 
 import AuthService from '../services/AuthService'
 import AuthActions from '../actions/AuthActions'
+import RefereeService from '../services/RefereeService'
 
 let AuthStore = Reflux.createStore({
   listenables: AuthActions,
@@ -54,15 +55,24 @@ let AuthStore = Reflux.createStore({
   onSignUp: function (username, password, email, firstName, surname, cardId, signKey, callback) {
     AuthService.signup(username, password, email, firstName, surname, cardId, signKey, (response, err) => {
       if (err === null) {
-        this.onLogIn(username, password, function (user, err) {
-          if (typeof callback === 'function') {
-            callback(user, err)
+        // TODO: Add a default avatarUrl
+        let avatarUrl = ''
+        let name = firstName + ' ' + surname
+        let userId = response.id
+        // When an user is created, a new referee is created too with this user
+        RefereeService.create(name, cardId, avatarUrl, userId, (referee, err) => {
+          if (err === null) {
+            this.onLogIn(username, password, function (user, err) {
+              if (typeof callback === 'function') {
+                callback(user, err)
+              }
+            })
           }
         })
-      } else {
-        if (typeof callback === 'function') {
-          callback(response, err)
-        }
+      }
+      // Otherwise returns an error
+      if (typeof callback === 'function') {
+        callback(response, err)
       }
     })
   },
