@@ -31,7 +31,7 @@ let RefereeService = {
         }
       })
     }).then(function (result) {
-      callback(result.docs, null)
+      callback(result.docs[0], null)
     }).catch(function (err) {
       console.log('err: ', err)
       callback(null, err)
@@ -62,7 +62,8 @@ let RefereeService = {
         name: name,
         cardId: cardId,
         avatarUrl: avatarUrl,
-        userId: userId
+        userId: userId,
+        fedId: 1
         // TODO: Add federation id
       }
       // Save it

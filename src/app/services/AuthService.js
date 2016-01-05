@@ -15,12 +15,12 @@ let AuthService = {
    * Login a user and returns an error if login fail
    */
   login: function (username, password, callback) {
-    db.login(username, password, function (err, response) {
+    db.login(username, password, (err, response) => {
       if (err !== null) {
         console.log(err)
         callback(null, err)
       } else {
-        callback(response, null)
+        this.getUser(username, callback)
       }
     })
   },
@@ -55,9 +55,9 @@ let AuthService = {
     }, (err, response) => {
       if (err !== null) {
         console.log(err)
+        callback(null, err)
       }
-      console.log('response', response)
-      callback(response, err)
+      this.getUser(username, callback)
     })
   },
 

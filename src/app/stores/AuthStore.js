@@ -58,7 +58,7 @@ let AuthStore = Reflux.createStore({
         // TODO: Add a default avatarUrl
         let avatarUrl = ''
         let name = firstName + ' ' + surname
-        let userId = response.id
+        let userId = response._id
         // When an user is created, a new referee is created too with this user
         RefereeService.create(name, cardId, avatarUrl, userId, (referee, err) => {
           if (err === null) {
