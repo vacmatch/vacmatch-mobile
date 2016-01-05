@@ -9,7 +9,7 @@ let RaisedButton = mui.RaisedButton
 let TextField = mui.TextField
 let Snackbar = mui.Snackbar
 
-let RefereeTab = React.createClass({
+let Incidences = React.createClass({
   mixins: [
     Reflux.connect(ReportStore, 'report')
   ],
@@ -59,4 +59,4 @@ let RefereeTab = React.createClass({
 
 })
 
-module.exports = RefereeTab
+module.exports = Incidences

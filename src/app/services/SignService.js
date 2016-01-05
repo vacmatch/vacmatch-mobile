@@ -51,7 +51,7 @@ let SignStore = {
     })
   },
 
-  create: function (userId, reportId, stringToHash, timeStamp, personId, personName, teamId, refereeId, refereeName, callback) {
+  create: function (userId, reportId, stringToHash, timeStamp, identifier, name, teamId, fedId, callback) {
     let hash = new Hashes.SHA512().hex(stringToHash)
     this.getLastId((id) => {
       let signature = {
@@ -60,11 +60,10 @@ let SignStore = {
         reportId: reportId,
         hash: hash,
         timeStamp: timeStamp,
+        identifier: identifier,
+        name: name,
         teamId: teamId,
-        personId: personId,
-        personName: personName,
-        refereeId: refereeId,
-        refereeName: refereeName
+        fedId: fedId
       }
       this.save(signature, callback)
     })

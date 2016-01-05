@@ -3,7 +3,7 @@ PouchDB.plugin(require('pouchdb-authentication'))
 
 import Hashes from 'jshashes'
 
-var db = new PouchDB('http://localhost:5984/users')
+var db = new PouchDB('http://localhost:5984/_users')
 
 // Create a local users database and sync the remote database
 let localdb = new PouchDB('localUsers')
@@ -81,10 +81,11 @@ let AuthService = {
   */
 
   /*
-   * Get user from local DB by ID
+   * Get user from DB by ID
+   * TODO: Work offline
    */
   findById: function (userId, callback) {
-    localdb.get(userId).then(function (doc) {
+    db.get(userId).then(function (doc) {
       callback(doc, null)
     }).catch(function (err) {
       console.log('err: ', err)
