@@ -33,6 +33,7 @@ let ReportStore = Reflux.createStore({
         secondaryField: 0
       },
       incidences: '',
+      refereeList: [],
       isPlaying: false,
       hasFinished: false,
       timer: new Stopwatch(1200000),
@@ -55,6 +56,7 @@ let ReportStore = Reflux.createStore({
       this.state.location = report.location
       this.state.hasFinished = report.hasFinished
       this.state.incidences = report.incidences
+      this.state.refereeList = report.refereeList
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
       this.trigger(this.state)
@@ -168,6 +170,7 @@ let ReportStore = Reflux.createStore({
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
       this.state.incidences = report.incidences
+      this.state.refereeList = report.refereeList
       this.trigger(this.state)
       if (typeof callback === 'function') {
         callback(report, err)

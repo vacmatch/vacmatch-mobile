@@ -17,7 +17,7 @@ let TextField = mui.TextField
 let SelectField = require('material-ui/lib/select-field')
 let Avatar = mui.Avatar
 
-let RefereeTab = React.createClass({
+let Sign = React.createClass({
   mixins: [
     Reflux.connect(SignStore, 'signatures')
   ],
@@ -39,6 +39,17 @@ let RefereeTab = React.createClass({
     }
   },
 
+  toggleSnackBar: function (newText) {
+    this.setState({
+      dialogIsOpen: this.state.dialogIsOpen,
+      snackbarMessage: newText,
+      index: this.state.index,
+      value: this.state.value,
+      userId: this.state.userId
+    })
+    this.refs.snack.show()
+  },
+
   toggleDialog: function () {
     this.setState({
       dialogIsOpen: !this.state.dialogIsOpen,
@@ -58,22 +69,29 @@ let RefereeTab = React.createClass({
   },
 
   handleSign: function () {
-    // Players created in this moment
+    // Players created in this APP (without user)
     if (this.state.userId === null) {
       SignActions.nonUserSignReport(this.props.reportId, this.state.value._id,
         this.state.value.name, this.state.value.teamId, (data, err) => {
-          this.toggleDialog()
+          if (err !== null) {
+            this.toggleSnackBar(err)
+          } else {
+            this.toggleDialog()
+          }
+        })
+    } else {
+      let signKey = this.refs.pin.getValue()
+      // Referee and players with user
+      SignActions.userSignReport(this.state.userId, signKey, this.props.reportId,
+        this.state.value._id, this.state.value.name,
+        this.state.value.teamId, this.state.value.fedId, (data, err) => {
+          if (err !== null) {
+            this.toggleSnackBar(err)
+          } else {
+            this.toggleDialog()
+          }
         })
     }
-/*
-    else {
-      // Referee and players with user
-      SignActions.userSignReport(userId, signKey, reportId, personId, personName, teamId, refereeId, refereeName,(data, err) => {
-        console.log('SIGNED TOP USER', data, err)
-      })
-    }
-    let signKey = this.refs.pin.getValue()
-*/
   },
 
   render: function () {
@@ -102,11 +120,13 @@ let RefereeTab = React.createClass({
 
     let signaturesComponent = (
       this.state.signatures.map((signature, index) => {
-        if (signature.teamId === this.props.teamId) {
+        // Person: If Team is the same as passed by properties
+        // Referee: If there isn't a Team
+        if ((signature.teamId === this.props.teamId) || ((this.props.teamId === null) && (signature.teamId === undefined))) {
           let text = ''
           let time = new Date(signature.timeStamp)
-          if (signature.personName !== null) {
-            text = dateFormat(time, 'dd/mm/yyyy, HH:MM') + ' - ' + signature.personName
+          if (signature.name !== null) {
+            text = dateFormat(time, 'dd/mm/yyyy, HH:MM') + ' - ' + signature.name
           }
           return <p key={'signatures-' + index}>{text}</p>
         }
@@ -157,4 +177,4 @@ let RefereeTab = React.createClass({
 
 })
 
-module.exports = RefereeTab
+module.exports = Sign

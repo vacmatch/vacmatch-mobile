@@ -11,7 +11,7 @@ import SignStore from '../../../stores/SignStore'
 import SignActions from '../../../actions/SignActions'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
-import RefereeTab from './RefereeTab'
+import Incidences from './Incidences'
 import Sign from './Sign'
 
 let Tabs = mui.Tabs
@@ -45,12 +45,16 @@ let EndReport = React.createClass({
   },
 
   render: function () {
-    let refereeTitle = 'Referee'
+    let refereeTitle = 'Sign report referee'
     let localTitle = 'Sign report ' + this.state.report.localTeam.teamName
     let visitorTitle = 'Sign report ' + this.state.report.visitorTeam.teamName
     return <Tabs>
-      <Tab label={refereeTitle}>
-        <RefereeTab handleAddIncidences={this.handleAddIncidences}/>
+      <Tab label='Referee'>
+        <Incidences handleAddIncidences={this.handleAddIncidences}/>
+        <Sign title={refereeTitle}
+          personList={this.state.report.refereeList}
+          reportId={this.state.report._id}
+          teamId={null}/>
       </Tab>
       <Tab label={this.state.report.localTeam.teamName}>
         <Sign title={localTitle}
