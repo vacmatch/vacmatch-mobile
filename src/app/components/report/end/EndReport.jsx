@@ -6,9 +6,13 @@ import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
 import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
+import PersonListStore from '../../../stores/PersonListStore'
+import SignStore from '../../../stores/SignStore'
+import SignActions from '../../../actions/SignActions'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 import RefereeTab from './RefereeTab'
+import Sign from './Sign'
 
 let Tabs = mui.Tabs
 let Tab = mui.Tab
@@ -16,6 +20,8 @@ let Tab = mui.Tab
 let EndReport = React.createClass({
   mixins: [
     Reflux.connect(ReportStore, 'report'),
+    Reflux.connect(PersonListStore, 'personLists'),
+    Reflux.connect(SignStore, 'signatures'),
     Reflux.connect(MenuStore, 'menu')
   ],
 
@@ -30,16 +36,34 @@ let EndReport = React.createClass({
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
     // Update report state
-    ReportActions.updateReport(this.props.params.reportId)
+    ReportActions.updateReport(this.props.params.reportId, () => {
+      ReportActions.updatePlayers(this.state.report._id, this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+        SignActions.updateSignatures(this.state.report._id, () => {
+        })
+      })
+    })
   },
 
   render: function () {
+    let refereeTitle = 'Referee'
+    let localTitle = 'Sign report ' + this.state.report.localTeam.teamName
+    let visitorTitle = 'Sign report ' + this.state.report.visitorTeam.teamName
     return <Tabs>
-      <Tab label='Referee'>
+      <Tab label={refereeTitle}>
         <RefereeTab handleAddIncidences={this.handleAddIncidences}/>
       </Tab>
-      <Tab label={this.state.report.localTeam.teamName}></Tab>
-      <Tab label={this.state.report.visitorTeam.teamName}></Tab>
+      <Tab label={this.state.report.localTeam.teamName}>
+        <Sign title={localTitle}
+          personList={this.state.personLists.localPeople}
+          reportId={this.state.report._id}
+          teamId={this.state.report.localTeam.id}/>
+      </Tab>
+      <Tab label={this.state.report.visitorTeam.teamName}>
+        <Sign title={visitorTitle}
+          personList={this.state.personLists.visitorPeople}
+          reportId={this.state.report._id}
+          teamId={this.state.report.visitorTeam.id}/>
+      </Tab>
     </Tabs>
   }
 

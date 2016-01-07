@@ -16,6 +16,9 @@ module.exports =
   center: {
     marginTop: '15%',
     textAlign: 'center'
-  }
+  },
 
+  container: {
+    marginTop: '10%'
+  }
 }

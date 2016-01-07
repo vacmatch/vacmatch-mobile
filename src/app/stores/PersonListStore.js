@@ -29,18 +29,18 @@ let PersonListStore = Reflux.createStore({
         this.state.localTeamId = localTeamId
         this.trigger(this.state)
       }
-      if (typeof callback === 'function') {
-        callback()
-      }
-    })
-    PersonService.findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {
-      if (err) {
-        console.log('Error: ', err)
-      } else {
-        this.state.visitorPeople = data
-        this.state.visitorTeamId = visitorTeamId
-        this.trigger(this.state)
-      }
+      PersonService.findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {
+        if (err) {
+          console.log('Error: ', err)
+        } else {
+          this.state.visitorPeople = data
+          this.state.visitorTeamId = visitorTeamId
+          this.trigger(this.state)
+        }
+        if (typeof callback === 'function') {
+          callback()
+        }
+      })
     })
   },
 

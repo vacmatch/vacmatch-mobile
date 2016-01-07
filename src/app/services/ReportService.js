@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb'
 
 var db = new PouchDB('reports')
+db.sync('http://localhost:5984/reports', {live: true})
 
 let ReportService = {
 
