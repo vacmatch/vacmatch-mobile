@@ -82,6 +82,31 @@ let PersonListStore = Reflux.createStore({
         callback(person, err)
       })
     })
+  },
+
+  onDeletePerson: function (personId, reportId, teamId, callback) {
+    PersonService.deletePerson(personId, reportId, teamId, (data, err) => {
+      if (err === null) {
+        // Check witch team and update that team list removing this person
+        if (teamId === this.state.localTeamId) {
+          let newList = this.state.localPeople.filter(function (e, index) {
+            return ((e._id !== personId) && (e.teamId === teamId) && (e.reportId === reportId))
+          })
+          this.state.localPeople = newList
+          this.trigger(this.state)
+        }
+        if (teamId === this.state.visitorTeamId) {
+          let newList = this.state.visitorPeople.filter(function (e, index) {
+            return ((e._id !== personId) && (e.teamId === teamId) && (e.reportId === reportId))
+          })
+          this.state.visitorPeople = newList
+          this.trigger(this.state)
+        }
+      }
+      if (typeof callback === 'function') {
+        callback(data, err)
+      }
+    })
   }
 
 })

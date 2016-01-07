@@ -48,9 +48,12 @@ let PersonStore = Reflux.createStore({
     PersonService.update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, (person, err) => {
       this.state = person
       this.trigger(this.state)
-      callback(person, err)
+      if (typeof callback === 'function') {
+        callback(person, err)
+      }
     })
   }
+
 })
 
 module.exports = PersonStore

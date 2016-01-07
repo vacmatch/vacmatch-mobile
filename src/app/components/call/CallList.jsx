@@ -93,6 +93,10 @@ let CallList = React.createClass({
       })
   },
 
+  handleDelete: function (personId, reportId, teamId) {
+    PersonActions.deletePerson(personId, reportId, teamId)
+  },
+
   render: function () {
     let tabs =
       [
@@ -106,7 +110,8 @@ let CallList = React.createClass({
           return <CallItem key={'local-' + person._id}
             person={person}
             dialogIsOpen={this.state.editDialogIsOpen}
-            toggleDialog={this.handleEdit}
+            editDialog={this.handleEdit}
+            deleteDialog={this.handleDelete}
             handleCallToggle={this.callToggle}/>
         })
       ],
@@ -115,7 +120,8 @@ let CallList = React.createClass({
           return <CallItem key={'visitor-' + person._id}
             person={person}
             dialogIsOpen={this.state.editDialogIsOpen}
-            toggleDialog={this.handleEdit}
+            editDialog={this.handleEdit}
+            deleteDialog={this.handleDelete}
             handleCallToggle={this.callToggle}/>
         })
       ]
