@@ -1,82 +1,46 @@
-import PouchDB from 'pouchdb'
-PouchDB.plugin(require('pouchdb-find'))
-
-var db = new PouchDB('events')
-db.sync('http://localhost:5984/events', {live: true})
-window.PouchDB = PouchDB
+import GenericService from './GenericService'
+import {Event, ControlEvent} from '../models/event/Event'
 
 let EventService = {
 
-  save: function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
-    this.getLastId(function (id) {
-      let element = {
-        '_id': id.toString(),
-        'type': eventType,
-        'matchTime': matchTime,
-        'text': cause,
-        'reportId': reportId,
-        'person': {
-          'id': person._id,
-          'name': person.name,
-          'dorsal': person.dorsal,
-          'avatarUrl': person.avatarUrl
-        },
-        'team': {
-          'id': team.id,
-          'name': team.teamName
-        },
-        // TODO: Add user which create the event
-        'timestamp': timestamp
-      }
-      db.put(element).then(function (response) {
-        db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-          callback(doc.rows[0].doc, null)
-        })
-      }).catch(function (err) {
-        console.log('err: ', err)
-        callback(null, err)
-      })
-    })
+  /**
+   * Returns the type of this service
+   * @returns {String} The type identifier
+   */
+  getType: function () {
+    return 'event'
   },
 
-  saveControl: function (reportId, eventType, matchTime, text, timestamp, callback) {
-    this.getLastId(function (id) {
-      let element = {
-        '_id': id.toString(),
-        'type': eventType,
-        'matchTime': matchTime,
-        'text': text,
-        'reportId': reportId,
-        // TODO: Add user which create the event
-        'timestamp': timestamp
-      }
-      db.put(element).then(function (response) {
-        db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-          callback(doc.rows[0].doc, null)
-        })
-      }).catch(function (err) {
-        console.log('err: ', err)
-        callback(null, err)
-      })
-    })
-  },
+  /**
+   * Callback to return lists in Event Service
+   * @callback eventListCallback
+   * @param {Object[]} list - A Event list.
+   * @param {Object} err - An error object.
+   */
 
-  getLastId: function (callback) {
-    db.allDocs({limit: 0}).then(function (doc) {
-      callback(doc.total_rows)
-    })
-  },
+  /**
+   * Callback to return an element in Event Service
+   * @callback eventCallback
+   * @param {Object} element - A Event object.
+   * @param {Object} err - An error object.
+   */
 
+  /**
+    * Get an Event by Id
+    * @param {Number} id The event identifier
+    * @param {eventCallback} callback A callback that returns an event
+    */
   findById: function (eventId, callback) {
-    db.get(eventId).then(function (doc) {
-      callback(doc, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    GenericService.findById(eventId, callback)
   },
 
+  /**
+    * Get all Events from a Report
+    * @param {Number} reportId The report identifier
+    * @param {eventListCallback} callback A callback that returns an Event list
+    */
   findAllByReportId: function (reportId, callback) {
+    let db = GenericService.getDatabase()
     db.createIndex({
       index: {fields: ['timestamp', 'reportId']}
     }).then(function () {
@@ -91,11 +55,21 @@ let EventService = {
         ]
       })
     }).then(function (result) {
-      callback(result.docs)
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
     })
   },
 
+  /**
+    * Get all Events from this EventType in a Report
+    * @param {Number} reportId The report identifier
+    * @param {String} eventType The string that represents an EventType
+    * @param {eventListCallback} callback A callback that returns an Event list
+    */
   findAllByReportIdAndEventType: function (reportId, eventType, callback) {
+    let db = GenericService.getDatabase()
     db.createIndex({
       index: {
         fields: ['timestamp', 'reportId', 'type']
@@ -114,16 +88,59 @@ let EventService = {
         ]
       })
     }).then(function (result) {
-      callback(result.docs)
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
     })
   },
 
+  /**
+    * Create a new Sport Event (Score, foul, etc)
+    * @param {Number} reportId The report identifier
+    * @param {Object} person The Person who is involved in this Event
+    * @param {Object} team The Team which is involved in this Event
+    * @param {String} eventType The string that represents an EventType
+    * @param {Number} matchTime Match time when the event happened in miliseconds
+    * @param {String} cause The cause of this Event or extra information
+    * @param {Number} timestamp Real time when the event happened in miliseconds
+    * @param {eventCallback} callback A callback that returns the created element or error
+    */
+  create: function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
+    let event = new Event(this.getType(), reportId, person, team, eventType, matchTime, cause, timestamp)
+    // Save it
+    GenericService.create(event, callback)
+  },
+
+  /**
+    * Create a new Control Event (Start game, change term, etc)
+    * @param {Number} reportId The report identifier
+    * @param {String} eventType The string that represents an EventType
+    * @param {Number} matchTime Match time when the event happened in miliseconds
+    * @param {String} text The cause of this Event or extra information
+    * @param {Number} timestamp Real time when the event happened in miliseconds
+    * @param {eventCallback} callback A callback that returns the created element or error
+    */
+  createControl: function (reportId, eventType, matchTime, text, timestamp, callback) {
+    let event = new ControlEvent(this.getType(), reportId, eventType, matchTime, text, timestamp)
+    // Save it
+    GenericService.create(event, callback)
+  },
+
+  /**
+    * Delete an Event (Control or Sport)
+    * @param {Number} eventId The Event identifier
+    * @param {eventCallback} callback A callback that returns an object with
+    * the deleted eventId if the event was deleted
+    */
   deleteEvent: function (eventId, callback) {
-    this.findById(eventId, function (data, err) {
-      // Remove it
-      db.remove(data, function () {
-        callback(data, err)
-      })
+    this.findById(eventId, function (event, err) {
+      if (err === null) {
+        // Remove it
+        GenericService.remove(event, callback)
+      } else {
+        callback(null, err)
+      }
     })
   }
 }
