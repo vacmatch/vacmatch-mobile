@@ -43,12 +43,16 @@ let AuthStore = Reflux.createStore({
 
   onLogOut: function (callback) {
     AuthService.logout((response, err) => {
-      // Set an null active user in state
-      this.setUser(null, () => {
-        if (typeof callback === 'function') {
-          callback(response, err)
-        }
-      })
+      if (err === null) {
+        // Set an null active user in state
+        this.setUser(null, () => {
+          if (typeof callback === 'function') {
+            callback(response, err)
+          }
+        })
+      } else {
+        callback(response, err)
+      }
     })
   },
 
