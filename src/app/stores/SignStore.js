@@ -31,7 +31,7 @@ let SignStore = Reflux.createStore({
    * Sign a report
    */
   sign: function (userId, signKey, reportId, identifier, name, teamId, fedId, callback) {
-    let stringToHash = '' // report
+    let stringToHash = '' // TODO: Add report info
     let timestamp = Date.now()
     SignService.create(userId, reportId, stringToHash, timestamp, identifier, name, teamId, fedId, (data, err) => {
       if (err === null) {
