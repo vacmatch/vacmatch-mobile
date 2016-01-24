@@ -1,23 +1,46 @@
-import PouchDB from 'pouchdb'
-
-var db = new PouchDB('reports')
-db.sync('http://localhost:5984/reports', {live: true})
+import GenericService from './GenericService'
+import Report from '../models/report/Report'
 
 let ReportService = {
 
-  find: function (id, callback) {
-    db.allDocs({key: id, include_docs: true}).then(function (docs) {
-      callback(docs.rows[0].doc)
-    })
+  /**
+   * Returns the type of this service
+   * @returns {String} The type identifier
+   */
+  getType: function () {
+    return 'report'
   },
 
-  findAll: function (callback) {
-    db.allDocs({include_docs: true}).then(function (doc) {
-      callback(doc)
-    })
+  /**
+   * Callback to return lists in Report Service
+   * @callback reportListCallback
+   * @param {Object[]} list - A Report list.
+   * @param {Object} err - An error object.
+   */
+
+  /**
+   * Callback to return an element in Report Service
+   * @callback reportCallback
+   * @param {Object} element - A Report object.
+   * @param {Object} err - An error object.
+   */
+
+  /**
+   * Find a Report by id
+   * @param {Number} reportId Report identifier
+   * @param {reportCallback} callback A callback that returns the Report element or error
+   */
+  findById: function (reportId, callback) {
+    GenericService.findById(reportId, callback)
   },
 
+  /**
+    * Find finished Reports
+    * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
+    * @param {reportListCallback} callback A callback that returns the a list of Reports
+    */
   findAllByFinished: function (hasFinished, callback) {
+    let db = GenericService.getDatabase()
     db.createIndex({
       index: {fields: ['hasFinished']}
     }).then(function () {
@@ -34,70 +57,70 @@ let ReportService = {
     })
   },
 
-  save: function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
-    let report = {
-      date: date,
-      location: location,
-      hasFinished: hasFinished,
-      localTeam: {
-        id: localTeam.id,
-        teamName: localTeam.teamName,
-        result: localTeam.result,
-        secondaryField: localTeam.secondaryField
-      },
-      visitorTeam: {
-        id: visitorTeam.id,
-        teamName: visitorTeam.teamName,
-        result: visitorTeam.result,
-        secondaryField: visitorTeam.secondaryField
-      },
-      incidences: '',
-      refereeList: refereeList
-    }
-    db.post(report).then(function (response) {
-      db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-        callback(doc.rows[0], null)
-      })
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+  /**
+    * Create a Report
+    * @param {String} date A string with the date when the game is played
+    * @param {String} location The place where the game is played
+    * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
+    * @param {Object} localTeam The team which is local in the game
+    * @param {Object} visitorTeam The team which is visitor in the game
+    * @param {String} refereeList The list with all referees assigned to this game
+    * @param {reportCallback} callback A callback that returns the created Report or error
+    */
+  create: function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
+    let report = new Report(this.getType(), date, location, hasFinished, localTeam, visitorTeam, refereeList)
+    // Save it
+    GenericService.create(report, callback)
   },
 
-  update: function (reportId, date, hasFinished, location, localTeam, visitorTeam, incidences, callback) {
-    this.find(reportId, (element) => {
-      element.date = date
-      element.location = location
-      element.hasFinished = hasFinished
-      element.localTeam.id = localTeam.id
-      element.localTeam.teamName = localTeam.teamName
-      element.localTeam.result = localTeam.result
-      element.localTeam.secondaryField = localTeam.secondaryField
-      element.visitorTeam.id = visitorTeam.id
-      element.visitorTeam.teamName = visitorTeam.teamName
-      element.visitorTeam.result = visitorTeam.result
-      element.visitorTeam.secondaryField = visitorTeam.secondaryField
-      element.incidences = incidences
-
-      db.put(element).then(function (response) {
-        db.allDocs({key: response.id, include_docs: true}).then(function (docs) {
-          callback(docs.rows[0].doc, null)
-        })
-      }).catch(function (err) {
-        console.log('err: ', err)
+  /**
+    * Update a Report
+    * @param {Number} reportId The report identifier
+    * @param {String} date A string with the date when the game is played
+    * @param {String} location The place where the game is played
+    * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
+    * @param {Object} localTeam The team which is local in the game
+    * @param {Object} visitorTeam The team which is visitor in the game
+    * @param {String} incidences Text field to write incidences and other information in the game
+    * @param {reportCallback} callback A callback that returns the updated Report or error
+    */
+  update: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
+    this.findById(reportId, (report, err) => {
+      if (err === null) {
+        report.date = date
+        report.location = location
+        report.hasFinished = hasFinished
+        report.localTeam.id = localTeam.id
+        report.localTeam.teamName = localTeam.teamName
+        report.localTeam.result = localTeam.result
+        report.localTeam.secondaryField = localTeam.secondaryField
+        report.visitorTeam.id = visitorTeam.id
+        report.visitorTeam.teamName = visitorTeam.teamName
+        report.visitorTeam.result = visitorTeam.result
+        report.visitorTeam.secondaryField = visitorTeam.secondaryField
+        report.incidences = incidences
+        // Save it
+        GenericService.update(report, callback)
+      } else {
         callback(null, err)
-      })
+      }
     })
   },
 
+  /**
+    * Delete a Report by identifier
+    * @param {Number} id The Report identifier
+    * @param {reportCallback} callback A callback that returns an object with
+    * the deleted reportId if the report was deleted
+    */
   delete: function (id, callback) {
-    db.get(id).then(function (doc) {
-      return db.remove(doc)
-    }).then(function (result) {
-      callback(result, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
+    this.findById(id, function (report, err) {
+      if (err === null) {
+        // Remove it
+        GenericService.remove(report, callback)
+      } else {
+        callback(null, err)
+      }
     })
   }
 }

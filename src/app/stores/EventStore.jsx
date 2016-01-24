@@ -46,7 +46,7 @@ let EventStore = Reflux.createStore({
         if (eventType === end.type) {
           let hasFinished = true
           // Find report
-          ReportService.find(reportId, function (report) {
+          ReportService.findById(reportId, function (report) {
             // Update report state with new value
             ReportService.update(reportId, report.date, hasFinished, report.location,
               report.localTeam, report.visitorTeam, report.incidences, function () {
@@ -74,7 +74,7 @@ let EventStore = Reflux.createStore({
         if (event.type === end.type) {
           let hasFinished = false
           // Find report
-          ReportService.find(event.reportId, function (report) {
+          ReportService.findById(event.reportId, function (report) {
             // Update report state with new value
             ReportService.update(event.reportId, report.date, hasFinished, report.location,
               report.localTeam, report.visitorTeam, function () {

@@ -88,7 +88,7 @@ let ReportList = React.createClass({
 
   handleEditConfirm: function (report) {
     // Save new changes in report
-    ReportActions.editReport(report.id, report.date, report.location, report.hasFinished,
+    ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
       report.localTeam, report.visitorTeam, report.incidences, (result, err) => {
         // Update report list
         ReportActions.updateLists(() => {
@@ -131,6 +131,7 @@ let ReportList = React.createClass({
     let emptyReport = {
       date: '',
       location: '',
+      hasFinished: false,
       localTeam: {
         id: null,
         teamName: '',
@@ -142,7 +143,9 @@ let ReportList = React.createClass({
         teamName: '',
         result: 0,
         secondaryField: 0
-      }
+      },
+      incidences: '',
+      refereeList: []
     }
 
     return (
