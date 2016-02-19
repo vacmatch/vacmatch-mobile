@@ -3,7 +3,7 @@ import mui from 'material-ui'
 
 import style from './report-style'
 
-import ChangeTermEvent from '../../../models/event/control/ChangeTermEvent'
+import ChangeTermEvent from '../../../models/web/event/control/ChangeTermEvent'
 
 import EventActions from '../../../actions/EventActions'
 

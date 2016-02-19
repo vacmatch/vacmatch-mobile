@@ -5,10 +5,10 @@ import ReportActions from '../actions/ReportActions'
 import ReportService from '../services/ReportService'
 import EventService from '../services/EventService'
 
-import ChangeTermEvent from '../models/event/control/ChangeTermEvent'
-import StartMatchEvent from '../models/event/control/StartMatchEvent'
-import GoalEvent from '../models/event/GoalEvent'
-import FoulEvent from '../models/event/FoulEvent'
+import ChangeTermEvent from '../models/web/event/control/ChangeTermEvent'
+import StartMatchEvent from '../models/web/event/control/StartMatchEvent'
+import GoalEvent from '../models/web/event/GoalEvent'
+import FoulEvent from '../models/web/event/FoulEvent'
 
 import CronoUtils from './CronoUtils'
 

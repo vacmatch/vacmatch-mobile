@@ -1,6 +1,6 @@
 import Reflux from 'reflux'
 
-import Soccer from '../models/sport/Soccer'
+import Soccer from '../models/web/sport/Soccer'
 
 import SportActions from '../actions/SportActions'
 
