@@ -1,51 +1,36 @@
-import PouchDB from 'pouchdb'
-PouchDB.plugin(require('pouchdb-find'))
+import GenericService from './GenericService'
+import Team from '../models/team/Team'
 
-var db = new PouchDB('events')
-db.sync('http://localhost:5984/events', {live: true})
+let TeamService = {
 
-let EventService = {
-
-  save: function (teamName, callback) {
-    this.getLastId(function (id) {
-      let element = {
-        '_id': id.toString(),
-        'teamName': teamName
-      }
-      db.put(element).then(function (response) {
-        db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-          callback(doc.rows[0].doc, null)
-        })
-      }).catch(function (err) {
-        console.log('err: ', err)
-        callback(null, err)
-      })
-    })
+  /**
+   * Returns the type of this service
+   * @returns {String} The type identifier
+   */
+  getType: function () {
+    return 'team'
   },
 
-  getLastId: function (callback) {
-    db.allDocs({limit: 0}).then(function (doc) {
-      callback(doc.total_rows)
-    })
-  },
-
+  /**
+   * Find a Team by id
+   * @param {Boolean} teamId Team identifier
+   * @param {reportListCallback} callback A callback that returns the Team element or error
+   */
   findById: function (teamId, callback) {
-    db.get(teamId).then(function (doc) {
-      callback(doc, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    GenericService.findById(teamId, callback)
   },
 
-  deleteTeam: function (teamId, callback) {
-    this.findById(teamId, function (data, err) {
-      // Remove it
-      db.remove(data, function () {
-        callback(data, err)
-      })
-    })
+  /**
+    * Create a Team
+    * @param {String} teamName The name of the new Team
+    * @param {teamCallback} callback A callback that returns the created Team or error
+    */
+  create: function (teamName, callback) {
+    let team = new Team(this.getType(), teamName)
+    // Save it
+    GenericService.create(team, callback)
   }
+
 }
 
-module.exports = EventService
+module.exports = TeamService

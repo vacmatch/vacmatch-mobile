@@ -1,24 +1,48 @@
-import PouchDB from 'pouchdb'
-PouchDB.plugin(require('pouchdb-find'))
+import GenericService from './GenericService'
+import Signature from '../models/signature/Signature'
 
 import Hashes from 'jshashes'
 
-var db = new PouchDB('signatures')
-db.sync('http://localhost:5984/signatures', {live: true})
-
 let SignStore = {
 
-  findById: function (signId, callback) {
-    db.get(signId).then(function (doc) {
-      callback(doc, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+  /**
+   * Returns the type of this service
+   * @returns {String} The type identifier
+   */
+  getType: function () {
+    return 'signature'
   },
 
+  /**
+   * Callback to return lists in Signature Service
+   * @callback signatureListCallback
+   * @param {Object[]} list - A Signature list.
+   * @param {Object} err - An error object.
+   */
+
+  /**
+   * Callback to return an element in Signature Service
+   * @callback signatureCallback
+   * @param {Object} element - A Signature object.
+   * @param {Object} err - An error object.
+   */
+
+  /**
+   * Find a Signature by id
+   * @param {Number} signId Sinature identifier
+   * @param {signatureCallback} callback A callback that returns the Signature element or error
+   */
+  findById: function (signId, callback) {
+    GenericService.findById(signId, callback)
+  },
+
+  /**
+   * Find all Signatures in a Report by report id
+   * @param {Number} reportId Report identifier
+   * @param {signatureListCallback} callback A callback that returns the Signature list
+   */
   findAllByReportId: function (reportId, callback) {
-    console.log(reportId)
+    let db = GenericService.getDatabase()
     db.createIndex({
       index: {fields: ['timeStamp', 'reportId']}
     }).then(function () {
@@ -40,52 +64,42 @@ let SignStore = {
     })
   },
 
-  save: function (signature, callback) {
-    db.post(signature).then(function (response) {
-      db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
-        callback(doc.rows[0].doc, null)
-      })
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
-  },
-
-  create: function (userId, reportId, stringToHash, timeStamp, identifier, name, teamId, fedId, callback) {
+  /**
+   * Create a Signature
+   * @param {String} userId User identifier that creates the signature
+   * @param {String} reportId Report identifier which is signed
+   * @param {String} stringToHash A text with information about the game to create a checksum
+   * @param {Number} timeStamp The time when the Report is signed
+   * @param {String} personId The signer Person identifier
+   * @param {String} name The signer Person name
+   * @param {String} teamId The Team from the signer Person
+   * @param {String} fedId The Federation id from the signer Person (null if the signer is not an User)
+   * @param {signatureCallback} callback A callback that returns the created Signature or error
+   */
+  create: function (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
     let hash = new Hashes.SHA512().hex(stringToHash)
-    this.getLastId((id) => {
-      let signature = {
-        _id: id.toString(),
-        userId: userId,
-        reportId: reportId,
-        hash: hash,
-        timeStamp: timeStamp,
-        identifier: identifier,
-        name: name,
-        teamId: teamId,
-        fedId: fedId
-      }
-      this.save(signature, callback)
-    })
-  },
-
-  delete: function (signId, callback) {
-    this.findById(signId, function (data, err) {
-      // Remove it
-      db.remove(data, function () {
-        callback(data, err)
-      })
-    })
+    let signature = new Signature(this.getType(), userId, reportId, hash, timeStamp, personId, name, teamId, fedId)
+    // Save it
+    GenericService.create(signature, callback)
   },
 
   /**
-    * Get number last document ID
-    */
-  getLastId: function (callback) {
-    db.allDocs({limit: 0}).then(function (doc) {
-      callback(doc.total_rows)
+   * Delete a Signature
+   * @param {String} signId Signature identifier
+   * @param {signatureCallback} callback A callback that returns an object with
+   * the deleted signId if the Signature was deleted
+   */
+  delete: function (signId, callback) {
+    this.findById(signId, function (signature, err) {
+      if (err === null) {
+        // Remove it
+        GenericService.remove(signature, callback)
+      } else {
+        callback(null, err)
+      }
     })
   }
+
 }
 
 module.exports = SignStore

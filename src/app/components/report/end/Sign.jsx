@@ -51,13 +51,17 @@ let Sign = React.createClass({
   },
 
   toggleDialog: function () {
-    this.setState({
-      dialogIsOpen: !this.state.dialogIsOpen,
-      snackbarMessage: this.state.snackbarMessage,
-      index: this.state.index,
-      value: this.props.personList[this.state.index],
-      userId: this.props.personList[this.state.index].userId
-    })
+    if (this.props.personList.length !== 0) {
+      this.setState({
+        dialogIsOpen: !this.state.dialogIsOpen,
+        snackbarMessage: this.state.snackbarMessage,
+        index: this.state.index,
+        value: this.props.personList[this.state.index],
+        userId: this.props.personList[this.state.index].userId
+      })
+    } else {
+      this.toggleSnackBar('Empty people list')
+    }
   },
 
   _handleSelectValueChange: function (e, index, element) {

@@ -50,7 +50,7 @@ let ReportStore = Reflux.createStore({
     let termEvent = new ChangeTermEvent()
     let startEvent = new StartMatchEvent()
     // Update Teams
-    ReportService.find(reportId, (report) => {
+    ReportService.findById(reportId, (report) => {
       this.state._id = report._id
       this.state.date = report.date
       this.state.location = report.location
