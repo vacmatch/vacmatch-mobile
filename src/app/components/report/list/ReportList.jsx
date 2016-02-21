@@ -14,6 +14,7 @@ import RefereeStore from '../../../stores/RefereeStore'
 
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
+import Report from '../../../models/report/Report'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
@@ -128,25 +129,7 @@ let ReportList = React.createClass({
     ]
 
     // Empty report to host a new report
-    let emptyReport = {
-      date: '',
-      location: '',
-      hasFinished: false,
-      localTeam: {
-        _id: null,
-        teamName: '',
-        result: 0,
-        secondaryField: 0
-      },
-      visitorTeam: {
-        _id: null,
-        teamName: '',
-        result: 0,
-        secondaryField: 0
-      },
-      incidences: '',
-      refereeList: []
-    }
+    let emptyReport = new Report()
 
     return (
       <div>

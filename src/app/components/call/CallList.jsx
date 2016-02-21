@@ -11,6 +11,7 @@ import PersonActions from '../../actions/PersonActions'
 import TabList from '../generic/TabList'
 import CallItem from './CallItem'
 import EditPerson from './EditPerson'
+import Person from '../../models/person/Person'
 
 import AuthenticatedComponent from '../generic/AuthenticatedComponent'
 
@@ -127,17 +128,7 @@ let CallList = React.createClass({
       ]
     ]
 
-    let emptyPerson = {
-      _id: '',
-      name: '',
-      dorsal: '',
-      avatarUrl: '',
-      isCalled: false,
-      isStaff: false,
-      reportId: this.state.report.report._id,
-      teamId: this.state.report.report.localTeam._id,
-      userId: null
-    }
+    let emptyPerson = new Person(undefined, '', '', '', '', false, false, this.state.report.report._id, this.state.report.report.localTeam._id, '')
 
     let teams =
       [
