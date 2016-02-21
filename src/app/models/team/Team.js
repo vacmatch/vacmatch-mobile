@@ -2,8 +2,8 @@
 export default class Team {
 
   constructor (type, teamName) {
-    this.databaseType = type
-    this.teamName = teamName
+    this.databaseType = type ? type : 'team'
+    this.teamName = teamName ? teamName : ''
   }
 
 }
