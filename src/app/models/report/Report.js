@@ -7,13 +7,13 @@ export default class Report {
     this.location = location
     this.hasFinished = hasFinished
     this.localTeam = {
-      id: localTeam.id,
+      _id: localTeam._id,
       teamName: localTeam.teamName,
       result: localTeam.result,
       secondaryField: localTeam.secondaryField
     }
     this.visitorTeam = {
-      id: visitorTeam.id,
+      _id: visitorTeam._id,
       teamName: visitorTeam.teamName,
       result: visitorTeam.result,
       secondaryField: visitorTeam.secondaryField

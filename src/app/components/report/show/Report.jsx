@@ -31,7 +31,7 @@ let Report = React.createClass({
 
   propTypes: {
     params: React.PropTypes.shape({
-      id: React.PropTypes.string
+      reportId: React.PropTypes.string
     })
   },
 
@@ -54,13 +54,13 @@ let Report = React.createClass({
     // Set right menu buttons in AppBar
     this.addRigthMenuElements(rightMenuElements)
     // Update report state
-    ReportActions.updateReport(this.props.params.id, function () {})
+    ReportActions.updateReport(this.props.params.reportId, function () {})
   },
 
   _handleStartMatch: function () {
     // Create start match control event
     let event = new StartMatchEvent()
-    EventActions.addControlEvent(this.props.params.id, event.type, this.state.report.timer.ms, '', () => {
+    EventActions.addControlEvent(this.props.params.reportId, event.type, this.state.report.timer.ms, '', () => {
       // Set match has started in state
       ReportActions.toggleStartMatch()
       this.setState({snackbarMessage: 'Match started'})
@@ -84,12 +84,12 @@ let Report = React.createClass({
     let events = (
       this.state.sport.getEvents().map((e, index) => {
         if (index % 2) {
-          return <Link key={index} to={urls.event.add(this.props.params.id, e.type)}>
+          return <Link key={index} to={urls.event.add(this.props.params.reportId, e.type)}>
               <RaisedButton label={e.title} primary={true} style={style.button}/>
               <br/><br/>
             </Link>
         } else {
-          return <Link key={index} to={urls.event.add(this.props.params.id, e.type)}>
+          return <Link key={index} to={urls.event.add(this.props.params.reportId, e.type)}>
               <RaisedButton label={e.title} primary={true} style={style.button}/>
             </Link>
         }
@@ -98,10 +98,10 @@ let Report = React.createClass({
 
     return <div>
       <div style={style.center}>
-        <Link to={urls.call.list(this.props.params.id)}>
+        <Link to={urls.call.list(this.props.params.reportId)}>
           <FlatButton label={this.state.report.localTeam.teamName} secondary={true} />
         </Link>
-        <Link to={urls.call.list(this.props.params.id)}>
+        <Link to={urls.call.list(this.props.params.reportId)}>
           <FlatButton label={this.state.report.visitorTeam.teamName} secondary={true} />
         </Link>
         <ReportProperty
@@ -117,9 +117,9 @@ let Report = React.createClass({
       <div style={style.center}>
         <ReportProperty value={this.state.report.time} isPrimary={true} />
         {playButton}
-        <EditReport reportId={this.props.params.id} cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
+        <EditReport reportId={this.props.params.reportId} cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
            termUpdate={ReportActions.updateTerm} term={this.state.report.term}/>
-         <Link to={urls.event.list(this.props.params.id)}>
+         <Link to={urls.event.list(this.props.params.reportId)}>
           <RaisedButton label='Events' secondary={true} style={style.button}/>
         </Link>
       </div>
@@ -134,7 +134,7 @@ let Report = React.createClass({
         message={this.state.snackbarMessage}
         autoHideDuration={4000} />
 
-      <EndMatchDialog reportId={this.props.params.id}
+      <EndMatchDialog reportId={this.props.params.reportId}
         matchTime={this.state.report.timer.ms} addMenuElements={this.addRigthMenuElements}/>
     </div>
   }

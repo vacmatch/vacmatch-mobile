@@ -35,10 +35,10 @@ let ReportListStore = Reflux.createStore({
   onAddReport: function (date, location, localTeam, visitorTeam, refereeList, callback) {
     // Create both teams
     TeamService.create(localTeam.teamName, (local, err) => {
-      localTeam.id = local._id
+      localTeam._id = local._id
       TeamService.create(visitorTeam.teamName, (visitor, err) => {
         // Save new report
-        visitorTeam.id = visitor._id
+        visitorTeam._id = visitor._id
         let hasFinished = false
         ReportService.create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (doc, err) => {
           if (err == null) {

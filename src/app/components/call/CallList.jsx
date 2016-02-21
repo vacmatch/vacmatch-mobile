@@ -49,7 +49,7 @@ let CallList = React.createClass({
     ReportActions.updateReport(this.props.params.reportId, () => {
       // Update players lists (local and visitor)
       ReportActions.updatePlayers(this.props.params.reportId,
-        this.state.report.localTeam.id, this.state.report.visitorTeam.id)
+        this.state.report.localTeam._id, this.state.report.visitorTeam._id)
     })
   },
 
@@ -68,7 +68,7 @@ let CallList = React.createClass({
       person.isCalled, person.isStaff, person.reportId, person.teamId, person.userId, (data, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
-          this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+          this.state.report.localTeam._id, this.state.report.visitorTeam._id, () => {
             this.toggleCreateDialog()
           })
       })
@@ -87,7 +87,7 @@ let CallList = React.createClass({
       person.avatarUrl, person.isCalled, person.isStaff, person.reportId, oldTeamId, person.teamId, person.userId, (updatedPerson, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
-          this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+          this.state.report.localTeam._id, this.state.report.visitorTeam._id, () => {
             this.toggleEditDialog()
           })
       })
@@ -135,14 +135,14 @@ let CallList = React.createClass({
       isCalled: false,
       isStaff: false,
       reportId: this.state.report._id,
-      teamId: this.state.report.localTeam.id,
+      teamId: this.state.report.localTeam._id,
       userId: null
     }
 
     let teams =
       [
-        {payload: 1, text: this.state.report.localTeam.teamName, value: this.state.report.localTeam.id},
-        {payload: 2, text: this.state.report.visitorTeam.teamName, value: this.state.report.visitorTeam.id}
+        {payload: 1, text: this.state.report.localTeam.teamName, value: this.state.report.localTeam._id},
+        {payload: 2, text: this.state.report.visitorTeam.teamName, value: this.state.report.visitorTeam._id}
       ]
 
     return (

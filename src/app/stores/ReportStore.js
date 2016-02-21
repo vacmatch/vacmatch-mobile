@@ -21,13 +21,13 @@ let ReportStore = Reflux.createStore({
       date: '',
       location: '',
       localTeam: {
-        id: null,
+        _id: null,
         teamName: 'Local',
         result: 0,
         secondaryField: 0
       },
       visitorTeam: {
-        id: null,
+        _id: null,
         teamName: 'Visitor',
         result: 0,
         secondaryField: 0
@@ -50,7 +50,13 @@ let ReportStore = Reflux.createStore({
     let termEvent = new ChangeTermEvent()
     let startEvent = new StartMatchEvent()
     // Update Teams
-    ReportService.findById(reportId, (report) => {
+    ReportService.findById(reportId, (report, err) => {
+      // TODO: Handle error
+      if (err !== null) {
+        if (typeof callback === 'function') {
+          callback()
+        }
+      }
       this.state._id = report._id
       this.state.date = report.date
       this.state.location = report.location
@@ -59,20 +65,19 @@ let ReportStore = Reflux.createStore({
       this.state.refereeList = report.refereeList
       this.state.localTeam = report.localTeam
       this.state.visitorTeam = report.visitorTeam
-      this.trigger(this.state)
-    })
-    // Check if match has started
-    EventService.findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
-      this.state.hasFinished = (startEvents.length > 0)
-      // Update term
-      EventService.findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
-        if (termEvents.length) {
-          this.state.term = termEvents[0].text
-        }
-        this.trigger(this.state)
-        if (typeof callback === 'function') {
-          callback()
-        }
+      // Check if match has started
+      EventService.findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
+        this.state.hasFinished = (startEvents.length > 0)
+        // Update term
+        EventService.findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
+          if (termEvents.length) {
+            this.state.term = termEvents[0].text
+          }
+          this.trigger(this.state)
+          if (typeof callback === 'function') {
+            callback()
+          }
+        })
       })
     })
   },
@@ -108,10 +113,10 @@ let ReportStore = Reflux.createStore({
 
   updateTeam: function (reportId, newTeam) {
     // New result, state is updated when DB is updated too
-    if (newTeam.id === this.state.localTeam.id) {
+    if (newTeam._id === this.state.localTeam._id) {
       this.state.localTeam = newTeam
     }
-    if (newTeam.id === this.state.visitorTeam.id) {
+    if (newTeam._id === this.state.visitorTeam_id) {
       this.state.visitorTeam = newTeam
     }
     // Update result in DB
@@ -130,13 +135,13 @@ let ReportStore = Reflux.createStore({
       let goalEvent = new GoalEvent()
       if (event.type === goalEvent.type) {
         // Get the new value from Sport
-        let newValue = sport.getPrimaryFieldValue(events, event.team.id)
+        let newValue = sport.getPrimaryFieldValue(events, event.team._id)
         // Update team in report with new result
-        if (event.team.id === this.state.localTeam.id) {
+        if (event.team._id === this.state.localTeam._id) {
           this.state.localTeam.result = newValue
           this.updateTeam(event.reportId, this.state.localTeam)
         }
-        if (event.team.id === this.state.visitorTeam.id) {
+        if (event.team._id === this.state.visitorTeam._id) {
           this.state.visitorTeam.result = newValue
           this.updateTeam(event.reportId, this.state.visitorTeam)
         }
@@ -144,13 +149,13 @@ let ReportStore = Reflux.createStore({
       let foulEvent = new FoulEvent()
       if (event.type === foulEvent.type) {
         // Get the new value from Sport
-        let newValue = sport.getSecondaryFieldValue(events, event.team.id)
+        let newValue = sport.getSecondaryFieldValue(events, event.team._id)
         // Update team in report with new secondary result
-        if (event.team.id === this.state.localTeam.id) {
+        if (event.team._id === this.state.localTeam._id) {
           this.state.localTeam.secondaryField = newValue
           this.updateTeam(event.reportId, this.state.localTeam)
         }
-        if (event.team.id === this.state.visitorTeam.id) {
+        if (event.team._id === this.state.visitorTeam._id) {
           this.state.visitorTeam.secondaryField = newValue
           this.updateTeam(event.reportId, this.state.visitorTeam)
         }

@@ -133,13 +133,13 @@ let ReportList = React.createClass({
       location: '',
       hasFinished: false,
       localTeam: {
-        id: null,
+        _id: null,
         teamName: '',
         result: 0,
         secondaryField: 0
       },
       visitorTeam: {
-        id: null,
+        _id: null,
         teamName: '',
         result: 0,
         secondaryField: 0

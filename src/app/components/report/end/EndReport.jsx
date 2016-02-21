@@ -37,7 +37,7 @@ let EndReport = React.createClass({
     MenuActions.setRightMenu(rightMenuElements)
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, () => {
-      ReportActions.updatePlayers(this.state.report._id, this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+      ReportActions.updatePlayers(this.state.report._id, this.state.report.localTeam._id, this.state.report.visitorTeam._id, () => {
         SignActions.updateSignatures(this.state.report._id, () => {
         })
       })
@@ -60,13 +60,13 @@ let EndReport = React.createClass({
         <Sign title={localTitle}
           personList={this.state.personLists.localPeople}
           reportId={this.state.report._id}
-          teamId={this.state.report.localTeam.id}/>
+          teamId={this.state.report.localTeam._id}/>
       </Tab>
       <Tab label={this.state.report.visitorTeam.teamName}>
         <Sign title={visitorTitle}
           personList={this.state.personLists.visitorPeople}
           reportId={this.state.report._id}
-          teamId={this.state.report.visitorTeam.id}/>
+          teamId={this.state.report.visitorTeam._id}/>
       </Tab>
     </Tabs>
   }

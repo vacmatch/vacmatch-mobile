@@ -11,7 +11,7 @@ export class Event {
       avatarUrl: person.avatarUrl
     }
     this.team = {
-      id: team.id,
+      _id: team._id,
       name: team.teamName
     }
     this.type = eventType

@@ -19,7 +19,7 @@ let routes = (
     <Route path='/home' component={Home}/>
     <Route path='/login' component={Login}/>
     <Route path='/reports' component={ReportList}/>
-    <Route path='/report/:id' component={Report}/>
+    <Route path='/report/:reportId' component={Report}/>
     <Route path='/call/report/:reportId' component={CallList}/>
     <Route path='/end/report/:reportId' component={EndReport}/>
     <Route path='/addEvent/:reportId/:eventType' component={PersonList}/>
