@@ -2,22 +2,13 @@ import Reflux from 'reflux'
 
 import PersonService from '../services/PersonService'
 import PersonActions from '../actions/PersonActions'
+import Person from '../models/person/Person'
 
 let PersonStore = Reflux.createStore({
   listenables: PersonActions,
 
   init: function () {
-    this.state = {
-      _id: '',
-      name: '',
-      cardId: '',
-      dorsal: '',
-      avatarUrl: '',
-      isCalled: '',
-      reportId: '',
-      teamId: '',
-      userId: ''
-    }
+    this.state = new Person()
   },
 
   getInitialState: function () {
