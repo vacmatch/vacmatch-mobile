@@ -37,8 +37,8 @@ let EndReport = React.createClass({
     MenuActions.setRightMenu(rightMenuElements)
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, () => {
-      ReportActions.updatePlayers(this.state.report._id, this.state.report.localTeam._id, this.state.report.visitorTeam._id, () => {
-        SignActions.updateSignatures(this.state.report._id, () => {
+      ReportActions.updatePlayers(this.state.report.report._id, this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, () => {
+        SignActions.updateSignatures(this.state.report.report._id, () => {
         })
       })
     })
@@ -46,27 +46,27 @@ let EndReport = React.createClass({
 
   render: function () {
     let refereeTitle = 'Sign report referee'
-    let localTitle = 'Sign report ' + this.state.report.localTeam.teamName
-    let visitorTitle = 'Sign report ' + this.state.report.visitorTeam.teamName
+    let localTitle = 'Sign report ' + this.state.report.report.localTeam.teamName
+    let visitorTitle = 'Sign report ' + this.state.report.report.visitorTeam.teamName
     return <Tabs>
       <Tab label='Referee'>
         <Incidences handleAddIncidences={this.handleAddIncidences}/>
         <Sign title={refereeTitle}
-          personList={this.state.report.refereeList}
-          reportId={this.state.report._id}
+          personList={this.state.report.report.refereeList}
+          reportId={this.state.report.report._id}
           teamId={null}/>
       </Tab>
-      <Tab label={this.state.report.localTeam.teamName}>
+      <Tab label={this.state.report.report.localTeam.teamName}>
         <Sign title={localTitle}
           personList={this.state.personLists.localPeople}
-          reportId={this.state.report._id}
-          teamId={this.state.report.localTeam._id}/>
+          reportId={this.state.report.report._id}
+          teamId={this.state.report.report.localTeam._id}/>
       </Tab>
-      <Tab label={this.state.report.visitorTeam.teamName}>
+      <Tab label={this.state.report.report.visitorTeam.teamName}>
         <Sign title={visitorTitle}
           personList={this.state.personLists.visitorPeople}
-          reportId={this.state.report._id}
-          teamId={this.state.report.visitorTeam._id}/>
+          reportId={this.state.report.report._id}
+          teamId={this.state.report.report.visitorTeam._id}/>
       </Tab>
     </Tabs>
   }

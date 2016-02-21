@@ -72,7 +72,7 @@ let Report = React.createClass({
     // For start match event creation
     let playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
     // If Match has started
-    if (this.state.report.hasFinished) {
+    if (this.state.report.report.hasFinished) {
       let playButtonLabel = 'Play'
       if (this.state.report.isPlaying) {
         playButtonLabel = 'Stop'
@@ -99,19 +99,19 @@ let Report = React.createClass({
     return <div>
       <div style={style.center}>
         <Link to={urls.call.list(this.props.params.reportId)}>
-          <FlatButton label={this.state.report.localTeam.teamName} secondary={true} />
+          <FlatButton label={this.state.report.report.localTeam.teamName} secondary={true} />
         </Link>
         <Link to={urls.call.list(this.props.params.reportId)}>
-          <FlatButton label={this.state.report.visitorTeam.teamName} secondary={true} />
+          <FlatButton label={this.state.report.report.visitorTeam.teamName} secondary={true} />
         </Link>
         <ReportProperty
-          value={this.state.report.localTeam.result + ' - ' + this.state.report.visitorTeam.result}
+          value={this.state.report.report.localTeam.result + ' - ' + this.state.report.report.visitorTeam.result}
           isTitle={true} />
       </div>
       <div style={style.container}>
         <ReportProperty name={'Term'} value={this.state.report.term} isPrimary={false} />
         <ReportProperty name={'Fouls'}
-          value={this.state.report.localTeam.secondaryField + ' - ' + this.state.report.visitorTeam.secondaryField}
+          value={this.state.report.report.localTeam.secondaryField + ' - ' + this.state.report.report.visitorTeam.secondaryField}
           isPrimary={false} />
       </div>
       <div style={style.center}>

@@ -155,7 +155,7 @@ let ReportList = React.createClass({
           <i className='material-icons'>add</i>
         </FloatingActionButton>
         <EditReport
-          report={this.state.report}
+          report={this.state.report.report}
           title='Edit report'
           dialogIsOpen={this.state.editDialogIsOpen}
           toggleDialog={this.toggleEditDialog}

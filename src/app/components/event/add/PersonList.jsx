@@ -45,15 +45,15 @@ let PersonList = React.createClass({
     ReportActions.updateReport(this.props.params.reportId, () => {
       // Update players lists (local and visitor)
       ReportActions.updatePlayers(this.props.params.reportId,
-        this.state.report.localTeam._id, this.state.report.visitorTeam._id)
+        this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id)
     })
   },
 
   render: function () {
     let tabs =
       [
-        this.state.report.localTeam.teamName,
-        this.state.report.visitorTeam.teamName
+        this.state.report.report.localTeam.teamName,
+        this.state.report.report.visitorTeam.teamName
       ]
 
     let items = [
@@ -67,7 +67,7 @@ let PersonList = React.createClass({
                 reportId: this.props.params.reportId,
                 matchTime: this.state.report.timer.ms,
                 person: person,
-                team: this.state.report.localTeam,
+                team: this.state.report.report.localTeam,
                 eventTitle: event.title,
                 eventSubtitle: event.subtitle,
                 eventType: event.type,
@@ -88,7 +88,7 @@ let PersonList = React.createClass({
                 reportId: this.props.params.reportId,
                 matchTime: this.state.report.timer.ms,
                 person: person,
-                team: this.state.report.visitorTeam,
+                team: this.state.report.report.visitorTeam,
                 eventTitle: event.title,
                 eventSubtitle: event.subtitle,
                 eventType: event.type,
