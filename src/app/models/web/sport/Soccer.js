@@ -58,11 +58,13 @@ class Soccer extends Sport {
   }
 
   getPrimaryFieldValue (eventList, teamId) {
-    return eventList.length
+    let resultList = eventList.filter(function (element) { return element.team._id === teamId })
+    return resultList.length
   }
 
   getSecondaryFieldValue (eventList, teamId) {
-    return eventList.length
+    let resultList = eventList.filter(function (element) { return element.team._id === teamId })
+    return resultList.length
   }
 
 }

@@ -22,12 +22,12 @@ let Incidences = React.createClass({
 
   componentWillUpdate: function () {
     // Update new incidences value
-    this.refs.incidences.setValue(this.state.report.incidences)
+    this.refs.incidences.setValue(this.state.report.report.incidences)
   },
 
   handleAddIncidences: function () {
     let newIncidences = this.refs.incidences.getValue()
-    let report = this.state.report
+    let report = this.state.report.report
     // Add/update incidences in report
     ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
       report.localTeam, report.visitorTeam, newIncidences, (report, err) => {
@@ -45,7 +45,7 @@ let Incidences = React.createClass({
         hintText='Add incidences'
         floatingLabelText='Modify incidences'
         multiLine={true}
-        defaultValue={this.state.report.incidences}/>
+        defaultValue={this.state.report.report.incidences}/>
       <br/>
       <RaisedButton label='Modify incidences'
         primary={true}

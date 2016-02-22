@@ -4,7 +4,7 @@ import { History } from 'react-router'
 
 import urls from '../../../api/urls'
 import EventActions from '../../../actions/EventActions'
-import EndMatchEvent from '../../../models/event/control/EndMatchEvent'
+import EndMatchEvent from '../../../models/web/event/control/EndMatchEvent'
 
 // Components
 let Dialog = mui.Dialog

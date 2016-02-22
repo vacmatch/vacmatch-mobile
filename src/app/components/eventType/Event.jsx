@@ -55,7 +55,7 @@ let Event = React.createClass({
     let avatarUrl = this.props.person.avatarUrl
 
     return (
-    <div key={'event-' + this.props.person.id}>
+    <div key={'event-' + this.props.person._id}>
       <Dialog
         ref='eventDialog'
         title={this.props.eventTitle}
@@ -63,12 +63,12 @@ let Event = React.createClass({
         actions={
           [
             <FlatButton
-            key={'dialog-cancel-' + this.props.person.id}
+            key={'dialog-cancel-' + this.props.person._id}
             label='Cancel'
             secondary={true}
             onTouchTap={this.toggleDialog}/>,
             <FlatButton
-            key={'dialog-acept-' + this.props.person.id}
+            key={'dialog-acept-' + this.props.person._id}
             label='Accept'
             primary={true}
             onTouchTap={this._onDialogSubmit}/>
@@ -81,7 +81,7 @@ let Event = React.createClass({
         <h4>Dorsal: {personDorsal}</h4>
         <h4>{personName}</h4>
       </Dialog>
-      <ListItem key={'listItem-' + this.props.person.id}
+      <ListItem key={'listItem-' + this.props.person._id}
         primaryText={personName}
         secondaryTextLines={2}
         secondaryText={secondaryText}

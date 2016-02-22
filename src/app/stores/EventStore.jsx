@@ -5,7 +5,7 @@ import EventActions from '../actions/EventActions'
 
 import ReportService from '../services/ReportService'
 
-import EndMatchEvent from '../models/event/control/EndMatchEvent'
+import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
 
 let EventStore = Reflux.createStore({
   listenables: EventActions,

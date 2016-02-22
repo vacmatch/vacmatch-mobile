@@ -14,6 +14,7 @@ import RefereeStore from '../../../stores/RefereeStore'
 
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
+import Report from '../../../models/report/Report'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
@@ -128,25 +129,7 @@ let ReportList = React.createClass({
     ]
 
     // Empty report to host a new report
-    let emptyReport = {
-      date: '',
-      location: '',
-      hasFinished: false,
-      localTeam: {
-        id: null,
-        teamName: '',
-        result: 0,
-        secondaryField: 0
-      },
-      visitorTeam: {
-        id: null,
-        teamName: '',
-        result: 0,
-        secondaryField: 0
-      },
-      incidences: '',
-      refereeList: []
-    }
+    let emptyReport = new Report()
 
     return (
       <div>
@@ -155,7 +138,7 @@ let ReportList = React.createClass({
           <i className='material-icons'>add</i>
         </FloatingActionButton>
         <EditReport
-          report={this.state.report}
+          report={this.state.report.report}
           title='Edit report'
           dialogIsOpen={this.state.editDialogIsOpen}
           toggleDialog={this.toggleEditDialog}

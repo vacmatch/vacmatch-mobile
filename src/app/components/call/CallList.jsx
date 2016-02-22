@@ -11,6 +11,7 @@ import PersonActions from '../../actions/PersonActions'
 import TabList from '../generic/TabList'
 import CallItem from './CallItem'
 import EditPerson from './EditPerson'
+import Person from '../../models/person/Person'
 
 import AuthenticatedComponent from '../generic/AuthenticatedComponent'
 
@@ -49,7 +50,7 @@ let CallList = React.createClass({
     ReportActions.updateReport(this.props.params.reportId, () => {
       // Update players lists (local and visitor)
       ReportActions.updatePlayers(this.props.params.reportId,
-        this.state.report.localTeam.id, this.state.report.visitorTeam.id)
+        this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id)
     })
   },
 
@@ -68,7 +69,7 @@ let CallList = React.createClass({
       person.isCalled, person.isStaff, person.reportId, person.teamId, person.userId, (data, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
-          this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+          this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, () => {
             this.toggleCreateDialog()
           })
       })
@@ -87,7 +88,7 @@ let CallList = React.createClass({
       person.avatarUrl, person.isCalled, person.isStaff, person.reportId, oldTeamId, person.teamId, person.userId, (updatedPerson, err) => {
         // Update person list
         ReportActions.updatePlayers(this.props.params.reportId,
-          this.state.report.localTeam.id, this.state.report.visitorTeam.id, () => {
+          this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, () => {
             this.toggleEditDialog()
           })
       })
@@ -100,8 +101,8 @@ let CallList = React.createClass({
   render: function () {
     let tabs =
       [
-        this.state.report.localTeam.teamName,
-        this.state.report.visitorTeam.teamName
+        this.state.report.report.localTeam.teamName,
+        this.state.report.report.visitorTeam.teamName
       ]
 
     let items = [
@@ -127,22 +128,12 @@ let CallList = React.createClass({
       ]
     ]
 
-    let emptyPerson = {
-      _id: '',
-      name: '',
-      dorsal: '',
-      avatarUrl: '',
-      isCalled: false,
-      isStaff: false,
-      reportId: this.state.report._id,
-      teamId: this.state.report.localTeam.id,
-      userId: null
-    }
+    let emptyPerson = new Person(undefined, '', '', '', '', false, false, this.state.report.report._id, this.state.report.report.localTeam._id, '')
 
     let teams =
       [
-        {payload: 1, text: this.state.report.localTeam.teamName, value: this.state.report.localTeam.id},
-        {payload: 2, text: this.state.report.visitorTeam.teamName, value: this.state.report.visitorTeam.id}
+        {payload: 1, text: this.state.report.report.localTeam.teamName, value: this.state.report.report.localTeam._id},
+        {payload: 2, text: this.state.report.report.visitorTeam.teamName, value: this.state.report.report.visitorTeam._id}
       ]
 
     return (

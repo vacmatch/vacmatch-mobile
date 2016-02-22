@@ -1,5 +1,5 @@
 import React from 'react'
-import EventWithCause from '../../components/eventType/EventWithCause'
+import EventWithCause from '../../../components/eventType/EventWithCause'
 import SportEvent from './SportEvent'
 
 class YellowCardEvent extends SportEvent {

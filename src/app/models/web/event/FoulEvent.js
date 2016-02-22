@@ -1,5 +1,5 @@
 import React from 'react'
-import Event from '../../components/eventType/Event'
+import Event from '../../../components/eventType/Event'
 import SportEvent from './SportEvent'
 
 class FoulEvent extends SportEvent {

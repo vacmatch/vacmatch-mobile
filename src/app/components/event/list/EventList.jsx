@@ -5,7 +5,6 @@ import mui from 'material-ui'
 import EventActions from '../../../actions/EventActions'
 import EventStore from '../../../stores/EventStore'
 import SportStore from '../../../stores/SportStore'
-import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
 
 import ControlEventItem from './ControlEventItem'
@@ -18,8 +17,7 @@ let List = mui.List
 let PersonList = React.createClass({
   mixins: [
     Reflux.connect(EventStore, 'events'),
-    Reflux.connect(SportStore, 'sport'),
-    Reflux.connect(ReportStore, 'report')
+    Reflux.connect(SportStore, 'sport')
   ],
 
   propTypes: {
