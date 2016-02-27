@@ -50,6 +50,11 @@ let Layout = React.createClass({
     this.refs.leftNav.toggle()
   },
 
+  setSnackbarMessage: function (message) {
+    this.setState({snackbarMessage: message})
+    this.refs.snack.show()
+  },
+
   _handleClickRightMenu: function (element) {
     // If element has url, go to the link
     if (element.url) {
@@ -65,7 +70,7 @@ let Layout = React.createClass({
     AuthActions.logOut((response, err) => {
       if (err !== null) {
         // Show logout error
-        this.setState({snackbarMessage: err.message})
+        this.setSnackbarMessage(err.message)
       } else {
         this.handleLeftNavToggle()
         this.history.pushState(null, urls.login.show)
@@ -90,6 +95,10 @@ let Layout = React.createClass({
         </div>
       )
     }
+    // Add setSnackbarMessage function as a property to all children
+    var childrenWithProps = React.Children.map(this.props.children, (child) => {
+      return React.cloneElement(child, { setSnackbarMessage: this.setSnackbarMessage })
+    })
     return <div>
       <AppBar
         title='VACmatch'
@@ -114,7 +123,7 @@ let Layout = React.createClass({
           ref='snack'
           message={this.state.snackbarMessage}
           autoHideDuration={4000} />
-      {this.props.children}
+        {childrenWithProps}
       </div>
   }
 })
