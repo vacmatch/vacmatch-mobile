@@ -4,6 +4,7 @@ var browserify = require('browserify')
 var babelify = require('babelify')
 var source = require('vinyl-source-stream')
 var del = require('del')
+var jest = require('jest-cli')
 
 gulp.task('server', function () {
   gulp.src('./build')
@@ -13,6 +14,19 @@ gulp.task('server', function () {
       fallback: 'index.html',
       livereload: false
     }))
+})
+
+gulp.task('test', function (done) {
+  jest.runCLI({
+    config: {
+      rootDir: '__tests__',
+      scriptPreprocessor: '../node_modules/babel-jest',
+      testFileExtensions: ['es6', 'js'],
+      moduleFileExtensions: ['es6', 'js', 'json']
+    }
+  }, '.', function () {
+    done()
+  })
 })
 
 gulp.task('stylus', function () {

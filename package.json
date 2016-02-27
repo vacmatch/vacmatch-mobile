@@ -23,6 +23,7 @@
     "url": ""
   },
   "dependencies": {
+    "babel-jest": "^6.0.1",
     "babel-preset-es2015": "~6.0.15",
     "babel-preset-react": "~6.0.15",
     "babelify": "~7.2.0",
@@ -33,7 +34,8 @@
     "gulp-install": "~0.6.0",
     "gulp-webserver": "~0.9.1",
     "history": "~1.17.0",
-    "jest": "~0.1.40",
+    "jest": "^0.1.40",
+    "jest-cli": "^0.8.2",
     "jshashes": "^1.0.5",
     "material-ui": "~0.13.1",
     "pouchdb": "~5.1.0",
