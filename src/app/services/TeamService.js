@@ -1,5 +1,6 @@
 import GenericService from './GenericService'
 import Team from '../models/team/Team'
+import InvalidParametersException from '../models/exception/InvalidParametersException'
 
 let TeamService = {
 
@@ -26,6 +27,9 @@ let TeamService = {
     * @param {teamCallback} callback A callback that returns the created Team or error
     */
   create: function (teamName, callback) {
+    if ((teamName === null) || (teamName === undefined)) {
+      return callback(null, new InvalidParametersException('Invalid team name', 'teamName', teamName))
+    }
     let team = new Team(this.getType(), teamName)
     // Save it
     GenericService.create(team, callback)

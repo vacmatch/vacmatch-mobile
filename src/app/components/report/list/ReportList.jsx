@@ -29,6 +29,10 @@ let ReportList = React.createClass({
     Reflux.connect(AuthStore, 'auth')
   ],
 
+  propTypes: {
+    setSnackbarMessage: React.PropTypes.func
+  },
+
   getInitialState: function () {
     return {
       editDialogIsOpen: false,
@@ -74,6 +78,9 @@ let ReportList = React.createClass({
               ReportActions.updateLists(() => {
                 this.toggleCreateDialog()
               })
+            } else {
+              // Show errors in snackbar
+              this.props.setSnackbarMessage(err.message)
             }
           })
       }
