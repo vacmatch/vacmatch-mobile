@@ -19,6 +19,7 @@ gulp.task('server', function () {
 gulp.task('test', function (done) {
   jest.runCLI({
     config: {
+      verbose: true,
       rootDir: '__tests__',
       scriptPreprocessor: '../node_modules/babel-jest',
       testFileExtensions: ['es6', 'js'],

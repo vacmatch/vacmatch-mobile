@@ -1,5 +1,9 @@
 import GenericService from './GenericService'
 import {Event, ControlEvent} from '../models/event/Event'
+import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
+import ReportService from './ReportService'
+import PersonService from './PersonService'
+import TeamService from './TeamService'
 
 let EventService = {
 
@@ -107,9 +111,27 @@ let EventService = {
     * @param {eventCallback} callback A callback that returns the created element or error
     */
   create: function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
-    let event = new Event(this.getType(), reportId, person, team, eventType, matchTime, cause, timestamp)
-    // Save it
-    GenericService.create(event, callback)
+    // Check if report exists
+    ReportService.findById(reportId, (anyReport, err) => {
+      if (err !== null) {
+        return callback(null, new InstanceNotFoundException('Non existent report', 'reportId', reportId))
+      }
+      // Check if person exists
+      PersonService.findByPersonIdReportIdAndTeamId(person._id, reportId, team._id, (anyPerson, err) => {
+        if (err !== null) {
+          return callback(null, new InstanceNotFoundException('Non existent person', 'person._id', person._id))
+        }
+        // Check if team exists
+        TeamService.findById(team._id, (anyTeam, err) => {
+          if (err !== null) {
+            return callback(null, new InstanceNotFoundException('Non existent team', 'team._id', team._id))
+          }
+          let event = new Event(this.getType(), reportId, person, team, eventType, matchTime, cause, timestamp)
+          // Save it
+          GenericService.create(event, callback)
+        })
+      })
+    })
   },
 
   /**

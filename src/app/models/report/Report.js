@@ -1,5 +1,5 @@
 
-export default class Report {
+class Report {
 
   constructor (type, date, location, hasFinished, localTeam, visitorTeam, refereeList) {
     this.databaseType = type ? type : 'report'
@@ -23,3 +23,5 @@ export default class Report {
   }
 
 }
+
+module.exports = Report

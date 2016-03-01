@@ -1,5 +1,5 @@
 
-export default class Team {
+class Team {
 
   constructor (type, teamName) {
     this.databaseType = type ? type : 'team'
@@ -7,3 +7,5 @@ export default class Team {
   }
 
 }
+
+module.exports = Team

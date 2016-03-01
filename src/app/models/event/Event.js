@@ -1,5 +1,5 @@
 
-export class Event {
+class Event {
 
   constructor (type, reportId, person, team, eventType, matchTime, cause, timestamp) {
     this.databaseType = type ? type : 'event'
@@ -12,7 +12,7 @@ export class Event {
     }
     this.team = {
       _id: team ? team._id : '',
-      name: team ? team.teamName : ''
+      name: team ? team.name : ''
     }
     this.type = eventType ? eventType : ''
     this.matchTime = matchTime ? matchTime : ''
@@ -23,7 +23,7 @@ export class Event {
 
 }
 
-export class ControlEvent {
+class ControlEvent {
 
   constructor (type, reportId, eventType, matchTime, cause, timestamp) {
     this.databaseType = type ? type : 'event'
@@ -35,4 +35,9 @@ export class ControlEvent {
     // TODO: Add user which create the event
   }
 
+}
+
+module.exports = {
+  Event: Event,
+  ControlEvent: ControlEvent
 }

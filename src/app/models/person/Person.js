@@ -1,5 +1,5 @@
 
-export default class Person {
+class Person {
 
   constructor (type, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId) {
     this.type = type ? type : 'person'
@@ -15,3 +15,5 @@ export default class Person {
   }
 
 }
+
+module.exports = Person
