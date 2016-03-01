@@ -8,13 +8,13 @@ class Report {
     this.hasFinished = hasFinished ? hasFinished : false
     this.localTeam = {
       _id: localTeam ? localTeam._id : '',
-      teamName: localTeam ? localTeam.teamName : '',
+      name: localTeam ? localTeam.name : '',
       result: localTeam ? localTeam.result : 0,
       secondaryField: localTeam ? localTeam.secondaryField : 0
     }
     this.visitorTeam = {
       _id: visitorTeam ? visitorTeam._id : '',
-      teamName: visitorTeam ? visitorTeam.teamName : '',
+      name: visitorTeam ? visitorTeam.name : '',
       result: visitorTeam ? visitorTeam.result : 0,
       secondaryField: visitorTeam ? visitorTeam.secondaryField : 0
     }

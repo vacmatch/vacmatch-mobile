@@ -101,8 +101,8 @@ let CallList = React.createClass({
   render: function () {
     let tabs =
       [
-        this.state.report.report.localTeam.teamName,
-        this.state.report.report.visitorTeam.teamName
+        this.state.report.report.localTeam.name,
+        this.state.report.report.visitorTeam.name
       ]
 
     let items = [
@@ -132,8 +132,8 @@ let CallList = React.createClass({
 
     let teams =
       [
-        {payload: 1, text: this.state.report.report.localTeam.teamName, value: this.state.report.report.localTeam._id},
-        {payload: 2, text: this.state.report.report.visitorTeam.teamName, value: this.state.report.report.visitorTeam._id}
+        {payload: 1, text: this.state.report.report.localTeam.name, value: this.state.report.report.localTeam._id},
+        {payload: 2, text: this.state.report.report.visitorTeam.name, value: this.state.report.report.visitorTeam._id}
       ]
 
     return (

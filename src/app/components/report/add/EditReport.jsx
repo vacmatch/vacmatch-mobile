@@ -11,10 +11,10 @@ let EditReport = React.createClass({
     report: React.PropTypes.shape({
       _id: React.PropTypes.string,
       localTeam: React.PropTypes.shape({
-        teamName: React.PropTypes.string
+        name: React.PropTypes.string
       }),
       visitorTeam: React.PropTypes.shape({
-        teamName: React.PropTypes.string
+        name: React.PropTypes.string
       }),
       date: React.PropTypes.string,
       location: React.PropTypes.string
@@ -26,8 +26,8 @@ let EditReport = React.createClass({
 
   handleUpdate: function () {
     let newReport = this.props.report
-    newReport.localTeam.teamName = this.refs.localTeam.getValue()
-    newReport.visitorTeam.teamName = this.refs.visitorTeam.getValue()
+    newReport.localTeam.name = this.refs.localTeam.getValue()
+    newReport.visitorTeam.name = this.refs.visitorTeam.getValue()
     newReport.date = this.refs.date.getValue()
     newReport.location = this.refs.location.getValue()
     this.props.handleUpdate(newReport)
@@ -59,12 +59,12 @@ let EditReport = React.createClass({
                 key={'dialog-localTeam-field'}
                 hintText='Insert local team'
                 floatingLabelText='Modify local team'
-                defaultValue={this.props.report.localTeam.teamName}/>
+                defaultValue={this.props.report.localTeam.name}/>
               <TextField ref='visitorTeam'
                 key={'dialog-visitorTeam-field'}
                 hintText='Insert visitor team'
                 floatingLabelText='Modify visitor team'
-                defaultValue={this.props.report.visitorTeam.teamName}/>
+                defaultValue={this.props.report.visitorTeam.name}/>
               <TextField ref='date'
                 key={'dialog-date-field'}
                 hintText='Insert date'

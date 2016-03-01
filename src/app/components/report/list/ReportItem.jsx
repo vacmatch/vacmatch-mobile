@@ -16,11 +16,11 @@ let ReportItem = React.createClass({
     report: React.PropTypes.shape({
       _id: React.PropTypes.string,
       localTeam: React.PropTypes.shape({
-        teamName: React.PropTypes.string,
+        name: React.PropTypes.string,
         result: React.PropTypes.number
       }),
       visitorTeam: React.PropTypes.shape({
-        teamName: React.PropTypes.string,
+        name: React.PropTypes.string,
         result: React.PropTypes.number
       }),
       date: React.PropTypes.string,
@@ -45,8 +45,8 @@ let ReportItem = React.createClass({
     return (
       <div>
         <ListItem key={this.props.key}
-          primaryText={this.props.report.localTeam.teamName + ' ' + this.props.report.localTeam.result +
-          ' - ' + this.props.report.visitorTeam.result + ' ' + this.props.report.visitorTeam.teamName}
+          primaryText={this.props.report.localTeam.name + ' ' + this.props.report.localTeam.result +
+          ' - ' + this.props.report.visitorTeam.result + ' ' + this.props.report.visitorTeam.name}
           secondaryText={ this.props.report.date + ' - ' + this.props.report.location }
           rightIconButton={
             <IconMenu

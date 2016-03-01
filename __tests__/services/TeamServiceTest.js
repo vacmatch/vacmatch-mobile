@@ -7,7 +7,7 @@ describe('create', function () {
   let defaultTeamName = 'Fulanos FC'
   let defaultTeam = {
     databaseType: 'team',
-    teamName: defaultTeamName
+    name: defaultTeamName
   }
   let defaultErr = "Error"
 
@@ -35,7 +35,7 @@ describe('create', function () {
     // Set GenericService.create mock
     spyOn(genericService, 'create')
 
-    // Create the new team with null teamName paramter
+    // Create the new team with null team name paramter
     teamService.create(null, (team, err) => {
       expect(team).toBe(null)
       expect(err).not.toBe(null)

@@ -52,8 +52,8 @@ let PersonList = React.createClass({
   render: function () {
     let tabs =
       [
-        this.state.report.report.localTeam.teamName,
-        this.state.report.report.visitorTeam.teamName
+        this.state.report.report.localTeam.name,
+        this.state.report.report.visitorTeam.name
       ]
 
     let items = [

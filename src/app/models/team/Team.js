@@ -1,9 +1,9 @@
 
 class Team {
 
-  constructor (type, teamName) {
+  constructor (type, name) {
     this.databaseType = type ? type : 'team'
-    this.teamName = teamName ? teamName : ''
+    this.name = name ? name : ''
   }
 
 }

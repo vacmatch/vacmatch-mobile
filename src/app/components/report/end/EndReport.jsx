@@ -46,8 +46,8 @@ let EndReport = React.createClass({
 
   render: function () {
     let refereeTitle = 'Sign report referee'
-    let localTitle = 'Sign report ' + this.state.report.report.localTeam.teamName
-    let visitorTitle = 'Sign report ' + this.state.report.report.visitorTeam.teamName
+    let localTitle = 'Sign report ' + this.state.report.report.localTeam.name
+    let visitorTitle = 'Sign report ' + this.state.report.report.visitorTeam.name
     return <Tabs>
       <Tab label='Referee'>
         <Incidences handleAddIncidences={this.handleAddIncidences}/>
@@ -56,13 +56,13 @@ let EndReport = React.createClass({
           reportId={this.state.report.report._id}
           teamId={null}/>
       </Tab>
-      <Tab label={this.state.report.report.localTeam.teamName}>
+      <Tab label={this.state.report.report.localTeam.name}>
         <Sign title={localTitle}
           personList={this.state.personLists.localPeople}
           reportId={this.state.report.report._id}
           teamId={this.state.report.report.localTeam._id}/>
       </Tab>
-      <Tab label={this.state.report.report.visitorTeam.teamName}>
+      <Tab label={this.state.report.report.visitorTeam.name}>
         <Sign title={visitorTitle}
           personList={this.state.personLists.visitorPeople}
           reportId={this.state.report.report._id}
