@@ -49,19 +49,7 @@ let EventStore = Reflux.createStore({
         let filterList = this.state.filter(function (e) { return e._id !== event._id })
         this.state = filterList
         this.trigger(this.state)
-        let end = new EndMatchEvent()
-        // Check if this Event is a end event to modify report state if it's necessary
-        if (event.type === end.type) {
-          let hasFinished = false
-          // Find report
-          ReportService.findById(event.reportId, function (report) {
-            // Update report state with new value
-            ReportService.update(event.reportId, report.date, hasFinished, report.location,
-              report.localTeam, report.visitorTeam, function () {
-                callback(data)
-              })
-          })
-        }
+        callback(data, err)
       }
       callback(data, err)
     })

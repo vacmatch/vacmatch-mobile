@@ -405,15 +405,20 @@ describe('Delete Event', function () {
       callback(event, null)
     })
 
-    // Mock GenericService remove to return an OK result
-    spyOn(genericService, 'remove').andCallFake(function (anyEvent, callback) {
-      callback(jasmine.any(Object), null)
+    // Mock ReportService findById to return the report from this event
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
     })
 
     // Mock ReportService update to modify report status
     spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
       reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
       callback(validReport, null)
+    })
+
+    // Mock GenericService remove to return an OK result
+    spyOn(genericService, 'remove').andCallFake(function (anyEvent, callback) {
+      callback(jasmine.any(Object), null)
     })
 
     // Delete this event
@@ -430,4 +435,87 @@ describe('Delete Event', function () {
 
   })
 
+  it('If report status cant be modified when an EndMatchEvent is being deleted, Event shouldnt be deleted', function () {
+
+    // An existent EndMatchEvent
+    let event = defaultEvent
+    event.type = 'end-match'
+
+    // A valid Report
+    let validReport = defaultReport
+
+    // Mock GenericService findById to return this event
+    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    // Mock ReportService findById to return the report from this event
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    // Mock ReportService update to return an ERROR
+    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
+      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+      callback(null, jasmine.any(Object))
+    })
+
+    // Mock GenericService remove
+    spyOn(genericService, 'remove')
+
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).toBe(null)
+      expect(err).not.toBe(null)
+    })
+
+    // Check if genericService remove method was called
+    expect(genericService.remove).not.toHaveBeenCalled()
+
+    // Check if reportService update method was called to update Report status
+    expect(reportService.update).toHaveBeenCalled()
+
+  })
+
+  it('If report doesnt exists when an EndMatchEvent is being deleted, Event shouldnt be deleted', function () {
+
+    // An existent EndMatchEvent
+    let event = defaultEvent
+    event.type = 'end-match'
+
+    // A valid Report
+    let validReport = defaultReport
+
+    // Mock GenericService findById to return this event
+    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    let notFoundError = new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId)
+
+    // Mock ReportService findById to return not found ERROR
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(null, notFoundError)
+    })
+
+    // Mock ReportService update
+    spyOn(reportService, 'update')
+
+    // Mock GenericService remove
+    spyOn(genericService, 'remove')
+
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).toBe(null)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(notFoundError)
+    })
+
+    // Check if genericService remove method was called
+    expect(genericService.remove).not.toHaveBeenCalled()
+
+    // Check if reportService update method was called to update Report status
+    expect(reportService.update).not.toHaveBeenCalled()
+
+  })
 })

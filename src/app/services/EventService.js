@@ -158,7 +158,7 @@ let EventService = {
       let endEvent = new EndMatchEvent()
       if (eventType === endEvent.type) {
         let hasFinished = true
-        // Update report result with new value
+        // Update report state with new value
         ReportService.update(reportId, report.date, hasFinished, report.location,
           report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
             if (err !== null) {
@@ -181,10 +181,32 @@ let EventService = {
     * the deleted eventId if the event was deleted
     */
   deleteEvent: function (eventId, callback) {
+    // Get the event
     this.findById(eventId, function (event, err) {
       if (err === null) {
-        // Remove it
-        GenericService.remove(event, callback)
+        // Check if it's an end match event
+        let endEvent = new EndMatchEvent()
+        if (event.type === endEvent.type) {
+          let hasFinished = false
+          // Find report
+          ReportService.findById(event.reportId, function (report, err) {
+            if (err !== null) {
+              return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId))
+            }
+            // Update report state with new value
+            ReportService.update(event.reportId, report.date, hasFinished, report.location,
+              report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
+                if (err !== null) {
+                  return callback(null, err)
+                }
+                // Remove the event
+                GenericService.remove(event, callback)
+              })
+          })
+        } else {
+          // Remove the event
+          GenericService.remove(event, callback)
+        }
       } else {
         callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
       }
