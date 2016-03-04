@@ -39,27 +39,7 @@ let EventStore = Reflux.createStore({
 
   onAddControlEvent: function (reportId, eventType, matchTime, text, callback) {
     let timestamp = Date.now()
-    EventService.createControl(reportId, eventType, matchTime, text, timestamp, function (data, err) {
-      if (err == null) {
-        let end = new EndMatchEvent()
-        // Check if this Event is a end event to modify report state if it's necessary
-        if (eventType === end.type) {
-          let hasFinished = true
-          // Find report
-          ReportService.findById(reportId, function (report) {
-            // Update report state with new value
-            ReportService.update(reportId, report.date, hasFinished, report.location,
-              report.localTeam, report.visitorTeam, report.incidences, function () {
-                callback(data, null)
-              })
-          })
-        } else {
-          callback(data, err)
-        }
-      } else {
-        callback(data, err)
-      }
-    })
+    EventService.createControl(reportId, eventType, matchTime, text, timestamp, callback)
   },
 
   onDeleteEvent: function (event, callback) {

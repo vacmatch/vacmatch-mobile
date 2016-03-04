@@ -4,6 +4,7 @@ import InstanceNotFoundException from '../models/exception/InstanceNotFoundExcep
 import ReportService from './ReportService'
 import PersonService from './PersonService'
 import TeamService from './TeamService'
+import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
 
 let EventService = {
 
@@ -114,7 +115,7 @@ let EventService = {
     // Check if report exists
     ReportService.findById(reportId, (anyReport, err) => {
       if (err !== null) {
-        return callback(null, new InstanceNotFoundException('Non existent report', 'reportId', reportId))
+        return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
       }
       // Check if person exists
       PersonService.findByPersonIdReportIdAndTeamId(person._id, reportId, team._id, (anyPerson, err) => {
@@ -144,9 +145,33 @@ let EventService = {
     * @param {eventCallback} callback A callback that returns the created element or error
     */
   createControl: function (reportId, eventType, matchTime, text, timestamp, callback) {
-    let event = new ControlEvent(this.getType(), reportId, eventType, matchTime, text, timestamp)
-    // Save it
-    GenericService.create(event, callback)
+    // Check if report exists
+    ReportService.findById(reportId, (report, err) => {
+      if (err !== null) {
+        return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
+      }
+
+      // Create the new event
+      let event = new ControlEvent(this.getType(), reportId, eventType, matchTime, text, timestamp)
+
+      // Check if it's an end match event
+      let endEvent = new EndMatchEvent()
+      if (eventType === endEvent.type) {
+        let hasFinished = true
+        // Update report result with new value
+        ReportService.update(reportId, report.date, hasFinished, report.location,
+          report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
+            if (err !== null) {
+              return callback(null, err)
+            }
+            // Save the event
+            GenericService.create(event, callback)
+          })
+      } else {
+        // Save the event
+        GenericService.create(event, callback)
+      }
+    })
   },
 
   /**
@@ -161,7 +186,7 @@ let EventService = {
         // Remove it
         GenericService.remove(event, callback)
       } else {
-        callback(null, err)
+        callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
       }
     })
   }

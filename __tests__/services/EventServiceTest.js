@@ -80,7 +80,7 @@ describe('create Sport Event', function () {
     nonValidEvent.reportId = nonExistentReportId
 
     // Error: Can't find a report
-    let nonExistentError = new InstanceNotFoundException('Non existent report', 'reportId', nonExistentReportId)
+    let nonExistentError = new InstanceNotFoundException('Non existent report', 'event.reportId', nonExistentReportId)
 
     // Set ReportService findById mock implementation
     spyOn(reportService, 'findById').andCallFake(function (defaultEvent, callback) {
@@ -294,6 +294,45 @@ describe('Create Control Event', function () {
 
   })
 
+  it('If report status cant be modified when creating an EndMatchEvent, new control event shouldnt be created', function () {
+
+    // A valid EndMatchEvent
+    let event = defaultControlEvent
+    event.type = 'end-match'
+
+    // A valid Report
+    let validReport = defaultReport
+
+    // Mock ReportService findById method to return a valid report
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(event, null)
+    })
+
+    // Mock GenericService create to return a valid new ControlEvent
+    spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
+      callback(event, null)
+    })
+
+    // Mock ReportService update to send an ERROR
+    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
+      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+      callback(null, jasmine.any(Object))
+    })
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toBe(null)
+      expect(err).not.toBe(null)
+    })
+
+    // Check if genericService create method was called
+    expect(genericService.create).not.toHaveBeenCalled()
+
+    // Check if reportService update method was called trying to update Report status
+    expect(reportService.update).toHaveBeenCalled()
+
+  })
 })
 
 describe('Delete Event', function () {
