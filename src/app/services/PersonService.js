@@ -1,5 +1,9 @@
 import GenericService from './GenericService'
+import ReportService from './ReportService'
+import TeamService from './TeamService'
+import AuthService from './AuthService'
 import Person from '../models/person/Person'
+import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
 
 let PersonService = {
 
@@ -27,9 +31,9 @@ let PersonService = {
 
   /**
     * Get an unique Person from a team in this report
-    * @param {Number} personId The person identifier
-    * @param {Number} reportId The report identifier
-    * @param {Number} teamId The team identifier
+    * @param {String} personId The person identifier
+    * @param {String} reportId The report identifier
+    * @param {String} teamId The team identifier
     * @param {personCallback} callback A callback that returns an element
     */
   findByPersonIdReportIdAndTeamId: function (personId, reportId, teamId, callback) {
@@ -58,8 +62,8 @@ let PersonService = {
 
   /**
     * Get a list of People from a team in this report
-    * @param {Number} reportId The report identifier
-    * @param {Number} teamId The team identifier
+    * @param {String} reportId The report identifier
+    * @param {String} teamId The team identifier
     * @param {personListCallback} callback A callback that returns a list
     */
   findByReportIdAndTeamId: function (reportId, teamId, callback) {
@@ -84,35 +88,60 @@ let PersonService = {
   /**
     * Create a new Person
     * @param {String} name The report identifier
-    * @param {Number} cardId The card identification number
-    * @param {Number} dorsal The dorsal number
+    * @param {String} cardId The card identification number
+    * @param {String} dorsal The dorsal number
     * @param {String} avatarUrl The url where the avatar is hosted
     * @param {Boolean} isCalled Value that checks if this Person is called by this Team in this Report
     * @param {Boolean} isStaff Value that checks if this Person is a staff
-    * @param {Number} reportId The report identifier
-    * @param {Number} teamId The team identifier
-    * @param {Number} userId The user identifier
+    * @param {String} reportId The report identifier
+    * @param {String} teamId The team identifier
+    * @param {String} userId The user identifier
     * @param {personCallback} callback A callback that returns an element
     */
   create: function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
-    let person = new Person(this.getType(), name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId)
-    // Save it
-    GenericService.create(person, callback)
+    // Check if the Report exists
+    ReportService.findById(reportId, (report, err) => {
+      if (err !== null) {
+        return callback(null, new InstanceNotFoundException('Non existent report', 'person.reportId', reportId))
+      }
+      // Check if the Team exists
+      TeamService.findById(teamId, (team, err) => {
+        if (err !== null) {
+          return callback(null, new InstanceNotFoundException('Non existent team', 'person.teamId', teamId))
+        }
+        // If userId not null, check if User exists
+        // userId === null means that this Person that is going to be created is a temporal Person
+        if (userId !== null) {
+          AuthService.findById(userId, (user, err) => {
+            if (err !== null) {
+              return callback(null, new InstanceNotFoundException('Non existent user', 'person.userId', userId))
+            }
+            let person = new Person(null, this.getType(), name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId)
+            // Save it
+            GenericService.create(person, callback)
+          })
+        } else {
+          let person = new Person(null, this.getType(), name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId)
+          // Save it
+          GenericService.create(person, callback)
+        }
+      })
+    })
   },
 
   /**
     * Update a Person
-    * @param {Number} personId The Person identifier
+    * @param {String} personId The Person identifier
     * @param {String} name The report identifier
-    * @param {Number} cardId The card identification number
-    * @param {Number} dorsal The dorsal number
+    * @param {String} cardId The card identification number
+    * @param {String} dorsal The dorsal number
     * @param {String} avatarUrl The url where the avatar is hosted
     * @param {Boolean} isCalled Value that checks if this Person is called by this Team in this Report
     * @param {Boolean} isStaff Value that checks if this Person is a staff
-    * @param {Number} reportId The report identifier
-    * @param {Number} oldTeamId The old team identifier
-    * @param {Number} teamId The new team identifier
-    * @param {Number} userId The user identifier
+    * @param {String} reportId The report identifier
+    * @param {String} oldTeamId The old team identifier
+    * @param {String} teamId The new team identifier
+    * @param {String} userId The user identifier
     * @param {personCallback} callback A callback that returns an element
     */
   update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
@@ -131,16 +160,16 @@ let PersonService = {
         // Save it
         GenericService.update(person, callback)
       } else {
-        callback(null, err)
+        callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
     })
   },
 
   /**
     * Set a new value to isCalled property
-    * @param {Number} personId The Person identifier
-    * @param {Number} reportId The report identifier
-    * @param {Number} teamId The new team identifier
+    * @param {String} personId The Person identifier
+    * @param {String} reportId The report identifier
+    * @param {String} teamId The new team identifier
     * @param {Boolean} newValue The new value to isCalled property
     * @param {personCallback} callback A callback that returns an element
     */
@@ -152,17 +181,17 @@ let PersonService = {
         // Update it
         GenericService.update(person, callback)
       } else {
-        callback(null, err)
+        callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
     })
   },
 
   /**
     * Set a new value to dorsal property
-    * @param {Number} personId The Person identifier
-    * @param {Number} reportId The report identifier
-    * @param {Number} teamId The new team identifier
-    * @param {Number} newDorsal The new dorsal value
+    * @param {String} personId The Person identifier
+    * @param {String} reportId The report identifier
+    * @param {String} teamId The new team identifier
+    * @param {String} newDorsal The new dorsal value
     * @param {personCallback} callback A callback that returns an element
     */
   setDorsal: function (personId, reportId, teamId, newDorsal, callback) {
@@ -173,7 +202,7 @@ let PersonService = {
         // Update it
         GenericService.update(person, callback)
       } else {
-        callback(null, err)
+        callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
     })
   },
@@ -191,7 +220,7 @@ let PersonService = {
         // Remove it
         GenericService.remove(person, callback)
       } else {
-        callback(null, err)
+        callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
     })
   }

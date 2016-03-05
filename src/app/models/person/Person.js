@@ -1,17 +1,18 @@
 
 class Person {
 
-  constructor (type, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId) {
+  constructor (id, type, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId) {
+    this._id = id
     this.type = type ? type : 'person'
-    this.name = name ? name : ''
-    this.cardId = cardId ? cardId : ''
-    this.dorsal = dorsal ? dorsal : ''
-    this.avatarUrl = avatarUrl ? avatarUrl : ''
-    this.isCalled = isCalled ? isCalled : false
-    this.isStaff = isStaff ? isStaff : false
-    this.reportId = reportId ? reportId : ''
-    this.teamId = teamId ? teamId : ''
-    this.userId = userId ? userId : ''
+    this.name = name
+    this.cardId = cardId
+    this.dorsal = dorsal
+    this.avatarUrl = avatarUrl
+    this.isCalled = isCalled
+    this.isStaff = isStaff
+    this.reportId = reportId
+    this.teamId = teamId
+    this.userId = userId
   }
 
 }
