@@ -2,7 +2,6 @@ import Reflux from 'reflux'
 
 import ReportActions from '../actions/ReportActions'
 import ReportService from '../services/ReportService'
-import TeamService from '../services/TeamService'
 
 let ReportListStore = Reflux.createStore({
   listenables: ReportActions,
@@ -33,27 +32,13 @@ let ReportListStore = Reflux.createStore({
   },
 
   onAddReport: function (date, location, localTeam, visitorTeam, refereeList, callback) {
-    // Create both teams
-    TeamService.create(localTeam.name, (local, err) => {
+    let hasFinished = false
+    ReportService.create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (doc, err) => {
       if (err !== null) {
         return callback(null, err)
       }
-      localTeam._id = local._id
-      TeamService.create(visitorTeam.name, (visitor, err) => {
-        if (err !== null) {
-          return callback(null, err)
-        }
-        visitorTeam._id = visitor._id
-        // Save new report
-        let hasFinished = false
-        ReportService.create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (doc, err) => {
-          if (err !== null) {
-            return callback(null, err)
-          }
-          this.onUpdateLists()
-          callback(doc, null)
-        })
-      })
+      this.onUpdateLists()
+      callback(doc, null)
     })
   },
 

@@ -30,7 +30,7 @@ let TeamService = {
     if ((teamName === null) || (teamName === undefined)) {
       return callback(null, new InvalidParametersException('Invalid team name', 'teamName', teamName))
     }
-    let team = new Team(this.getType(), teamName)
+    let team = new Team(null, this.getType(), teamName)
     // Save it
     GenericService.create(team, callback)
   }
