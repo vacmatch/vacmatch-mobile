@@ -98,8 +98,25 @@ let SignStore = {
         callback(null, err)
       }
     })
-  }
+  },
 
+  /**
+   * Delete all Signature from a Report
+   * @param {String} reportId Report identifier
+   * @param {signatureCallback} callback A callback that returns if Signatures were removed
+   */
+  deleteAllSignaturesByReportId: function (reportId, callback) {
+    this.findAllByReportId(reportId, function (signatureList, err) {
+      signatureList.map((sign) => {
+        this.delete(sign._id, function (res, err) {
+          if (err !== null) {
+            return callback(null, err)
+          }
+        })
+      })
+      callback(signatureList, err)
+    })
+  }
 }
 
 module.exports = SignStore

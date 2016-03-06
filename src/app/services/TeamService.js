@@ -33,8 +33,21 @@ let TeamService = {
     let team = new Team(null, this.getType(), teamName)
     // Save it
     GenericService.create(team, callback)
-  }
+  },
 
+  /**
+    * Delete a Team
+    * @param {String} teamId The Team identifier
+    * @param {teamCallback} callback A callback that returns if team was removed
+    */
+  delete: function (teamId, callback) {
+    this.findById(teamId, function (team, err) {
+      if (err !== null) {
+        return callback(null, err)
+      }
+      GenericService.remove(team, callback)
+    })
+  }
 }
 
 module.exports = TeamService
