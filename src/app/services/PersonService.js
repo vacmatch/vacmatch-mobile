@@ -86,6 +86,29 @@ let PersonService = {
   },
 
   /**
+    * Get a list of People in a Report
+    * @param {String} reportId The report identifier
+    * @param {personListCallback} callback A callback that returns a list
+    */
+  findAllByReportId: function (reportId, callback) {
+    let db = GenericService.getDatabase()
+    db.createIndex({
+      index: {fields: ['reportId', 'teamId']}
+    }).then(function () {
+      return db.find({
+        selector: {
+          reportId: {$eq: reportId}
+        }
+      })
+    }).then(function (result) {
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', reportId, err)
+      callback(null, err)
+    })
+  },
+
+  /**
     * Create a new Person
     * @param {String} name The report identifier
     * @param {String} cardId The card identification number
@@ -223,7 +246,27 @@ let PersonService = {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
     })
+  },
+
+  /**
+    * Delete all Person from a Report
+    * @param {String} reportId The report identifier
+    * @param {personCallback} callback A callback that returns if all Person were removed
+    */
+  deleteAllPersonByReportId: function (reportId, callback) {
+    this.findAllByReportId(reportId, function (personList, err) {
+      // Remove all person
+      personList.map((person) => {
+        this.deletePerson(person._id, person.reportId, person.teamId, function (res, err) {
+          if (err !== null) {
+            return callback(null, err)
+          }
+        })
+      })
+      callback(personList, err)
+    })
   }
+
 }
 
 module.exports = PersonService

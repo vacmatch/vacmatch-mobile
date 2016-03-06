@@ -1,5 +1,8 @@
 import GenericService from './GenericService'
 import TeamService from './TeamService'
+import EventService from './EventService'
+import PersonService from './PersonService'
+import SignService from './SignService'
 import Report from '../models/report/Report'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
 
@@ -137,18 +140,43 @@ let ReportService = {
 
   /**
     * Delete a Report by identifier
-    * @param {Number} id The Report identifier
+    * It delete all Events, Person, Teams an Signatures from this Report too
+    * @param {String} reportId, The Report identifier
     * @param {reportCallback} callback A callback that returns an object with
     * the deleted reportId if the report was deleted
     */
-  delete: function (id, callback) {
-    this.findById(id, function (report, err) {
-      if (err === null) {
-        // Remove it
-        GenericService.remove(report, callback)
-      } else {
-        callback(null, err)
+  delete: function (reportId, callback) {
+    this.findById(reportId, function (report, err) {
+      if (err !== null) {
+        return callback(null, new InstanceNotFoundException('Non existent report', 'reportId', reportId))
       }
+      EventService.deleteAllEventsByReportId(reportId, (res, err) => {
+        if (err !== null) {
+          return callback(null, err)
+        }
+        PersonService.deleteAllPersonByReportId(reportId, (res, err) => {
+          if (err !== null) {
+            return callback(null, err)
+          }
+          TeamService.delete(report.localTeam._id, (res, err) => {
+            if (err !== null) {
+              return callback(null, err)
+            }
+            TeamService.delete(report.visitorTeam._id, (res, err) => {
+              if (err !== null) {
+                return callback(null, err)
+              }
+              SignService.deleteAllSignaturesByReportId(reportId, (res, err) => {
+                if (err !== null) {
+                  return callback(null, err)
+                }
+                // Remove Report
+                GenericService.remove(report, callback)
+              })
+            })
+          })
+        })
+      })
     })
   }
 }

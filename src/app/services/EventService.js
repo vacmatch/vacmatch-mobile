@@ -211,7 +211,26 @@ let EventService = {
         callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
       }
     })
+  },
+
+  /**
+    * Delete all Events from a Report
+    * @param {String} reportId The Report identifier
+    * @param {eventCallback} callback A callback that returns if Events were removed
+    */
+  deleteAllEventsByReportId: function (reportId, callback) {
+    this.findAllByReportId(reportId, (eventList, err) => {
+      eventList.map((e) => {
+        this.deleteEvent(e._id, function (res, err) {
+          if (err !== null) {
+            return callback(null, err)
+          }
+        })
+      })
+      callback(eventList, err)
+    })
   }
+
 }
 
 module.exports = EventService
