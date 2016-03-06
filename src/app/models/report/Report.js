@@ -1,7 +1,8 @@
 
 class Report {
 
-  constructor (type, date, location, hasFinished, localTeam, visitorTeam, refereeList) {
+  constructor (id, type, date, location, hasFinished, localTeam, visitorTeam, refereeList) {
+    this._id = id
     this.databaseType = type ? type : 'report'
     this.date = date ? date : ''
     this.location = location ? location : ''

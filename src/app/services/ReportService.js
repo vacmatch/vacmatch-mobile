@@ -1,5 +1,7 @@
 import GenericService from './GenericService'
+import TeamService from './TeamService'
 import Report from '../models/report/Report'
+import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
 
 let ReportService = {
 
@@ -68,9 +70,23 @@ let ReportService = {
     * @param {reportCallback} callback A callback that returns the created Report or error
     */
   create: function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
-    let report = new Report(this.getType(), date, location, hasFinished, localTeam, visitorTeam, refereeList)
-    // Save it
-    GenericService.create(report, callback)
+    // Create a new local team
+    TeamService.create(localTeam.name, (local, err) => {
+      if (err !== null) {
+        return callback(null, err)
+      }
+      localTeam._id = local._id
+      // Create a new visitor team
+      TeamService.create(visitorTeam.name, (visitor, err) => {
+        if (err !== null) {
+          return callback(null, err)
+        }
+        visitorTeam._id = visitor._id
+        // Create the new report
+        let report = new Report(null, this.getType(), date, location, hasFinished, localTeam, visitorTeam, refereeList)
+        GenericService.create(report, callback)
+      })
+    })
   },
 
   /**
@@ -87,20 +103,32 @@ let ReportService = {
   update: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
     this.findById(reportId, (report, err) => {
       if (err === null) {
-        report.date = date
-        report.location = location
-        report.hasFinished = hasFinished
-        report.localTeam._id = localTeam._id
-        report.localTeam.name = localTeam.name
-        report.localTeam.result = localTeam.result
-        report.localTeam.secondaryField = localTeam.secondaryField
-        report.visitorTeam._id = visitorTeam._id
-        report.visitorTeam.name = visitorTeam.name
-        report.visitorTeam.result = visitorTeam.result
-        report.visitorTeam.secondaryField = visitorTeam.secondaryField
-        report.incidences = incidences
-        // Save it
-        GenericService.update(report, callback)
+        // Check if localTeam exists
+        TeamService.findById(localTeam._id, (lt, err) => {
+          if (err !== null) {
+            return callback(null, new InstanceNotFoundException('Non existent local team', 'report.localTeam._id', localTeam._id))
+          }
+          // Check if visitorTeam exists
+          TeamService.findById(visitorTeam._id, (vt, err) => {
+            if (err !== null) {
+              return callback(null, new InstanceNotFoundException('Non existent visitor team', 'report.visitorTeam._id', visitorTeam._id))
+            }
+            report.date = date
+            report.location = location
+            report.hasFinished = hasFinished
+            report.localTeam._id = localTeam._id
+            report.localTeam.name = localTeam.name
+            report.localTeam.result = localTeam.result
+            report.localTeam.secondaryField = localTeam.secondaryField
+            report.visitorTeam._id = visitorTeam._id
+            report.visitorTeam.name = visitorTeam.name
+            report.visitorTeam.result = visitorTeam.result
+            report.visitorTeam.secondaryField = visitorTeam.secondaryField
+            report.incidences = incidences
+            // Save it
+            GenericService.update(report, callback)
+          })
+        })
       } else {
         callback(null, err)
       }
