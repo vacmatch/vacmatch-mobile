@@ -65,3 +65,5 @@ gulp.task('watch', function () {
 gulp.task('default', ['server', 'watch'])
 
 gulp.task('run', ['build', 'server', 'watch'])
+
+gulp.task('deploy', ['build', 'test', 'server'])

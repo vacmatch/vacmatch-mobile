@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+  - "4.1"
+  - "4.0"
+before_script:
+  - npm install -g gulp
+script: gulp test
+
+# whitelist
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
+  slack: vacmatch:61qt7wMKuO0e8juiX6MCnX6T
