@@ -14,13 +14,13 @@
       "email": "pablocastro@vacmatch.com"
     }
   ],
-  "license": "AGPLv3",
+  "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/vacmatch/vacmatch-mobile.git"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/vacmatch/vacmatch-mobile/issues"
   },
   "dependencies": {
     "babel-jest": "^6.0.1",
