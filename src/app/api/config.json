@@ -3,7 +3,11 @@
   "production" : {
   },
   "development" : {
+    "db": {
+      "username": "admin",
+      "password": "admin"
+    }
   },
 
-  "_env": "development",
+  "_env": "development"
 }
