@@ -22,9 +22,9 @@ let EditUser = React.createClass({
 
   handleUpdate: function () {
     this.props.handleUpdate(
-      this.refs.username.getValue(), this.refs.password.getValue(),
+      this.refs.username.getValue(), this.refs.password.getValue(), this.refs.secondPassword.getValue(),
       this.refs.email.getValue(), this.refs.name.getValue(), this.refs.surname.getValue(),
-      this.refs.cardid.getValue(), this.refs.signKey.getValue()
+      this.refs.cardid.getValue(), this.refs.signKey.getValue(), this.refs.secondSignKey.getValue()
     )
   },
 
@@ -61,10 +61,21 @@ let EditUser = React.createClass({
               floatingLabelText='Password'
               type='password'/>
             <br/>
+            <TextField ref='secondPassword'
+              key={'dialog-secondPassword-field'}
+              hintText='Confirm password'
+              floatingLabelText='Confirm password'
+              type='password'/>
+            <br/>
             <TextField ref='signKey'
               key={'dialog-signKey-field'}
               hintText='Insert PIN'
               floatingLabelText='PIN'
+              type='password'/>
+            <TextField ref='secondSignKey'
+              key={'dialog-secondSignKey-field'}
+              hintText='Confirm PIN'
+              floatingLabelText='Confirm PIN'
               type='password'/>
             <br/>
             <TextField ref='name'
