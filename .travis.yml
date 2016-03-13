@@ -10,6 +10,7 @@ script: gulp test
 branches:
   only:
     - master
+    - development
 
 notifications:
   email: false
