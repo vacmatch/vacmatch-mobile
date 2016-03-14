@@ -17,7 +17,7 @@ gulp.task('server', function () {
 })
 
 gulp.task('test', function (done) {
-  jest.runCLI({
+  return jest.runCLI({
     config: {
       verbose: true,
       rootDir: '__tests__',
@@ -25,7 +25,10 @@ gulp.task('test', function (done) {
       testFileExtensions: ['es6', 'js'],
       moduleFileExtensions: ['es6', 'js', 'json']
     }
-  }, '.', function () {
+  }, '.', function (success) {
+    if (!success) {
+      process.exit(1)
+    }
     done()
   })
 })
