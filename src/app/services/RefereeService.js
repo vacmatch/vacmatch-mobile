@@ -65,7 +65,7 @@ let RefereeService = {
    * @param {refereeCallback} callback A callback that returns a Referee if it was created or error
    */
   create: function (name, cardId, avatarUrl, userId, callback) {
-    let referee = new Referee(this.getType(), name, cardId, avatarUrl, userId)
+    let referee = new Referee(null, this.getType(), name, cardId, avatarUrl, userId)
     // Save it
     GenericService.create(referee, callback)
   }
