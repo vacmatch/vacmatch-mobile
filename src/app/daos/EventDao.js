@@ -61,6 +61,35 @@ let EventDao = {
     })
   },
 
+  findAllByReportIdAndPersonId: function (reportId, personId, callback) {
+    let db = GenericDao.getDatabase()
+    db.createIndex({
+      index: {
+        fields: ['databaseType', 'timestamp', 'reportId', 'personId']
+      }
+    }).then(() => {
+      return db.find({
+        selector: {
+          databaseType: {$eq: this.databaseType},
+          timestamp: {$exists: true},
+          reportId: {$eq: reportId},
+          person: {
+            _id: {$eq: personId}
+          }
+        },
+        sort: [
+          {'timestamp': 'desc'},
+          {'reportId': 'asc'}
+        ]
+      })
+    }).then(function (result) {
+      callback(result.docs, null)
+    }).catch(function (err) {
+      console.log('err: ', err)
+      callback(null, err)
+    })
+  },
+
   create: function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
     let event = new Event(null, reportId, person, team, eventType, matchTime, cause, timestamp)
     // Save it

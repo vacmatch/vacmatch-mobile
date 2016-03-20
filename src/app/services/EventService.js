@@ -39,6 +39,16 @@ class EventService {
   }
 
   /**
+    * Get all Events from this Report and Person
+    * @param {String} reportId The report identifier
+    * @param {String} personId The person identifier
+    * @param {eventListCallback} callback A callback that returns an Event list
+    */
+  findAllByReportIdAndPersonId (reportId, personId, callback) {
+    EventDao.findAllByReportIdAndPersonId(reportId, personId, callback)
+  }
+
+  /**
     * Create a new Sport Event (Score, foul, etc)
     * @param {String} reportId The report identifier
     * @param {Object} person The Person who is involved in this Event

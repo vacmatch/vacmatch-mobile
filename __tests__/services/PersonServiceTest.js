@@ -10,12 +10,15 @@ let ReportService = require('../../src/app/services/ReportService')
 let TeamService = require('../../src/app/services/TeamService')
 let RefereeService = require('../../src/app/services/RefereeService')
 let AuthService = require('../../src/app/services/AuthService')
+let EventService = require('../../src/app/services/EventService')
 
 let Person = require('../../src/app/models/person/Person')
 let User = require('../../src/app/models/user/User')
+let EventElements = require('../../src/app/models/event/Event')
 let Team = require('../../src/app/models/team/Team')
 let Report = require('../../src/app/models/report/Report')
 let InstanceNotFoundException = require('../../src/app/models/exception/InstanceNotFoundException')
+let ExistingElementsException = require('../../src/app/models/exception/ExistingElementsException')
 
 let PersonDao = require('../../src/app/daos/PersonDao')
 
@@ -29,6 +32,7 @@ let reportService = null
 let teamService = null
 let refereeService = null
 let authService = null
+let eventService = null
 
 describe('Create Person', function () {
 
@@ -41,7 +45,8 @@ describe('Create Person', function () {
     teamService = new TeamService()
     refereeService = new RefereeService()
     authService = new AuthService(jasmine.createSpy('RefereeService'))
-    personService = new PersonService(reportService, teamService, authService)
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
   it('Create a new Person with valid parameters', function () {
@@ -248,7 +253,8 @@ describe('Update Person', function () {
     teamService = new TeamService()
     refereeService = new RefereeService()
     authService = new AuthService(jasmine.createSpy('RefereeService'))
-    personService = new PersonService(reportService, teamService, authService)
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
   it('Update a Person with valid parameters', function () {
@@ -329,7 +335,8 @@ describe('Set called value in Person', function () {
     teamService = new TeamService()
     refereeService = new RefereeService()
     authService = new AuthService(jasmine.createSpy('RefereeService'))
-    personService = new PersonService(reportService, teamService, authService)
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
   it('Called value must be changed if Person exists', function () {
@@ -340,12 +347,18 @@ describe('Set called value in Person', function () {
     // A valid Person
     let person = defaultPerson
 
+    let emptyEventsList = []
+
     // A Person with new called value
     let newPerson = defaultNewPerson
     newPerson.isCalled = newCalledValue
 
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
       callback(person, null)
+    })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
+      callback(emptyEventsList, null)
     })
 
     spyOn(PersonDao, 'update').andCallFake(function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback) {
@@ -359,8 +372,8 @@ describe('Set called value in Person', function () {
     })
 
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).toHaveBeenCalled()
     expect(PersonDao.update).toHaveBeenCalled()
-
   })
 
   it('Called value cant be changed if Person doesnt exist', function () {
@@ -371,12 +384,16 @@ describe('Set called value in Person', function () {
     // A valid Person
     let person = defaultPerson
 
+    let emptyEventsList = []
+
     // An error
     let nonExistingPersonException = new InstanceNotFoundException('Non existent person', 'personId', person._id)
 
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
       callback(null, nonExistingPersonException)
     })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId')
 
     spyOn(PersonDao, 'update')
 
@@ -387,9 +404,50 @@ describe('Set called value in Person', function () {
     })
 
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).not.toHaveBeenCalled()
     expect(PersonDao.update).not.toHaveBeenCalled()
 
   })
+
+  it('A Person cant be uncalled if he has any event in this Report', function () {
+
+    // A new uncalled value
+    let newCalledValue = false
+
+    // A valid Person
+    let person = defaultPerson
+
+    // An event where this person is involved
+    let event = new EventElements.Event('event', '1', person, defaultTeam, 'goal', 1, 'cause', 1)
+
+    // A list with some event inside
+    let eventList = []
+    eventList.push(event)
+
+    // An error
+    let existingElementsException = new ExistingElementsException('Existing events assigned to this person', 'personId', person._id)
+
+    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
+    spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
+      callback(person, null)
+    })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
+      callback(eventList, null)
+    })
+
+    spyOn(PersonDao, 'update')
+
+    personService.setCalledValue(person._id, person.reportId, person.teamId, newCalledValue, (p, err) => {
+      expect(p).toBe(null)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(existingElementsException)
+    })
+
+    expect(PersonDao.update).not.toHaveBeenCalled()
+
+  })
+
 
 })
 
@@ -423,18 +481,18 @@ describe('Set dorsal value in Person', function () {
       callback(person, null)
     })
 
-    spyOn(PersonDao, 'update').andCallFake(function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback) {
+    spyOn(PersonDao, 'setCalledValue').andCallFake(function (personId, reportId, teamId, newValue, oldPerson, callback) {
       callback(newPerson, null)
     })
 
-    personService.setCalledValue(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
+    personService.setDorsal(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
       expect(p).toEqual(newPerson)
       expect(p).not.toBe(null)
       expect(err).toBe(null)
     })
 
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
-    expect(PersonDao.update).toHaveBeenCalled()
+    expect(PersonDao.setCalledValue).toHaveBeenCalled()
 
   })
 
@@ -452,16 +510,16 @@ describe('Set dorsal value in Person', function () {
       callback(null, nonExistingPersonException)
     })
 
-    spyOn(PersonDao, 'update')
+    spyOn(PersonDao, 'setCalledValue')
 
-    personService.setCalledValue(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
+    personService.setDorsal(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
       expect(err).toEqual(nonExistingPersonException)
       expect(err).not.toBe(null)
       expect(p).toBe(null)
     })
 
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
-    expect(PersonDao.update).not.toHaveBeenCalled()
+    expect(PersonDao.setCalledValue).not.toHaveBeenCalled()
 
   })
 
