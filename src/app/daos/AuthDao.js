@@ -32,7 +32,7 @@ let AuthDao = {
     })
   },
 
-  doSignUp: function (username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback) {
+  signup: function (username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback) {
     db.signup(username, password, {
       metadata: {
         avatarUrl: avatarUrl,

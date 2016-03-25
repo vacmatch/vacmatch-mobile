@@ -1,7 +1,6 @@
 jest.dontMock('../../src/app/services/AuthService')
 
 // Services
-let genericService = require('../../src/app/services/GenericService')
 let authService = require('../../src/app/services/AuthService')
 let refereeService = require('../../src/app/services/RefereeService')
 
@@ -10,6 +9,8 @@ let Referee = require('../../src/app/models/referee/Referee')
 let DuplicateException = require('../../src/app/models/exception/DuplicateException')
 let InvalidParametersException = require('../../src/app/models/exception/InvalidParametersException')
 
+let AuthDao = require('../../src/app/daos/AuthDao')
+
 // Default elements
 let defaultUser = null
 let defaultReferee = null
@@ -17,7 +18,7 @@ let defaultReferee = null
 describe('Signup', function () {
 
   beforeEach(function () {
-    defaultUser = new User(null, 'username', 'pass', 'www.avatarurl.test' ,'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
+    defaultUser = new User(null, 'username', 'pass', 'www.avatarurl.test', 'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
     defaultReferee = new Referee(null, 'name', '22222222Z', 'www.avatarurl.test', 'userid')
   })
 
@@ -26,6 +27,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Passwords are diferent', 'password', user.password)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with different passwords
     authService.signup(user.username, user.password, 'another password', user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -33,6 +38,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if password doesnt exist', function () {
@@ -41,6 +50,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Password is not valid', 'password', user.password)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with undefined passwords
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -48,6 +61,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if password is null', function () {
@@ -56,6 +73,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Password is not valid', 'password', user.password)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with null passwords
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -63,6 +84,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if password is empty', function () {
@@ -71,6 +96,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Password is not valid', 'password', user.password)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with empty passwords
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -78,12 +107,20 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if both sign key are diferent', function () {
     let user = defaultUser
 
     let error = new InvalidParametersException('Sign keys are diferent', 'signKey', user.signKey)
+
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
 
     // Sign up with differents sign keys
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
@@ -92,6 +129,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if sign key doesnt exists', function () {
@@ -100,6 +141,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Sign key is not valid', 'signKey', user.signKey)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with undefined sign keys
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -107,6 +152,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if sign key is null', function () {
@@ -115,6 +164,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Sign key is not valid', 'signKey', user.signKey)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with null sign keys
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -122,6 +175,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if sign key is empty', function () {
@@ -130,6 +187,10 @@ describe('Signup', function () {
 
     let error = new InvalidParametersException('Sign key is not valid', 'signKey', user.signKey)
 
+    spyOn(AuthDao, 'signup')
+
+    spyOn(refereeService, 'create')
+
     // Sign up with empty sign keys
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -137,6 +198,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).not.toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new User cant be signed up if username is been used', function () {
@@ -144,9 +209,11 @@ describe('Signup', function () {
 
     let error = new DuplicateException('Username is been used', 'username', user.username)
 
-    spyOn(authService, 'doSignUp').andCallFake(function (username, password, avatarUrl, email, firstName, surname, cardId, hashKey, callback) {
+    spyOn(AuthDao, 'signup').andCallFake(function (username, password, avatarUrl, email, firstName, surname, cardId, hashKey, callback) {
       callback(null, error)
     })
+
+    spyOn(refereeService, 'create')
 
     authService.signup(user.username, user.password, user.password, user.avatarUrl, user.email,
       user.firstName, user.surname, user.cardId, user.signKey, user.signKey, function (user, err) {
@@ -154,6 +221,10 @@ describe('Signup', function () {
         expect(err).not.toBe(null)
         expect(user).toBe(null)
     })
+
+    expect(AuthDao.signup).toHaveBeenCalled()
+    expect(refereeService.create).not.toHaveBeenCalled()
+
   })
 
   it('A new Referee should be created if the user type is referee, the User was signed up and the new Referee was created', function () {
@@ -162,7 +233,7 @@ describe('Signup', function () {
 
     let referee = defaultReferee
 
-    spyOn(authService, 'doSignUp').andCallFake(function (username, password, avatarUrl, email, firstName, surname, cardId, hashKey, callback) {
+    spyOn(AuthDao, 'signup').andCallFake(function (username, password, avatarUrl, email, firstName, surname, cardId, hashKey, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -176,6 +247,7 @@ describe('Signup', function () {
         expect(err).toBe(null)
     })
 
+    expect(AuthDao.signup).toHaveBeenCalled()
     expect(refereeService.create).toHaveBeenCalled()
 
   })
@@ -186,7 +258,7 @@ describe('Signup', function () {
 
     let referee = defaultReferee
 
-    spyOn(authService, 'doSignUp').andCallFake(function (username, password, avatarUrl, email, firstName, surname, cardId, hashKey, callback) {
+    spyOn(AuthDao, 'signup').andCallFake(function (username, password, avatarUrl, email, firstName, surname, cardId, hashKey, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -204,8 +276,8 @@ describe('Signup', function () {
         expect(response).toBe(null)
     })
 
+    expect(AuthDao.signup).toHaveBeenCalled()
     expect(refereeService.create).toHaveBeenCalled()
-
     expect(authService.deleteUser).toHaveBeenCalled()
 
   })
