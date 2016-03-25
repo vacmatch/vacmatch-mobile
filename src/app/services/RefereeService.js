@@ -1,22 +1,6 @@
-import GenericService from './GenericService'
-import Referee from '../models/referee/Referee'
+import RefereeDao from '../daos/RefereeDao'
 
 let RefereeService = {
-
-  /**
-   * Returns the type of this service
-   * @returns {String} The type identifier
-   */
-  getType: function () {
-    return 'referee'
-  },
-
-  /**
-   * Callback to return an element in Referee Service
-   * @callback refereeCallback
-   * @param {Object} element - A Referee object.
-   * @param {Object} err - An error object.
-   */
 
   /**
    * Get a Referee from de DB by id
@@ -24,7 +8,7 @@ let RefereeService = {
    * @param {refereeCallback} callback A callback that returns a Referee or error
    */
   findById: function (refereeId, callback) {
-    GenericService.findById(refereeId, callback)
+    RefereeDao.findById(refereeId, callback)
   },
 
   /**
@@ -34,25 +18,7 @@ let RefereeService = {
    * @param {refereeCallback} callback A callback that returns a Referee or error
    */
   findByUserId: function (userId, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['userId']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          userId: {$eq: userId}
-        }
-      })
-    }).then(function (result) {
-      let value = null
-      if (result.docs.length > 0) {
-        value = result.docs[0]
-      }
-      callback(value, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(userId, err)
-    })
+    RefereeDao.findByUserId(userId, callback)
   },
 
   /**
@@ -65,9 +31,7 @@ let RefereeService = {
    * @param {refereeCallback} callback A callback that returns a Referee if it was created or error
    */
   create: function (name, cardId, avatarUrl, userId, callback) {
-    let referee = new Referee(null, this.getType(), name, cardId, avatarUrl, userId)
-    // Save it
-    GenericService.create(referee, callback)
+    RefereeDao.create(name, cardId, avatarUrl, userId, callback)
   }
 
 }
