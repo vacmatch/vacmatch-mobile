@@ -1,24 +1,10 @@
-import PouchDB from 'pouchdb'
 import InvalidParametersException from '../models/exception/InvalidParametersException'
-import DuplicateException from '../models/exception/DuplicateException'
 import RefereeService from './RefereeService'
-import GenericService from './GenericService'
-
-PouchDB.plugin(require('pouchdb-authentication'))
+import AuthDao from '../daos/AuthDao'
 
 import Hashes from 'jshashes'
-import config from '../api/config'
-
-var db = new PouchDB('http://' + config[config._env].db.username + ':' + config[config._env].db.password + '@localhost:5984/_users')
 
 let AuthService = {
-
-  /**
-   * Callback to return an element in User Service
-   * @callback userCallback
-   * @param {Object} element - A User object.
-   * @param {Object} err - An error object.
-   */
 
   /**
    * Login a User and returns an error if login fails
@@ -27,14 +13,7 @@ let AuthService = {
    * @param {userCallback} callback A callback that returns an User or error
    */
   login: function (username, password, callback) {
-    db.login(username, password, (err, response) => {
-      if (err !== null) {
-        console.log('err: ', err)
-        callback(username, err)
-      } else {
-        this.getUser(username, callback)
-      }
-    })
+    AuthDao.login(username, password, callback)
   },
 
   /**
@@ -42,14 +21,7 @@ let AuthService = {
    * @param {userCallback} callback A callback that returns an object with response or error
    */
   logout: function (callback) {
-    db.logout(function (err, response) {
-      if (err !== null) {
-        console.log('err: ', err)
-        callback(null, err)
-      } else {
-        callback(response, null)
-      }
-    })
+    AuthDao.logout(callback)
   },
 
   /**
@@ -64,21 +36,7 @@ let AuthService = {
    * @param {userCallback} callback A callback that returns a User or error
    */
   doSignUp: function (username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback) {
-    db.signup(username, password, {
-      metadata: {
-        avatarUrl: avatarUrl,
-        email: email,
-        firstName: firstName,
-        surname: surname,
-        cardId: cardId,
-        signKey: signKey
-      }
-    }, (err, response) => {
-      if (err !== null) {
-        console.log('err: ', err)
-      }
-      callback(response, err)
-    })
+    AuthDao.signup(username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback)
   },
 
   /**
@@ -113,11 +71,7 @@ let AuthService = {
     let hashKey = new Hashes.SHA512().hex(signKey)
     this.doSignUp(username, password, avatarUrl, email, firstName, surname, cardId, hashKey, (response, err) => {
       if (err !== null) {
-        if (err === 'conflict') {
-          return callback(null, new DuplicateException('Username is been used', 'username', username))
-        } else {
-          return callback(null, err)
-        }
+        return callback(response, err)
       }
       // Create Referee if signup was ok
       RefereeService.create(firstName, cardId, avatarUrl, response.id, (referee, err) => {
@@ -133,49 +87,21 @@ let AuthService = {
   },
 
   /**
+  * Get a User from de DB by id
+  * @param {String} userId The User identifier
+  * @param {userCallback} callback A callback that returns a User or error
+  */
+  findById: function (userId, callback) {
+    AuthDao.findById(userId, callback)
+  },
+
+  /**
    * Get a User from de DB by Username
    * @param {String} username The username
    * @param {userCallback} callback A callback that returns a User or error
    */
   getUser: function (username, callback) {
-    db.getUser(username, function (err, user) {
-      if (err !== null) {
-        console.log('err: ', err)
-        callback(username, err)
-      } else {
-        callback(user, err)
-      }
-    })
-  },
-
-  /**
-   * Delete a User from de DB by id if it exists
-   * @param {String} userId The user identifier
-   * @param {userCallback} callback A callback that returns an ok response or error
-   */
-  deleteUser: function (userId, callback) {
-    this.findById(userId, function (user, err) {
-      if (err !== null) {
-        console.log('err: ', err)
-        callback(userId, err)
-      } else {
-        GenericService.delete(user, callback)
-      }
-    })
-  },
-
-  /**
-   * Get a User from de DB by id
-   * @param {String} userId The User identifier
-   * @param {userCallback} callback A callback that returns a User or error
-   */
-  findById: function (userId, callback) {
-    db.get(userId).then(function (doc) {
-      callback(doc, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    AuthDao.getUser(username, callback)
   },
 
   /**
@@ -194,7 +120,24 @@ let AuthService = {
         callback(value, err)
       }
     })
+  },
+
+  /**
+   * Delete a User from de DB by id if it exists
+   * @param {String} userId The user identifier
+   * @param {userCallback} callback A callback that returns an ok response or error
+   */
+  deleteUser: function (userId, callback) {
+    this.findById(userId, function (user, err) {
+      if (err !== null) {
+        console.log('err: ', err)
+        callback(userId, err)
+      } else {
+        AuthDao.deleteUser(user, callback)
+      }
+    })
   }
+
 }
 
 module.exports = AuthService
