@@ -1,16 +1,7 @@
-import GenericService from './GenericService'
-import Team from '../models/team/Team'
+import TeamDao from '../daos/TeamDao'
 import InvalidParametersException from '../models/exception/InvalidParametersException'
 
 let TeamService = {
-
-  /**
-   * Returns the type of this service
-   * @returns {String} The type identifier
-   */
-  getType: function () {
-    return 'team'
-  },
 
   /**
    * Find a Team by id
@@ -18,7 +9,7 @@ let TeamService = {
    * @param {reportListCallback} callback A callback that returns the Team element or error
    */
   findById: function (teamId, callback) {
-    GenericService.findById(teamId, callback)
+    TeamDao.findById(teamId, callback)
   },
 
   /**
@@ -30,9 +21,8 @@ let TeamService = {
     if ((teamName === null) || (teamName === undefined)) {
       return callback(null, new InvalidParametersException('Invalid team name', 'teamName', teamName))
     }
-    let team = new Team(null, this.getType(), teamName)
     // Save it
-    GenericService.create(team, callback)
+    TeamDao.create(teamName, callback)
   },
 
   /**
@@ -45,7 +35,7 @@ let TeamService = {
       if (err !== null) {
         return callback(null, err)
       }
-      GenericService.remove(team, callback)
+      TeamDao.deleteTeam(team, callback)
     })
   }
 }
