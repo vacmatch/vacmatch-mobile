@@ -1,42 +1,19 @@
-import GenericService from './GenericService'
 import TeamService from './TeamService'
 import EventService from './EventService'
 import PersonService from './PersonService'
 import SignService from './SignService'
-import Report from '../models/report/Report'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
+import ReportDao from '../daos/ReportDao'
 
 let ReportService = {
 
   /**
-   * Returns the type of this service
-   * @returns {String} The type identifier
-   */
-  getType: function () {
-    return 'report'
-  },
-
-  /**
-   * Callback to return lists in Report Service
-   * @callback reportListCallback
-   * @param {Object[]} list - A Report list.
-   * @param {Object} err - An error object.
-   */
-
-  /**
-   * Callback to return an element in Report Service
-   * @callback reportCallback
-   * @param {Object} element - A Report object.
-   * @param {Object} err - An error object.
-   */
-
-  /**
    * Find a Report by id
-   * @param {Number} reportId Report identifier
+   * @param {String} reportId Report identifier
    * @param {reportCallback} callback A callback that returns the Report element or error
    */
   findById: function (reportId, callback) {
-    GenericService.findById(reportId, callback)
+    ReportDao.findById(reportId, callback)
   },
 
   /**
@@ -45,21 +22,7 @@ let ReportService = {
     * @param {reportListCallback} callback A callback that returns the a list of Reports
     */
   findAllByFinished: function (hasFinished, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['hasFinished']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          hasFinished: {$eq: hasFinished}
-        }
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    ReportDao.findAllByFinished(hasFinished, callback)
   },
 
   /**
@@ -85,16 +48,15 @@ let ReportService = {
           return callback(null, err)
         }
         visitorTeam._id = visitor._id
-        // Create the new report
-        let report = new Report(null, this.getType(), date, location, hasFinished, localTeam, visitorTeam, refereeList)
-        GenericService.create(report, callback)
+        // Create it
+        ReportDao.create(date, location, hasFinished, localTeam, visitorTeam, refereeList, callback)
       })
     })
   },
 
   /**
     * Update a Report
-    * @param {Number} reportId The report identifier
+    * @param {String} reportId The report identifier
     * @param {String} date A string with the date when the game is played
     * @param {String} location The place where the game is played
     * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
@@ -104,7 +66,7 @@ let ReportService = {
     * @param {reportCallback} callback A callback that returns the updated Report or error
     */
   update: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
-    this.findById(reportId, (report, err) => {
+    this.findById(reportId, (oldReport, err) => {
       if (err === null) {
         // Check if localTeam exists
         TeamService.findById(localTeam._id, (lt, err) => {
@@ -116,20 +78,8 @@ let ReportService = {
             if (err !== null) {
               return callback(null, new InstanceNotFoundException('Non existent visitor team', 'report.visitorTeam._id', visitorTeam._id))
             }
-            report.date = date
-            report.location = location
-            report.hasFinished = hasFinished
-            report.localTeam._id = localTeam._id
-            report.localTeam.name = localTeam.name
-            report.localTeam.result = localTeam.result
-            report.localTeam.secondaryField = localTeam.secondaryField
-            report.visitorTeam._id = visitorTeam._id
-            report.visitorTeam.name = visitorTeam.name
-            report.visitorTeam.result = visitorTeam.result
-            report.visitorTeam.secondaryField = visitorTeam.secondaryField
-            report.incidences = incidences
             // Save it
-            GenericService.update(report, callback)
+            ReportDao.update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback)
           })
         })
       } else {
@@ -171,7 +121,7 @@ let ReportService = {
                   return callback(null, err)
                 }
                 // Remove Report
-                GenericService.remove(report, callback)
+                ReportDao.remove(report, callback)
               })
             })
           })
