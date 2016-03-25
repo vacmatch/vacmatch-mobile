@@ -1,5 +1,4 @@
-import GenericService from './GenericService'
-import {Event, ControlEvent} from '../models/event/Event'
+import EventDao from '../daos/EventDao'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
 import ReportService from './ReportService'
 import PersonService from './PersonService'
@@ -9,100 +8,36 @@ import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
 let EventService = {
 
   /**
-   * Returns the type of this service
-   * @returns {String} The type identifier
-   */
-  getType: function () {
-    return 'event'
-  },
-
-  /**
-   * Callback to return lists in Event Service
-   * @callback eventListCallback
-   * @param {Object[]} list - A Event list.
-   * @param {Object} err - An error object.
-   */
-
-  /**
-   * Callback to return an element in Event Service
-   * @callback eventCallback
-   * @param {Object} element - A Event object.
-   * @param {Object} err - An error object.
-   */
-
-  /**
     * Get an Event by Id
-    * @param {Number} id The event identifier
+    * @param {String} id The event identifier
     * @param {eventCallback} callback A callback that returns an event
     */
   findById: function (eventId, callback) {
-    GenericService.findById(eventId, callback)
+    EventDao.findById(eventId, callback)
   },
 
   /**
     * Get all Events from a Report
-    * @param {Number} reportId The report identifier
+    * @param {String} reportId The report identifier
     * @param {eventListCallback} callback A callback that returns an Event list
     */
   findAllByReportId: function (reportId, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['timestamp', 'reportId']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          timestamp: {$exists: true},
-          reportId: {$eq: reportId}
-        },
-        sort: [
-          {'timestamp': 'desc'},
-          {'reportId': 'asc'}
-        ]
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    EventDao.findAllByReportId(reportId, callback)
   },
 
   /**
     * Get all Events from this EventType in a Report
-    * @param {Number} reportId The report identifier
+    * @param {String} reportId The report identifier
     * @param {String} eventType The string that represents an EventType
     * @param {eventListCallback} callback A callback that returns an Event list
     */
   findAllByReportIdAndEventType: function (reportId, eventType, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {
-        fields: ['timestamp', 'reportId', 'type']
-      }
-    }).then(function () {
-      return db.find({
-        selector: {
-          timestamp: {$exists: true},
-          reportId: {$eq: reportId},
-          type: {$eq: eventType}
-        },
-        sort: [
-          {'timestamp': 'desc'},
-          {'reportId': 'asc'},
-          {'type': 'asc'}
-        ]
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    EventDao.findAllByReportIdAndEventType(reportId, eventType, callback)
   },
 
   /**
     * Create a new Sport Event (Score, foul, etc)
-    * @param {Number} reportId The report identifier
+    * @param {String} reportId The report identifier
     * @param {Object} person The Person who is involved in this Event
     * @param {Object} team The Team which is involved in this Event
     * @param {String} eventType The string that represents an EventType
@@ -127,9 +62,8 @@ let EventService = {
           if (err !== null) {
             return callback(null, new InstanceNotFoundException('Non existent team', 'team._id', team._id))
           }
-          let event = new Event(this.getType(), reportId, person, team, eventType, matchTime, cause, timestamp)
           // Save it
-          GenericService.create(event, callback)
+          EventDao.create(reportId, person, team, eventType, matchTime, cause, timestamp, callback)
         })
       })
     })
@@ -137,7 +71,7 @@ let EventService = {
 
   /**
     * Create a new Control Event (Start game, change term, etc)
-    * @param {Number} reportId The report identifier
+    * @param {String} reportId The report identifier
     * @param {String} eventType The string that represents an EventType
     * @param {Number} matchTime Match time when the event happened in miliseconds
     * @param {String} text The cause of this Event or extra information
@@ -150,10 +84,6 @@ let EventService = {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
       }
-
-      // Create the new event
-      let event = new ControlEvent(this.getType(), reportId, eventType, matchTime, text, timestamp)
-
       // Check if it's an end match event
       let endEvent = new EndMatchEvent()
       if (eventType === endEvent.type) {
@@ -165,18 +95,18 @@ let EventService = {
               return callback(null, err)
             }
             // Save the event
-            GenericService.create(event, callback)
+            EventDao.create(reportId, eventType, matchTime, text, timestamp, callback)
           })
       } else {
         // Save the event
-        GenericService.create(event, callback)
+        EventDao.create(reportId, eventType, matchTime, text, timestamp, callback)
       }
     })
   },
 
   /**
     * Delete an Event (Control or Sport)
-    * @param {Number} eventId The Event identifier
+    * @param {String} eventId The Event identifier
     * @param {eventCallback} callback A callback that returns an object with
     * the deleted eventId if the event was deleted
     */
@@ -200,12 +130,12 @@ let EventService = {
                   return callback(null, err)
                 }
                 // Remove the event
-                GenericService.remove(event, callback)
+                EventDao.deleteEvent(event, callback)
               })
           })
         } else {
           // Remove the event
-          GenericService.remove(event, callback)
+          EventDao.deleteEvent(event, callback)
         }
       } else {
         callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
@@ -220,8 +150,8 @@ let EventService = {
     */
   deleteAllEventsByReportId: function (reportId, callback) {
     this.findAllByReportId(reportId, (eventList, err) => {
-      eventList.map((e) => {
-        this.deleteEvent(e._id, function (res, err) {
+      eventList.map((event) => {
+        EventDao.deleteEvent(event, function (res, err) {
           if (err !== null) {
             return callback(null, err)
           }
