@@ -2,7 +2,6 @@ jest.dontMock('../../src/app/services/EventService')
 
 // Services
 let eventService = require('../../src/app/services/EventService')
-let genericService = require('../../src/app/services/GenericService')
 let reportService = require('../../src/app/services/ReportService')
 let personService = require('../../src/app/services/PersonService')
 let teamService = require('../../src/app/services/TeamService')
@@ -12,6 +11,8 @@ let Person = require('../../src/app/models/person/Person')
 let Team = require('../../src/app/models/team/Team')
 let Report = require('../../src/app/models/report/Report')
 let InstanceNotFoundException = require('../../src/app/models/exception/InstanceNotFoundException')
+
+let EventDao = require('../../src/app/daos/EventDao')
 
 // Default elements
 let defaultPerson = null
@@ -51,8 +52,7 @@ describe('create Sport Event', function () {
       callback(defaultTeam, null)
     })
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create').andCallFake(function (defaultEvent, callback) {
+    spyOn(EventDao, 'create').andCallFake(function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
       // Returns a valid Event
       callback(defaultEvent, null)
     })
@@ -66,8 +66,10 @@ describe('create Sport Event', function () {
 
     })
 
-    // Check if create was called in GenericService
-    expect(genericService.create).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(teamService.findById).toHaveBeenCalled()
+    expect(EventDao.create).toHaveBeenCalled()
 
   })
 
@@ -88,9 +90,9 @@ describe('create Sport Event', function () {
       callback(null, nonExistentError)
     })
 
-    // Set spy on GenericService.create
-    spyOn(genericService, 'create')
-
+    spyOn(personService, 'findByPersonIdReportIdAndTeamId')
+    spyOn(teamService, 'findById')
+    spyOn(EventDao, 'create')
 
     eventService.create(nonValidEvent.reportId, nonValidEvent.person, nonValidEvent.team,
       nonValidEvent.type, nonValidEvent.matchTime, nonValidEvent.text, nonValidEvent.timestamp,
@@ -101,8 +103,10 @@ describe('create Sport Event', function () {
 
     })
 
-    // Check if create wasn't called in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).not.toHaveBeenCalled()
+    expect(teamService.findById).not.toHaveBeenCalled()
+    expect(EventDao.create).not.toHaveBeenCalled()
 
   })
 
@@ -129,8 +133,9 @@ describe('create Sport Event', function () {
       callback(null, nonExistentError)
     })
 
-    // Set spy on GenericService.create
-    spyOn(genericService, 'create')
+    spyOn(teamService, 'findById')
+
+    spyOn(EventDao, 'create')
 
     eventService.create(nonValidEvent.reportId, nonValidEvent.person, nonValidEvent.team,
       nonValidEvent.type, nonValidEvent.matchTime, nonValidEvent.text, nonValidEvent.timestamp,
@@ -141,10 +146,13 @@ describe('create Sport Event', function () {
 
     })
 
-    // Check if create was called in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(teamService.findById).not.toHaveBeenCalled()
+    expect(EventDao.create).not.toHaveBeenCalled()
 
   })
+
   it('Create a new Sport Event with non existent team', function () {
 
         let nonExistentTeamId = -1
@@ -174,8 +182,7 @@ describe('create Sport Event', function () {
           callback(null, nonExistentError)
         })
 
-        // Set spy on GenericService.create
-        spyOn(genericService, 'create')
+        spyOn(EventDao, 'create')
 
         eventService.create(nonValidEvent.reportId, nonValidEvent.person, nonValidEvent.team,
           nonValidEvent.type, nonValidEvent.matchTime, nonValidEvent.text, nonValidEvent.timestamp,
@@ -185,8 +192,12 @@ describe('create Sport Event', function () {
           expect(event).toBe(null)
 
         })
-        // Check if create was called in GenericService
-        expect(genericService.create).not.toHaveBeenCalled()
+
+        expect(reportService.findById).toHaveBeenCalled()
+        expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+        expect(teamService.findById).toHaveBeenCalled()
+        expect(EventDao.create).not.toHaveBeenCalled()
+
   })
 })
 
@@ -201,13 +212,17 @@ describe('Create Control Event', function () {
     // A valid Control Event
     let event = defaultControlEvent
 
+    let validReport = defaultReport
+
     // Mock ReportService findById method to return a valid report
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      callback(event, null)
+      callback(validReport, null)
     })
 
-    // Mock GenericService create to return a valid new ControlEvent
-    spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'create').andCallFake(function (reportId, eventType, matchTime,
+      text, timestamp, callback) {
       callback(event, null)
     })
 
@@ -219,8 +234,9 @@ describe('Create Control Event', function () {
       expect(err).toBe(null)
     })
 
-    // Check if genericService create method was called
-    expect(genericService.create).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.create).toHaveBeenCalled()
 
   })
 
@@ -237,8 +253,8 @@ describe('Create Control Event', function () {
       callback(null, notFoundError)
     })
 
-    // Mock GenericService create without return value (Just to check if it wasn't called)
-    spyOn(genericService, 'create')
+    spyOn(reportService, 'update')
+    spyOn(EventDao, 'create')
 
     // Create a new ControlEvent
     eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
@@ -248,8 +264,9 @@ describe('Create Control Event', function () {
       expect(err).toEqual(notFoundError)
     })
 
-    // Check if genericService create method was called
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.create).not.toHaveBeenCalled()
 
   })
 
@@ -264,18 +281,18 @@ describe('Create Control Event', function () {
 
       // Mock ReportService findById method to return a valid report
       spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-        callback(event, null)
-      })
-
-      // Mock GenericService create to return a valid new ControlEvent
-      spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
-        callback(event, null)
+        callback(validReport, null)
       })
 
       // Mock ReportService update to modify report status
       spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
         reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
         callback(validReport, null)
+      })
+
+      spyOn(EventDao, 'create').andCallFake(function (reportId, eventType, matchTime,
+        text, timestamp, callback) {
+        callback(event, null)
       })
 
       // Create a new ControlEvent
@@ -286,11 +303,11 @@ describe('Create Control Event', function () {
         expect(err).toBe(null)
       })
 
-      // Check if genericService create method was called
-      expect(genericService.create).toHaveBeenCalled()
-
+      expect(reportService.findById).toHaveBeenCalled()
       // Check if reportService update method was called to update Report status
       expect(reportService.update).toHaveBeenCalled()
+      // Check if genericService create method was called
+      expect(EventDao.create).toHaveBeenCalled()
 
   })
 
@@ -308,16 +325,13 @@ describe('Create Control Event', function () {
       callback(event, null)
     })
 
-    // Mock GenericService create to return a valid new ControlEvent
-    spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
-      callback(event, null)
-    })
-
     // Mock ReportService update to send an ERROR
     spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
       reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
       callback(null, jasmine.any(Object))
     })
+
+    spyOn(EventDao, 'create')
 
     // Create a new ControlEvent
     eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
@@ -326,11 +340,9 @@ describe('Create Control Event', function () {
       expect(err).not.toBe(null)
     })
 
-    // Check if genericService create method was called
-    expect(genericService.create).not.toHaveBeenCalled()
-
-    // Check if reportService update method was called trying to update Report status
+    expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).toHaveBeenCalled()
+    expect(EventDao.create).not.toHaveBeenCalled()
 
   })
 })
@@ -342,14 +354,18 @@ describe('Delete Event', function () {
     // An existent event
     let event = defaultEvent
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    let validReport = defaultReport
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    // Mock GenericService remove to return an OK result
-    spyOn(genericService, 'remove').andCallFake(function (anyEvent, callback) {
-      callback(jasmine.any(Object), null)
+    spyOn(reportService, 'findById')
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
     })
 
     // Delete this event
@@ -358,8 +374,10 @@ describe('Delete Event', function () {
       expect(err).toBe(null)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).toHaveBeenCalled()
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).not.toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
 
   })
 
@@ -371,13 +389,15 @@ describe('Delete Event', function () {
     // An error to show not found event
     let notFoundError = new InstanceNotFoundException('Non existent event', 'eventId', event._id)
 
-    // Mock GenericService findById to return a not found error
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(null, notFoundError)
     })
 
-    // Mock GenericService remove (just to check if it wasn't called)
-    spyOn(genericService, 'remove')
+    spyOn(reportService, 'findById')
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'deleteEvent')
 
     // Delete this event
     eventService.deleteEvent(event._id, (result, err) => {
@@ -386,8 +406,10 @@ describe('Delete Event', function () {
       expect(result).toBe(null)
     })
 
-    // Check if genericService remove method wasn't called
-    expect(genericService.remove).not.toHaveBeenCalled()
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).not.toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.deleteEvent).not.toHaveBeenCalled()
 
   })
 
@@ -400,25 +422,21 @@ describe('Delete Event', function () {
     // A valid Report
     let validReport = defaultReport
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    // Mock ReportService findById to return the report from this event
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(validReport, null)
     })
 
-    // Mock ReportService update to modify report status
-    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
-      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, hasFinished, location,
+      localTeam, visitorTeam, incidences, callback) {
       callback(validReport, null)
     })
 
-    // Mock GenericService remove to return an OK result
-    spyOn(genericService, 'remove').andCallFake(function (anyEvent, callback) {
-      callback(jasmine.any(Object), null)
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
     })
 
     // Delete this event
@@ -427,11 +445,10 @@ describe('Delete Event', function () {
       expect(err).toBe(null)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).toHaveBeenCalled()
-
-    // Check if reportService update method was called to update Report status
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).toHaveBeenCalled()
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
 
   })
 
@@ -444,24 +461,20 @@ describe('Delete Event', function () {
     // A valid Report
     let validReport = defaultReport
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    // Mock ReportService findById to return the report from this event
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(validReport, null)
     })
 
-    // Mock ReportService update to return an ERROR
-    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
-      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, hasFinished, location,
+      localTeam, visitorTeam, incidences, callback) {
       callback(null, jasmine.any(Object))
     })
 
-    // Mock GenericService remove
-    spyOn(genericService, 'remove')
+    spyOn(EventDao, 'deleteEvent')
 
     // Delete this event
     eventService.deleteEvent(event._id, (result, err) => {
@@ -469,11 +482,10 @@ describe('Delete Event', function () {
       expect(err).not.toBe(null)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).not.toHaveBeenCalled()
-
-    // Check if reportService update method was called to update Report status
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).toHaveBeenCalled()
+    expect(EventDao.deleteEvent).not.toHaveBeenCalled()
 
   })
 
@@ -486,23 +498,19 @@ describe('Delete Event', function () {
     // A valid Report
     let validReport = defaultReport
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    let notFoundError = new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId)
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    let notFoundError = new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId)
-
-    // Mock ReportService findById to return not found ERROR
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(null, notFoundError)
     })
 
-    // Mock ReportService update
     spyOn(reportService, 'update')
 
-    // Mock GenericService remove
-    spyOn(genericService, 'remove')
+    spyOn(EventDao, 'deleteEvent')
 
     // Delete this event
     eventService.deleteEvent(event._id, (result, err) => {
@@ -511,11 +519,10 @@ describe('Delete Event', function () {
       expect(err).toEqual(notFoundError)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).not.toHaveBeenCalled()
-
-    // Check if reportService update method was called to update Report status
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.deleteEvent).not.toHaveBeenCalled()
 
   })
 })
