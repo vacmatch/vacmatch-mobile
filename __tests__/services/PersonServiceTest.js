@@ -22,10 +22,10 @@ let defaultReport = null
 describe('Create Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User('user', 'username', 'pass')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('Create a new Person with valid parameters', function () {
@@ -258,8 +258,8 @@ describe('Create Person', function () {
 describe('Update Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultNewPerson = new Person(null, 'person', 'New person name', '', '', '', false, false, '', '', '')
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultNewPerson = new Person(null, 'New person name', '', '', '', false, false, '', '', '')
   })
 
   it('Update a Person with valid parameters', function () {
@@ -343,11 +343,11 @@ let defaultNewPerson = null
 describe('Set called value in Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultNewPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User(null, 'user', 'username', 'pass')
-    defaultTeam = new Team(null, 'team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultNewPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('Called value must be changed if Person exists', function () {
@@ -421,11 +421,11 @@ describe('Set called value in Person', function () {
 describe('Set dorsal value in Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultNewPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User(null, 'user', 'username', 'pass')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultNewPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('Dorsal value must be changed if Person exists', function () {
@@ -497,10 +497,10 @@ describe('Set dorsal value in Person', function () {
 describe('Delete Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User(null, 'user', 'username', 'pass')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('A Person must be deleted if it exists', function () {

@@ -16,8 +16,8 @@ let defaultReferee = null
 describe('Create Referee', function () {
 
   beforeEach(function () {
-    defaultUser = new User(1, 'user', 'username', 'pass', 'www.avatarurl.test', 'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
-    defaultReferee = new Referee(null, 'referee', 'name', '22222222Z', 'www.avatarurl.test', '1')
+    defaultUser = new User(null, 'username', 'pass', 'www.avatarurl.test', 'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
+    defaultReferee = new Referee(null, 'name', '22222222Z', 'www.avatarurl.test', '1')
   })
 
   it('A new Referee can be created if User exists', function () {

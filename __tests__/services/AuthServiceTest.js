@@ -17,8 +17,8 @@ let defaultReferee = null
 describe('Signup', function () {
 
   beforeEach(function () {
-    defaultUser = new User(null, 'user', 'username', 'pass', 'www.avatarurl.test' ,'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
-    defaultReferee = new Referee(null, 'referee', 'name', '22222222Z', 'www.avatarurl.test', 'userid')
+    defaultUser = new User(null, 'username', 'pass', 'www.avatarurl.test' ,'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
+    defaultReferee = new Referee(null, 'name', '22222222Z', 'www.avatarurl.test', 'userid')
   })
 
   it('A new User cant be signed up if both passwords are diferent', function () {

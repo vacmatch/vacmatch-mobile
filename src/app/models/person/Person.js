@@ -1,9 +1,9 @@
 
 class Person {
 
-  constructor (id, type, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId) {
+  constructor (id, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId) {
     this._id = id
-    this.type = type ? type : 'person'
+    this.databaseType = 'person'
     this.name = name
     this.cardId = cardId
     this.dorsal = dorsal

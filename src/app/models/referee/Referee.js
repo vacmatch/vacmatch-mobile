@@ -1,9 +1,9 @@
 
 class Referee {
 
-  constructor (id, type, name, cardId, avatarUrl, userId) {
+  constructor (id, name, cardId, avatarUrl, userId) {
     this._id = id
-    this.type = type ? type : 'referee'
+    this.type = 'referee'
     this.name = name
     this.cardId = cardId
     this.avatarUrl = avatarUrl

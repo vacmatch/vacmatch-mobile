@@ -23,9 +23,9 @@ let defaultControlEvent = null
 describe('create Sport Event', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person('person', '', '', '', '', false, false, '', '', '')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
     defaultEvent = new EventElements.Event('event', '1', defaultPerson, defaultTeam, 'goal', 1, 'cause', 1)
   })
 

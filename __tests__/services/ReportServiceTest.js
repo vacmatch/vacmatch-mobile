@@ -19,8 +19,8 @@ let defaultReport = null
 describe('Create Report', function () {
 
   beforeEach(function () {
-    defaultTeam = new Team(null, 'team', 'Local team name')
-    defaultReport = new Report(null, 'report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultTeam = new Team(null, 'Local team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('A new Report should be created and should create a new local and visitor teams', function () {
@@ -55,8 +55,8 @@ describe('Create Report', function () {
 describe('Update Report', function () {
 
   beforeEach(function () {
-    defaultTeam = new Team(null, 'team', 'Local team name')
-    defaultReport = new Report(null, 'report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultTeam = new Team(null, 'Local team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('A Report can be updated with valid parameters', function () {
@@ -124,8 +124,8 @@ describe('Update Report', function () {
 
 describe('Delete Report', function () {
   beforeEach(function () {
-    defaultTeam = new Team(null, 'team', 'Local team name')
-    defaultReport = new Report(null, 'report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultTeam = new Team(null, 'Local team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
   })
 
   it('A Report should be deleted if it exists', function () {

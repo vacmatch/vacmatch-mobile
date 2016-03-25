@@ -23,9 +23,9 @@ let defaultReport = null
 describe('Create Signature', function () {
 
   beforeEach(function () {
-    defaultSignature = new Signature(null, 'signature', 'userid', 'reortId', 'hash', 'time', 'identifier', 'name', 'teamId', 'fedId')
-    defaultUser = new User(null, 'user', 'username', 'pass', 'www.avatarurl.test', 'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
-    defaultTeam = new Team('team', 'Team name')
+    defaultSignature = new Signature(null, 'userid', 'reortId', 'hash', 'time', 'identifier', 'name', 'teamId', 'fedId')
+    defaultUser = new User(null, 'username', 'pass', 'www.avatarurl.test', 'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
+    defaultTeam = new Team(null, 'Team name')
     defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
   })
 
@@ -188,7 +188,7 @@ describe('Create Signature', function () {
 describe('Delete Signature', function () {
 
   beforeEach(function () {
-    defaultSignature = new Signature(null, 'signature', 'userid', 'reortId', 'hash', 'time', 'identifier', 'name', 'teamId', 'fedId')
+    defaultSignature = new Signature(null, 'userid', 'reortId', 'hash', 'time', 'identifier', 'name', 'teamId', 'fedId')
   })
 
   it('A signature should be deleted if it exists', function () {

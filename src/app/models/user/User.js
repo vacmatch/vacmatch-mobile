@@ -2,9 +2,9 @@ import RefereeUserType from '../web/user/RefereeUserType'
 
 class User {
 
-  constructor (id, type, username, password, avatarUrl, email, firstName, lastName, cardId, signKey) {
+  constructor (id, username, password, avatarUrl, email, firstName, lastName, cardId, signKey) {
     this.id_ = id
-    this.databaseType = type ? type : 'user'
+    this.databaseType = 'user'
     this.username = username
     this.password = password
     this.avatarUrl = avatarUrl
