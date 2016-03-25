@@ -1,30 +1,20 @@
 import PouchDB from 'pouchdb'
+import Exception from '../models/exception/Exception'
 PouchDB.plugin(require('pouchdb-find'))
 
 let db = new PouchDB('mobile')
 db.sync('http://localhost:5984/mobile', {live: true})
 window.PouchDB = PouchDB
 
-let GenericService = {
+let GenericDao = {
 
-  /**
-   * Returns the database
-   * @returns {Object} The database object
-   */
   getDatabase: function () {
     return db
   },
 
   /**
-   * Callback to return an element
-   * @callback genericCallback
-   * @param {Object} element - An object.
-   * @param {Object} err - An error object.
-   */
-
-  /**
     * Get an object by Id
-    * @param {Number} id The object identifier
+    * @param {String} id The object identifier
     * @param {genericCallback} callback A callback that returns an object
     */
   findById: function (id, callback) {
@@ -42,6 +32,9 @@ let GenericService = {
     * @param {genericCallback} callback A callback that returns the object if it's added
     */
   create: function (object, callback) {
+    if (!object.databaseType) {
+      callback(null, new Exception('Object with no type', 'object', object))
+    }
     db.post(object).then(function (response) {
       db.allDocs({key: response.id, include_docs: true}).then(function (doc) {
         let value = null
@@ -91,4 +84,4 @@ let GenericService = {
   }
 }
 
-module.exports = GenericService
+module.exports = GenericDao
