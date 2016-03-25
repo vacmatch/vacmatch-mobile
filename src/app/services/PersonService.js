@@ -1,33 +1,10 @@
-import GenericService from './GenericService'
 import ReportService from './ReportService'
 import TeamService from './TeamService'
 import AuthService from './AuthService'
-import Person from '../models/person/Person'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
+import PersonDao from '../daos/PersonDao'
 
 let PersonService = {
-
-  /**
-   * Returns the type of this service
-   * @returns {String} The type identifier
-   */
-  getType: function () {
-    return 'person'
-  },
-
-  /**
-   * Callback to return lists in Person Service
-   * @callback personListCallback
-   * @param {Object[]} list - A Person list.
-   * @param {Object} err - An error object.
-   */
-
-  /**
-   * Callback to return an element in Person Service
-   * @callback personCallback
-   * @param {Object} element - A Person object.
-   * @param {Object} err - An error object.
-   */
 
   /**
     * Get an unique Person from a team in this report
@@ -37,27 +14,7 @@ let PersonService = {
     * @param {personCallback} callback A callback that returns an element
     */
   findByPersonIdReportIdAndTeamId: function (personId, reportId, teamId, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['_id', 'reportId', 'teamId']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          _id: {$eq: personId},
-          reportId: {$eq: reportId},
-          teamId: {$eq: teamId}
-        }
-      })
-    }).then(function (result) {
-      let value = null
-      if (result.docs.length > 0) {
-        value = result.docs[0]
-      }
-      callback(value, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
+    PersonDao.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, callback)
   },
 
   /**
@@ -67,22 +24,7 @@ let PersonService = {
     * @param {personListCallback} callback A callback that returns a list
     */
   findByReportIdAndTeamId: function (reportId, teamId, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['reportId', 'teamId']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          reportId: {$eq: reportId},
-          teamId: {$eq: teamId}
-        }
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', reportId, teamId, err)
-      callback(null, err)
-    })
+    PersonDao.findByReportIdAndTeamId(reportId, teamId, callback)
   },
 
   /**
@@ -91,21 +33,7 @@ let PersonService = {
     * @param {personListCallback} callback A callback that returns a list
     */
   findAllByReportId: function (reportId, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['reportId', 'teamId']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          reportId: {$eq: reportId}
-        }
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', reportId, err)
-      callback(null, err)
-    })
+    PersonDao.findAllByReportId(reportId, callback)
   },
 
   /**
@@ -139,14 +67,12 @@ let PersonService = {
             if (err !== null) {
               return callback(null, new InstanceNotFoundException('Non existent user', 'person.userId', userId))
             }
-            let person = new Person(null, this.getType(), name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId)
             // Save it
-            GenericService.create(person, callback)
+            PersonDao.create(name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback)
           })
         } else {
-          let person = new Person(null, this.getType(), name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId)
           // Save it
-          GenericService.create(person, callback)
+          PersonDao.create(name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback)
         }
       })
     })
@@ -169,19 +95,9 @@ let PersonService = {
     */
   update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
     // Get person
-    this.findByPersonIdReportIdAndTeamId(personId, reportId, oldTeamId, (person, err) => {
-      if (err === null) {
-        person.name = name
-        person.cardId = cardId
-        person.dorsal = dorsal
-        person.avatarUrl = avatarUrl
-        person.isCalled = isCalled
-        person.isStaff = isStaff
-        person.reportId = reportId
-        person.teamId = teamId
-        person.userId = userId
-        // Save it
-        GenericService.update(person, callback)
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, oldTeamId, (oldPerson, err) => {
+      if (err !== null) {
+        PersonDao.update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, oldPerson, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -198,11 +114,10 @@ let PersonService = {
     */
   setCalledValue: function (personId, reportId, teamId, newValue, callback) {
     // Get person
-    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (oldPerson, err) => {
       if (err === null) {
-        person.isCalled = newValue
         // Update it
-        GenericService.update(person, callback)
+        PersonDao.update(personId, reportId, teamId, newValue, oldPerson, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -219,11 +134,10 @@ let PersonService = {
     */
   setDorsal: function (personId, reportId, teamId, newDorsal, callback) {
     // Get person
-    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (oldPerson, err) => {
       if (err === null) {
-        person.dorsal = newDorsal
         // Update it
-        GenericService.update(person, callback)
+        PersonDao.update(personId, reportId, teamId, newDorsal, oldPerson, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -241,7 +155,7 @@ let PersonService = {
     this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, function (person, err) {
       if (err === null) {
         // Remove it
-        GenericService.remove(person, callback)
+        PersonDao.remove(person, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -257,7 +171,7 @@ let PersonService = {
     this.findAllByReportId(reportId, function (personList, err) {
       // Remove all person
       personList.map((person) => {
-        this.deletePerson(person._id, person.reportId, person.teamId, function (res, err) {
+        PersonDao.remove(person, function (res, err) {
           if (err !== null) {
             return callback(null, err)
           }
