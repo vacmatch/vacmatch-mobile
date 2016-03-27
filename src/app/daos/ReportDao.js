@@ -13,7 +13,7 @@ let ReportDao = {
     let db = GenericDao.getDatabase()
     db.createIndex({
       index: {fields: ['databaseType', 'hasFinished']}
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},

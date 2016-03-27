@@ -15,7 +15,7 @@ let SignDao = {
     let db = GenericDao.getDatabase()
     db.createIndex({
       index: {fields: ['databaseType', 'timeStamp', 'reportId']}
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},

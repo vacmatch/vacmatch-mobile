@@ -33,7 +33,7 @@ let PersonDao = {
     let db = GenericDao.getDatabase()
     db.createIndex({
       index: {fields: ['databaseType', 'reportId', 'teamId']}
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},
@@ -53,7 +53,7 @@ let PersonDao = {
     let db = GenericDao.getDatabase()
     db.createIndex({
       index: {fields: ['databaseType', 'reportId', 'teamId']}
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},

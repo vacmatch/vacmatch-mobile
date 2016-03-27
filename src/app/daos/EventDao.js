@@ -13,7 +13,7 @@ let EventDao = {
     let db = GenericDao.getDatabase()
     db.createIndex({
       index: {fields: ['databaseType', 'timestamp', 'reportId']}
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},
@@ -39,7 +39,7 @@ let EventDao = {
       index: {
         fields: ['databaseType', 'timestamp', 'reportId', 'type']
       }
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},

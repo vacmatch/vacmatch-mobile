@@ -7,18 +7,18 @@ class Report {
     this.date = date
     this.location = location
     this.hasFinished = hasFinished
-    this.localTeam = visitorTeam ? {
-      _id: localTeam._id,
-      name: localTeam.name,
-      result: localTeam.result,
-      secondaryField: localTeam.secondaryField
-    } : null
-    this.visitorTeam = visitorTeam ? {
-      _id: visitorTeam._id,
-      name: visitorTeam.name,
-      result: visitorTeam.result,
-      secondaryField: visitorTeam.secondaryField
-    } : null
+    this.localTeam = {
+      _id: localTeam ? localTeam._id : null,
+      name: localTeam ? localTeam.name : null,
+      result: localTeam ? localTeam.result : '0',
+      secondaryField: localTeam ? localTeam.secondaryField : '0'
+    }
+    this.visitorTeam = {
+      _id: visitorTeam ? visitorTeam._id : null,
+      name: visitorTeam ? visitorTeam.name : null,
+      result: visitorTeam ? visitorTeam.result : '0',
+      secondaryField: visitorTeam ? visitorTeam.secondaryField : '0'
+    }
     this.incidences = ''
     this.refereeList = refereeList
   }

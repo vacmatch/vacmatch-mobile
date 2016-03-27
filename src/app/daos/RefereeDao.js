@@ -13,7 +13,7 @@ let RefereeDao = {
     let db = GenericDao.getDatabase()
     db.createIndex({
       index: {fields: ['databaseType', 'userId']}
-    }).then(function () {
+    }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},
