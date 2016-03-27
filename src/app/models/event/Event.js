@@ -5,16 +5,16 @@ class Event {
     this._id = id
     this.databaseType = 'event'
     this.reportId = reportId
-    this.person = person ? {
-      _id: person._id,
-      name: person.name,
-      dorsal: person.dorsal,
-      avatarUrl: person.avatarUrl
-    } : null
-    this.team = team ? {
-      _id: team._id,
-      name: team.name
-    } : null
+    this.person = {
+      _id: person ? person._id : null,
+      name: person ? person.name : null,
+      dorsal: person ? person.dorsal : null,
+      avatarUrl: person ? person.avatarUrl : null
+    }
+    this.team = {
+      _id: team ? team._id : null,
+      name: team ? team.name : null
+    }
     this.type = eventType
     this.matchTime = matchTime
     this.text = cause

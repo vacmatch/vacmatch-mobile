@@ -98,11 +98,11 @@ class EventService {
               return callback(null, err)
             }
             // Save the event
-            EventDao.create(reportId, eventType, matchTime, text, timestamp, callback)
+            EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
           })
       } else {
         // Save the event
-        EventDao.create(reportId, eventType, matchTime, text, timestamp, callback)
+        EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
       }
     })
   }

@@ -98,8 +98,8 @@ class PersonService {
   update (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
     // Get person
     this.findByPersonIdReportIdAndTeamId(personId, reportId, oldTeamId, (oldPerson, err) => {
-      if (err !== null) {
-        PersonDao.update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, oldPerson, callback)
+      if (err === null) {
+        PersonDao.update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -119,7 +119,8 @@ class PersonService {
     this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (oldPerson, err) => {
       if (err === null) {
         // Update it
-        PersonDao.update(personId, reportId, teamId, newValue, oldPerson, callback)
+        PersonDao.update(oldPerson._id, oldPerson.name, oldPerson.cardId, oldPerson.dorsal, oldPerson.avatarUrl,
+          newValue, oldPerson.isStaff, oldPerson.reportId, oldPerson.teamId, oldPerson.userId, oldPerson, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -157,7 +158,7 @@ class PersonService {
     this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, function (person, err) {
       if (err === null) {
         // Remove it
-        PersonDao.remove(person, callback)
+        PersonDao.deletePerson(person, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
@@ -173,10 +174,7 @@ class PersonService {
     this.findAllByReportId(reportId, function (personList, err) {
       // Remove all person
       personList.map((person) => {
-        PersonDao.remove(person, function (res, err) {
-          if (err !== null) {
-            return callback(null, err)
-          }
+        PersonDao.deletePerson(person, function (res, err) {
         })
       })
       callback(personList, err)

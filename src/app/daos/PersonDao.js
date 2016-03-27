@@ -74,7 +74,7 @@ let PersonDao = {
     GenericDao.create(person, callback)
   },
 
-  update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, oldPerson, callback) {
+  update: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback) {
     oldPerson.name = name
     oldPerson.cardId = cardId
     oldPerson.dorsal = dorsal
