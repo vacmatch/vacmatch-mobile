@@ -1,7 +1,7 @@
 import Reflux from 'reflux'
 
 import ReportActions from '../actions/ReportActions'
-import ReportService from '../services/ReportService'
+import ServiceFactory from '../api/ServiceFactory'
 
 let ReportListStore = Reflux.createStore({
   listenables: ReportActions,
@@ -18,11 +18,11 @@ let ReportListStore = Reflux.createStore({
   },
 
   onUpdateLists: function (callback) {
-    ReportService.findAllByFinished(false, (events, err) => {
+    ServiceFactory.getService('ReportService').findAllByFinished(false, (events, err) => {
       this.state.nextReports = events
       this.trigger(this.state)
     })
-    ReportService.findAllByFinished(true, (events, err) => {
+    ServiceFactory.getService('ReportService').findAllByFinished(true, (events, err) => {
       this.state.lastReports = events
       this.trigger(this.state)
     })
@@ -33,7 +33,7 @@ let ReportListStore = Reflux.createStore({
 
   onAddReport: function (date, location, localTeam, visitorTeam, refereeList, callback) {
     let hasFinished = false
-    ReportService.create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (doc, err) => {
+    ServiceFactory.getService('ReportService').create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (doc, err) => {
       if (err !== null) {
         return callback(null, err)
       }
@@ -43,7 +43,7 @@ let ReportListStore = Reflux.createStore({
   },
 
   onDeleteReport: function (id) {
-    ReportService.delete(id, (res, err) => {
+    ServiceFactory.getService('ReportService').delete(id, (res, err) => {
       if (err == null) {
         this.onUpdateLists()
       }

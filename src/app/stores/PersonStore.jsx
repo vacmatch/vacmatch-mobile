@@ -1,8 +1,8 @@
 import Reflux from 'reflux'
 
-import PersonService from '../services/PersonService'
 import PersonActions from '../actions/PersonActions'
 import Person from '../models/person/Person'
+import ServiceFactory from '../api/ServiceFactory'
 
 let PersonStore = Reflux.createStore({
   listenables: PersonActions,
@@ -16,7 +16,7 @@ let PersonStore = Reflux.createStore({
   },
 
   onUpdatePerson: function (personId, reportId, teamId, callback) {
-    PersonService.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
+    ServiceFactory.getService('PersonService').findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
       this.state = person
       this.trigger(this.state)
       callback(person, err)
@@ -24,7 +24,7 @@ let PersonStore = Reflux.createStore({
   },
 
   onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
-    PersonService.create(name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, (person, err) => {
+    ServiceFactory.getService('PersonService').create(name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, (person, err) => {
       if (err === null) {
         this.state = person
         this.trigger(this.state)
@@ -36,7 +36,7 @@ let PersonStore = Reflux.createStore({
   },
 
   onEditPerson: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
-    PersonService.update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, (person, err) => {
+    ServiceFactory.getService('PersonService').update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, (person, err) => {
       this.state = person
       this.trigger(this.state)
       if (typeof callback === 'function') {

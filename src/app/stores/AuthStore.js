@@ -1,7 +1,7 @@
 import Reflux from 'reflux'
 
-import AuthService from '../services/AuthService'
 import AuthActions from '../actions/AuthActions'
+import ServiceFactory from '../api/ServiceFactory'
 
 let AuthStore = Reflux.createStore({
   listenables: AuthActions,
@@ -25,7 +25,7 @@ let AuthStore = Reflux.createStore({
   },
 
   onLogIn: function (username, password, callback) {
-    AuthService.login(username, password, (user, err) => {
+    ServiceFactory.getService('AuthService').login(username, password, (user, err) => {
       if (err === null) {
         this.setUser(user, function () {
           if (typeof callback === 'function') {
@@ -41,7 +41,7 @@ let AuthStore = Reflux.createStore({
   },
 
   onLogOut: function (callback) {
-    AuthService.logout((response, err) => {
+    ServiceFactory.getService('AuthService').logout((response, err) => {
       if (err === null) {
         // Set an null active user in state
         this.setUser(null, () => {
@@ -58,7 +58,7 @@ let AuthStore = Reflux.createStore({
   onSignUp: function (username, password, secondPassword, email, firstName, surname, cardId, signKey, secondSignKey, callback) {
     // TODO: Add a default avatarUrl
     let avatarUrl = ''
-    AuthService.signup(username, password, secondPassword, avatarUrl, email, firstName,
+    ServiceFactory.getService('AuthService').signup(username, password, secondPassword, avatarUrl, email, firstName,
       surname, cardId, signKey, secondSignKey, (user, err) => {
         this.onLogIn(username, password, callback(user, err))
       })
