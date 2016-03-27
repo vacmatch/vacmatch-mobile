@@ -1,24 +1,24 @@
 import SignDao from '../daos/SignDao'
 
-let SignService = {
+class SignService {
 
   /**
    * Find a Signature by id
    * @param {String} signId Sinature identifier
    * @param {signatureCallback} callback A callback that returns the Signature element or error
    */
-  findById: function (signId, callback) {
+  findById (signId, callback) {
     SignDao.findById(signId, callback)
-  },
+  }
 
   /**
    * Find all Signatures in a Report by report id
    * @param {String} reportId Report identifier
    * @param {signatureListCallback} callback A callback that returns the Signature list
    */
-  findAllByReportId: function (reportId, callback) {
+  findAllByReportId (reportId, callback) {
     SignDao.findAllByReportId(reportId, callback)
-  },
+  }
 
   /**
    * Create a Signature
@@ -32,9 +32,9 @@ let SignService = {
    * @param {String} fedId The Federation id from the signer Person (null if the signer is not an User)
    * @param {signatureCallback} callback A callback that returns the created Signature or error
    */
-  create: function (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
+  create (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
     SignDao.create(userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
-  },
+  }
 
   /**
    * Delete a Signature
@@ -42,7 +42,7 @@ let SignService = {
    * @param {signatureCallback} callback A callback that returns an object with
    * the deleted signId if the Signature was deleted
    */
-  delete: function (signId, callback) {
+  delete (signId, callback) {
     this.findById(signId, function (signature, err) {
       if (err === null) {
         // Remove it
@@ -51,14 +51,14 @@ let SignService = {
         callback(null, err)
       }
     })
-  },
+  }
 
   /**
    * Delete all Signature from a Report
    * @param {String} reportId Report identifier
    * @param {signatureCallback} callback A callback that returns if Signatures were removed
    */
-  deleteAllSignaturesByReportId: function (reportId, callback) {
+  deleteAllSignaturesByReportId (reportId, callback) {
     this.findAllByReportId(reportId, function (signatureList, err) {
       signatureList.map((sign) => {
         SignDao.deleteSignature(sign, function (res, err) {

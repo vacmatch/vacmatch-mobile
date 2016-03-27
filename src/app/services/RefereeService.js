@@ -1,15 +1,15 @@
 import RefereeDao from '../daos/RefereeDao'
 
-let RefereeService = {
+class RefereeService {
 
   /**
    * Get a Referee from de DB by id
    * @param {String} refereeId The Referee identifier
    * @param {refereeCallback} callback A callback that returns a Referee or error
    */
-  findById: function (refereeId, callback) {
+  findById (refereeId, callback) {
     RefereeDao.findById(refereeId, callback)
-  },
+  }
 
   /**
    * Find a unique Referee by userId
@@ -17,9 +17,9 @@ let RefereeService = {
    * @param {String} userId The User identifier
    * @param {refereeCallback} callback A callback that returns a Referee or error
    */
-  findByUserId: function (userId, callback) {
+  findByUserId (userId, callback) {
     RefereeDao.findByUserId(userId, callback)
-  },
+  }
 
   /**
    * Create a new Referee
@@ -30,7 +30,7 @@ let RefereeService = {
    * @param {String} userId The User identifier
    * @param {refereeCallback} callback A callback that returns a Referee if it was created or error
    */
-  create: function (name, cardId, avatarUrl, userId, callback) {
+  create (name, cardId, avatarUrl, userId, callback) {
     RefereeDao.create(name, cardId, avatarUrl, userId, callback)
   }
 

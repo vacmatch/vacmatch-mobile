@@ -1,10 +1,13 @@
 import InvalidParametersException from '../models/exception/InvalidParametersException'
-import RefereeService from './RefereeService'
 import AuthDao from '../daos/AuthDao'
 
 import Hashes from 'jshashes'
 
-let AuthService = {
+class AuthService {
+
+  constructor (refereeService) {
+    this.RefereeService = refereeService
+  }
 
   /**
    * Login a User and returns an error if login fails
@@ -12,17 +15,17 @@ let AuthService = {
    * @param {String} password The password
    * @param {userCallback} callback A callback that returns an User or error
    */
-  login: function (username, password, callback) {
+  login (username, password, callback) {
     AuthDao.login(username, password, callback)
-  },
+  }
 
   /**
    * Logout a User and returns an error if logout fail
    * @param {userCallback} callback A callback that returns an object with response or error
    */
-  logout: function (callback) {
+  logout (callback) {
     AuthDao.logout(callback)
-  },
+  }
 
   /**
    * Signup a new User
@@ -35,9 +38,9 @@ let AuthService = {
    * @param {String} signKey The User sign key
    * @param {userCallback} callback A callback that returns a User or error
    */
-  doSignUp: function (username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback) {
+  doSignUp (username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback) {
     AuthDao.signup(username, password, avatarUrl, email, firstName, surname, cardId, signKey, callback)
-  },
+  }
 
   /**
    * Signup a new User, create a Referee and returns an error if signup fail
@@ -52,7 +55,7 @@ let AuthService = {
    * @param {String} secondSignKey The User sign key (2º field)
    * @param {userCallback} callback A callback that returns a User or error
    */
-  signup: function (username, password, secondPassword, avatarUrl, email, firstName, surname, cardId, signKey, secondSignKey, callback) {
+  signup (username, password, secondPassword, avatarUrl, email, firstName, surname, cardId, signKey, secondSignKey, callback) {
     // Check if both password are the same, exits, null, empty
     if (password !== secondPassword) {
       return callback(null, new InvalidParametersException('Passwords are diferent', 'password', password))
@@ -74,7 +77,7 @@ let AuthService = {
         return callback(response, err)
       }
       // Create Referee if signup was ok
-      RefereeService.create(firstName, cardId, avatarUrl, response.id, (referee, err) => {
+      this.RefereeService.create(firstName, cardId, avatarUrl, response.id, (referee, err) => {
         if (err !== null) {
           this.deleteUser(response.id, function (resp, error) {
             callback(referee, err)
@@ -84,25 +87,25 @@ let AuthService = {
         }
       })
     })
-  },
+  }
 
   /**
   * Get a User from de DB by id
   * @param {String} userId The User identifier
   * @param {userCallback} callback A callback that returns a User or error
   */
-  findById: function (userId, callback) {
+  findById (userId, callback) {
     AuthDao.findById(userId, callback)
-  },
+  }
 
   /**
    * Get a User from de DB by Username
    * @param {String} username The username
    * @param {userCallback} callback A callback that returns a User or error
    */
-  getUser: function (username, callback) {
+  getUser (username, callback) {
     AuthDao.getUser(username, callback)
-  },
+  }
 
   /**
    * Check if signKey si valid, return a boolean value
@@ -110,7 +113,7 @@ let AuthService = {
    * @param {String} signKey The User sign key
    * @param {userCallback} callback A callback that returns a Boolean value or error
    */
-  checkSignKey: function (userId, signKey, callback) {
+  checkSignKey (userId, signKey, callback) {
     this.findById(userId, (user, err) => {
       if (err !== null) {
         callback(user, err)
@@ -120,14 +123,14 @@ let AuthService = {
         callback(value, err)
       }
     })
-  },
+  }
 
   /**
    * Delete a User from de DB by id if it exists
    * @param {String} userId The user identifier
    * @param {userCallback} callback A callback that returns an ok response or error
    */
-  deleteUser: function (userId, callback) {
+  deleteUser (userId, callback) {
     this.findById(userId, function (user, err) {
       if (err !== null) {
         console.log('err: ', err)
