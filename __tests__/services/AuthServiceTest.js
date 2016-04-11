@@ -1,8 +1,9 @@
 jest.dontMock('../../src/app/services/AuthService')
+jest.dontMock('../../src/app/services/RefereeService')
 
 // Services
-let authService = require('../../src/app/services/AuthService')
-let refereeService = require('../../src/app/services/RefereeService')
+let AuthService = require('../../src/app/services/AuthService')
+let RefereeService = require('../../src/app/services/RefereeService')
 
 let User = require('../../src/app/models/user/User')
 let Referee = require('../../src/app/models/referee/Referee')
@@ -14,12 +15,16 @@ let AuthDao = require('../../src/app/daos/AuthDao')
 // Default elements
 let defaultUser = null
 let defaultReferee = null
+let authService = null
+let refereeService = null
 
 describe('Signup', function () {
 
   beforeEach(function () {
     defaultUser = new User(null, 'username', 'pass', 'www.avatarurl.test', 'test@email.com', 'Fulano', 'De tal', '22222222Z', 'signkey')
     defaultReferee = new Referee(null, 'name', '22222222Z', 'www.avatarurl.test', 'userid')
+    refereeService = new RefereeService()
+    authService = new AuthService(refereeService)
   })
 
   it('A new User cant be signed up if both passwords are diferent', function () {

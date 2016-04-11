@@ -1,10 +1,13 @@
 jest.dontMock('../../src/app/services/EventService')
+jest.dontMock('../../src/app/services/ReportService')
+jest.dontMock('../../src/app/services/PersonService')
+jest.dontMock('../../src/app/services/TeamService')
 
 // Services
-let eventService = require('../../src/app/services/EventService')
-let reportService = require('../../src/app/services/ReportService')
-let personService = require('../../src/app/services/PersonService')
-let teamService = require('../../src/app/services/TeamService')
+let EventService = require('../../src/app/services/EventService')
+let ReportService = require('../../src/app/services/ReportService')
+let PersonService = require('../../src/app/services/PersonService')
+let TeamService = require('../../src/app/services/TeamService')
 
 let EventElements = require('../../src/app/models/event/Event')
 let Person = require('../../src/app/models/person/Person')
@@ -20,6 +23,10 @@ let defaultTeam = null
 let defaultReport = null
 let defaultEvent = null
 let defaultControlEvent = null
+let eventService = null
+let teamService = null
+let personService = null
+let reportService = null
 
 describe('create Sport Event', function () {
 
@@ -28,25 +35,24 @@ describe('create Sport Event', function () {
     defaultTeam = new Team(null, 'Team name')
     defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
     defaultEvent = new EventElements.Event('event', '1', defaultPerson, defaultTeam, 'goal', 1, 'cause', 1)
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    personService = new PersonService(jasmine.createSpy('ReportService'), jasmine.createSpy('TeamService'), jasmine.createSpy('AuthService'))
+    teamService = new TeamService()
+    eventService = new EventService(reportService, personService, teamService)
   })
 
   it('Create a new Sport Event with valid parameters', function () {
 
-    let existentReportId = 1
-
-    // Set ReportService findById mock implementation
-    spyOn(reportService, 'findById').andCallFake(function (existentReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       // Returns a valid report
       callback(defaultReport, null)
     })
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
       // Returns a valid person
       callback(defaultPerson, null)
     })
 
-    // Set TeamService findById mock implementation
     spyOn(teamService, 'findById').andCallFake(function (anyTeamId, callback) {
       // Returns a valid team
       callback(defaultTeam, null)
@@ -60,17 +66,15 @@ describe('create Sport Event', function () {
     eventService.create(defaultEvent.reportId, defaultEvent.person, defaultEvent.team,
       defaultEvent.type, defaultEvent.matchTime, defaultEvent.text, defaultEvent.timestamp,
       (event, err) => {
-      expect(event).toEqual(defaultEvent)
-      expect(event).not.toBe(null)
-      expect(err).toBe(null)
-
+        expect(event).toEqual(defaultEvent)
+        expect(event).not.toBe(null)
+        expect(err).toBe(null)
     })
 
     expect(reportService.findById).toHaveBeenCalled()
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
     expect(teamService.findById).toHaveBeenCalled()
     expect(EventDao.create).toHaveBeenCalled()
-
   })
 
   it('Create a new Sport Event with non existent report', function () {
@@ -221,7 +225,7 @@ describe('Create Control Event', function () {
 
     spyOn(reportService, 'update')
 
-    spyOn(EventDao, 'create').andCallFake(function (reportId, eventType, matchTime,
+    spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
       text, timestamp, callback) {
       callback(event, null)
     })
@@ -236,7 +240,7 @@ describe('Create Control Event', function () {
 
     expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).not.toHaveBeenCalled()
-    expect(EventDao.create).toHaveBeenCalled()
+    expect(EventDao.createControl).toHaveBeenCalled()
 
   })
 
@@ -254,7 +258,7 @@ describe('Create Control Event', function () {
     })
 
     spyOn(reportService, 'update')
-    spyOn(EventDao, 'create')
+    spyOn(EventDao, 'createControl')
 
     // Create a new ControlEvent
     eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
@@ -266,7 +270,7 @@ describe('Create Control Event', function () {
 
     expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).not.toHaveBeenCalled()
-    expect(EventDao.create).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
 
   })
 
@@ -290,7 +294,7 @@ describe('Create Control Event', function () {
         callback(validReport, null)
       })
 
-      spyOn(EventDao, 'create').andCallFake(function (reportId, eventType, matchTime,
+      spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
         text, timestamp, callback) {
         callback(event, null)
       })
@@ -307,7 +311,7 @@ describe('Create Control Event', function () {
       // Check if reportService update method was called to update Report status
       expect(reportService.update).toHaveBeenCalled()
       // Check if genericService create method was called
-      expect(EventDao.create).toHaveBeenCalled()
+      expect(EventDao.createControl).toHaveBeenCalled()
 
   })
 
@@ -331,7 +335,7 @@ describe('Create Control Event', function () {
       callback(null, jasmine.any(Object))
     })
 
-    spyOn(EventDao, 'create')
+    spyOn(EventDao, 'createControl')
 
     // Create a new ControlEvent
     eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
@@ -342,7 +346,7 @@ describe('Create Control Event', function () {
 
     expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).toHaveBeenCalled()
-    expect(EventDao.create).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
 
   })
 })
