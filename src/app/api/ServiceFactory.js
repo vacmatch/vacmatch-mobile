@@ -16,13 +16,14 @@ let ServiceFactory = {
     this._eventService = new EventService()
     this._personService = new PersonService()
     this._reportService = new ReportService()
+    this._refereeService = new RefereeService()
 
     // With No dependencies
-    this._refereeService = new RefereeService()
     this._signService = new SignService()
     this._teamService = new TeamService()
 
     // Inject dependencies
+    this._refereeService.AuthService = this._authService
     this._authService.RefereeService = this._refereeService
 
     this._eventService.ReportService = this._reportService

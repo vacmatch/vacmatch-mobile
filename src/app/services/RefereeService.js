@@ -2,6 +2,10 @@ import RefereeDao from '../daos/RefereeDao'
 
 class RefereeService {
 
+  constructor (authService) {
+    this.AuthService = authService
+  }
+
   /**
    * Get a Referee from de DB by id
    * @param {String} refereeId The Referee identifier
@@ -31,7 +35,12 @@ class RefereeService {
    * @param {refereeCallback} callback A callback that returns a Referee if it was created or error
    */
   create (name, cardId, avatarUrl, userId, callback) {
-    RefereeDao.create(name, cardId, avatarUrl, userId, callback)
+    this.AuthService.findById(userId, function (data, err) {
+      if (err !== null) {
+        return callback(data, err)
+      }
+      RefereeDao.create(name, cardId, avatarUrl, userId, callback)
+    })
   }
 
 }
