@@ -24,6 +24,7 @@ let ServiceFactory = {
 
     // Inject dependencies
     this._refereeService.AuthService = this._authService
+
     this._authService.RefereeService = this._refereeService
 
     this._eventService.ReportService = this._reportService
