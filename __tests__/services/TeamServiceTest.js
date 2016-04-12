@@ -1,47 +1,54 @@
 jest.dontMock('../../src/app/services/TeamService')
 
+let TeamService = require('../../src/app/services/TeamService')
+
+let Team = require('../../src/app/models/team/Team')
+let InvalidParametersException = require('../../src/app/models/exception/InvalidParametersException')
+
+let TeamDao = require('../../src/app/daos/TeamDao')
+
+let defaultTeam = null
+let teamService = null
+
 describe('create', function () {
-  // Default elements
-  var teamService = require('../../src/app/services/TeamService')
-  var genericService = require('../../src/app/services/GenericService')
-  let defaultTeamName = 'Fulanos FC'
-  let defaultTeam = {
-    databaseType: 'team',
-    name: defaultTeamName
-  }
-  let defaultErr = "Error"
+
+  beforeEach(function () {
+    defaultTeam = new Team(null, 'Fulanos FC')
+    teamService = new TeamService()
+  })
 
   it('Create a new team with valid parameters', function () {
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create').andCallFake(function (defaultTeamName, callback) {
-      // Returns a valid team
+    let team = defaultTeam
+
+    spyOn(TeamDao, 'create').andCallFake(function (defaultTeamName, callback) {
       callback(defaultTeam, null)
     })
 
-    // Create the new team with correct parameters
-    teamService.create(defaultTeamName, (team, err) => {
-      expect(team).toBe(defaultTeam)
+    teamService.create(team.name, (team, err) => {
+      expect(team).toBe(team)
       expect(team).not.toBe(null)
       expect(err).toBe(null)
     })
 
-    // Check if create was called in GenericService
-    expect(genericService.create).toHaveBeenCalled()
+    expect(TeamDao.create).toHaveBeenCalled()
   })
 
   it('Create a new team with null team name', function () {
 
-    // Set GenericService.create mock
-    spyOn(genericService, 'create')
+    let team = defaultTeam
+    team.name = null
 
-    // Create the new team with null team name paramter
-    teamService.create(null, (team, err) => {
-      expect(team).toBe(null)
+    let defaultErr = new InvalidParametersException('Invalid team name', 'teamName', team.name)
+
+    spyOn(TeamDao, 'create')
+
+    teamService.create(team.name, (t, err) => {
+      expect(t).toBe(null)
       expect(err).not.toBe(null)
+      expect(err).toEqual(defaultErr)
     })
 
-    // Check if team wasn't created in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(TeamDao.create).not.toHaveBeenCalled()
   })
 })
