@@ -2,6 +2,13 @@ import SignDao from '../daos/SignDao'
 
 class SignService {
 
+  constructor (authService, reportService, personService, teamService) {
+    this.AuthService = authService
+    this.ReportService = reportService
+    this.PersonService = personService
+    this.TeamService = teamService
+  }
+
   /**
    * Find a Signature by id
    * @param {String} signId Sinature identifier
@@ -33,7 +40,27 @@ class SignService {
    * @param {signatureCallback} callback A callback that returns the created Signature or error
    */
   create (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
-    SignDao.create(userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
+    this.AuthService.findById(userId, (data, err) => {
+      if (err !== null) {
+        return callback(null, err)
+      }
+      this.ReportService.findById(reportId, (data, err) => {
+        if (err !== null) {
+          return callback(null, err)
+        }
+        this.PersonService.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (data, err) => {
+          if (err !== null) {
+            return callback(null, err)
+          }
+          this.TeamService.findById(teamId, (data, err) => {
+            if (err !== null) {
+              return callback(null, err)
+            }
+            SignDao.create(userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
+          })
+        })
+      })
+    })
   }
 
   /**
