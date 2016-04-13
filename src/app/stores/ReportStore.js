@@ -2,8 +2,6 @@ import Reflux from 'reflux'
 import Stopwatch from 'timer-stopwatch'
 
 import ReportActions from '../actions/ReportActions'
-import ReportService from '../services/ReportService'
-import EventService from '../services/EventService'
 
 import ChangeTermEvent from '../models/web/event/control/ChangeTermEvent'
 import StartMatchEvent from '../models/web/event/control/StartMatchEvent'
@@ -12,6 +10,8 @@ import FoulEvent from '../models/web/event/FoulEvent'
 
 import CronoUtils from './CronoUtils'
 import Report from '../models/report/Report'
+
+import ServiceFactory from '../api/ServiceFactory'
 
 let ReportStore = Reflux.createStore({
   listenables: ReportActions,
@@ -34,7 +34,7 @@ let ReportStore = Reflux.createStore({
     let termEvent = new ChangeTermEvent()
     let startEvent = new StartMatchEvent()
     // Update Teams
-    ReportService.findById(reportId, (report, err) => {
+    ServiceFactory.getService('ReportService').findById(reportId, (report, err) => {
       // TODO: Handle error
       if (err !== null) {
         if (typeof callback === 'function') {
@@ -43,12 +43,14 @@ let ReportStore = Reflux.createStore({
       }
       this.state.report = report
       // Check if match has started
-      EventService.findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
+      ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
         this.state.report.hasFinished = (startEvents.length > 0)
         // Update term
-        EventService.findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
+        ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
           if (termEvents.length) {
-            this.state.report.term = termEvents[0].text
+            this.state.term = termEvents[0].text
+          } else {
+            this.state.term = '1'
           }
           this.trigger(this.state)
           if (typeof callback === 'function') {
@@ -79,7 +81,7 @@ let ReportStore = Reflux.createStore({
   },
 
   onUpdateTerm: function (newTerm) {
-    this.state.report.term = newTerm
+    this.state.term = newTerm
     this.trigger(this.state)
   },
 
@@ -97,7 +99,7 @@ let ReportStore = Reflux.createStore({
       this.state.report.visitorTeam = newTeam
     }
     // Update result in DB
-    ReportService.update(reportId, this.state.report.date, this.state.report.hasFinished, this.state.report.location,
+    ServiceFactory.getService('ReportService').update(reportId, this.state.report.date, this.state.report.hasFinished, this.state.report.location,
       this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport) => {
         // Update state
         this.state.report.localTeam = newReport.localTeam
@@ -108,7 +110,7 @@ let ReportStore = Reflux.createStore({
 
   onUpdateResultFields: function (event, sport, callback) {
     // Get all events
-    EventService.findAllByReportIdAndEventType(event.reportId, event.type, (events, err) => {
+    ServiceFactory.getService('EventService').findAllByReportIdAndEventType(event.reportId, event.type, (events, err) => {
       let goalEvent = new GoalEvent()
       if (event.type === goalEvent.type) {
         // Get the new value from Sport
@@ -144,7 +146,7 @@ let ReportStore = Reflux.createStore({
   },
 
   onEditReport: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
-    ReportService.update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, (report, err) => {
+    ServiceFactory.getService('ReportService').update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, (report, err) => {
       // Update state
       this.state.report = report
       this.trigger(this.state)

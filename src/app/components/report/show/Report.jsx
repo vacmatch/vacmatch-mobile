@@ -60,7 +60,7 @@ let Report = React.createClass({
   _handleStartMatch: function () {
     // Create start match control event
     let event = new StartMatchEvent()
-    EventActions.addControlEvent(this.props.params.reportId, event.type, this.state.report.timer.ms, '', () => {
+    EventActions.addControlEvent(this.props.params.reportId, event.type, this.state.report.timer.ms, '', (event, err) => {
       // Set match has started in state
       ReportActions.toggleStartMatch()
       this.setState({snackbarMessage: 'Match started'})

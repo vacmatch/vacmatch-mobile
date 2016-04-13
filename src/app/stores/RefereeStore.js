@@ -1,13 +1,13 @@
 import Reflux from 'reflux'
 
-import RefereeService from '../services/RefereeService'
 import RefereeActions from '../actions/RefereeActions'
+import ServiceFactory from '../api/ServiceFactory'
 
 let RefereeStore = Reflux.createStore({
   listenables: RefereeActions,
 
   findByUserId: function (userId, callback) {
-    RefereeService.findByUserId(userId, callback)
+    ServiceFactory.getService('RefereeService').findByUserId(userId, callback)
   }
 
 })

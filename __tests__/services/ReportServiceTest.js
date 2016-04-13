@@ -1,26 +1,41 @@
 jest.dontMock('../../src/app/services/ReportService')
+jest.dontMock('../../src/app/services/TeamService')
+jest.dontMock('../../src/app/services/EventService')
+jest.dontMock('../../src/app/services/PersonService')
+jest.dontMock('../../src/app/services/SignService')
 
 // Services
-let genericService = require('../../src/app/services/GenericService')
-let reportService = require('../../src/app/services/ReportService')
-let teamService = require('../../src/app/services/TeamService')
-let eventService = require('../../src/app/services/EventService')
-let personService = require('../../src/app/services/PersonService')
-let signService = require('../../src/app/services/SignService')
+let ReportService = require('../../src/app/services/ReportService')
+let TeamService = require('../../src/app/services/TeamService')
+let EventService = require('../../src/app/services/EventService')
+let PersonService = require('../../src/app/services/PersonService')
+let SignService = require('../../src/app/services/SignService')
 
 let Team = require('../../src/app/models/team/Team')
 let Report = require('../../src/app/models/report/Report')
 let InstanceNotFoundException = require('../../src/app/models/exception/InstanceNotFoundException')
 
+let ReportDao = require('../../src/app/daos/ReportDao')
+
 // Default elements
 let defaultTeam = null
 let defaultReport = null
+let reportService = null
+let teamService = null
+let eventService = null
+let personService = null
+let signService = null
 
 describe('Create Report', function () {
 
   beforeEach(function () {
-    defaultTeam = new Team(null, 'team', 'Local team name')
-    defaultReport = new Report(null, 'report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultTeam = new Team(null, 'Local team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    teamService = new TeamService()
+    eventService = new EventService(jasmine.createSpy("ReportService"), jasmine.createSpy("PersonService"), jasmine.createSpy("TeamService"))
+    personService = new PersonService(jasmine.createSpy("ReportService"), jasmine.createSpy("TeamService"), jasmine.createSpy("AuthService"))
+    signService = new SignService()
+    reportService = new ReportService(personService, teamService, eventService, signService)
   })
 
   it('A new Report should be created and should create a new local and visitor teams', function () {
@@ -32,7 +47,7 @@ describe('Create Report', function () {
       callback(team, null)
     })
 
-    spyOn(genericService, 'create').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'create').andCallFake(function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
       callback(report, null)
     })
 
@@ -46,7 +61,7 @@ describe('Create Report', function () {
     // It should create local and visitor team (Both)
     expect(teamService.create.calls.length).toEqual(2)
 
-    expect(genericService.create).toHaveBeenCalled()
+    expect(ReportDao.create).toHaveBeenCalled()
 
   })
 
@@ -55,8 +70,13 @@ describe('Create Report', function () {
 describe('Update Report', function () {
 
   beforeEach(function () {
-    defaultTeam = new Team(null, 'team', 'Local team name')
-    defaultReport = new Report(null, 'report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultTeam = new Team(null, 'Local team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    teamService = new TeamService()
+    eventService = new EventService(jasmine.createSpy("ReportService"), jasmine.createSpy("PersonService"), jasmine.createSpy("TeamService"))
+    personService = new PersonService(jasmine.createSpy("ReportService"), jasmine.createSpy("TeamService"), jasmine.createSpy("AuthService"))
+    signService = new SignService()
+    reportService = new ReportService(personService, teamService, eventService, signService)
   })
 
   it('A Report can be updated with valid parameters', function () {
@@ -72,7 +92,7 @@ describe('Update Report', function () {
       callback(team, null)
     })
 
-    spyOn(genericService, 'update').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'update').andCallFake(function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback) {
       callback(report, null)
     })
 
@@ -83,9 +103,9 @@ describe('Update Report', function () {
       expect(err).toBe(null)
     })
 
+    expect(reportService.findById).toHaveBeenCalled()
     expect(teamService.findById.calls.length).toEqual(2)
-
-    expect(genericService.update).toHaveBeenCalled()
+    expect(ReportDao.update).toHaveBeenCalled()
 
   })
 
@@ -96,7 +116,7 @@ describe('Update Report', function () {
 
     let error = new InstanceNotFoundException('Non existent local team', 'report.localTeam._id', report.localTeam._id)
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(report, null)
     })
 
@@ -104,7 +124,7 @@ describe('Update Report', function () {
       callback(null, error)
     })
 
-    spyOn(genericService, 'update')
+    spyOn(ReportDao, 'update')
 
     reportService.update(report._id, report.date, report.location, report.hasFinished, report.localTeam,
       report.visitorTeam, report.incidences, (p, err) => {
@@ -113,25 +133,31 @@ describe('Update Report', function () {
         expect(p).toBe(null)
     })
 
+    expect(reportService.findById).toHaveBeenCalled()
     expect(teamService.findById.calls.length).toEqual(1)
-
-    expect(genericService.update).not.toHaveBeenCalled()
+    expect(ReportDao.update).not.toHaveBeenCalled()
 
   })
 
 
 })
 
+// TODO CHECK DELETE REPORT!!!!!!
 describe('Delete Report', function () {
   beforeEach(function () {
-    defaultTeam = new Team(null, 'team', 'Local team name')
-    defaultReport = new Report(null, 'report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultTeam = new Team(null, 'Local team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    teamService = new TeamService()
+    eventService = new EventService(jasmine.createSpy("ReportService"), jasmine.createSpy("PersonService"), jasmine.createSpy("TeamService"))
+    personService = new PersonService(jasmine.createSpy("ReportService"), jasmine.createSpy("TeamService"), jasmine.createSpy("AuthService"))
+    signService = new SignService()
+    reportService = new ReportService(personService, teamService, eventService, signService)
   })
 
   it('A Report should be deleted if it exists', function () {
     let report = defaultReport
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(report, null)
     })
 
@@ -143,11 +169,15 @@ describe('Delete Report', function () {
       callback(jasmine.any(Object), null)
     })
 
+    spyOn(teamService, 'delete').andCallFake(function (anyTeamId, callback) {
+      callback(jasmine.any(Object), null)
+    })
+
     spyOn(signService, 'deleteAllSignaturesByReportId').andCallFake(function (anyReportId, callback) {
       callback(jasmine.any(Object), null)
     })
 
-    spyOn(genericService, 'remove').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'delete').andCallFake(function (anyReport, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -156,7 +186,12 @@ describe('Delete Report', function () {
       expect(err).toBe(null)
     })
 
-    expect(genericService.remove).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(eventService.deleteAllEventsByReportId).toHaveBeenCalled()
+    expect(personService.deleteAllPersonByReportId).toHaveBeenCalled()
+    expect(teamService.delete.calls.length).toEqual(2)
+    expect(signService.deleteAllSignaturesByReportId).toHaveBeenCalled()
+    expect(ReportDao.delete).toHaveBeenCalled()
 
   })
 
@@ -165,7 +200,7 @@ describe('Delete Report', function () {
 
     let error = new InstanceNotFoundException('Non existent report', 'reportId', report._id)
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(null, error)
     })
 
@@ -173,29 +208,30 @@ describe('Delete Report', function () {
 
     spyOn(personService, 'deleteAllPersonByReportId')
 
+    spyOn(teamService, 'delete')
+
     spyOn(signService, 'deleteAllSignaturesByReportId')
 
-    spyOn(genericService, 'remove')
+    spyOn(ReportDao, 'delete')
 
     reportService.delete(report._id, (res, err) => {
       expect(res).toBe(null)
       expect(err).not.toBe(null)
     })
 
+    expect(reportService.findById).toHaveBeenCalled()
     expect(eventService.deleteAllEventsByReportId).not.toHaveBeenCalled()
-
     expect(personService.deleteAllPersonByReportId).not.toHaveBeenCalled()
-
+    expect(teamService.delete).not.toHaveBeenCalled()
     expect(signService.deleteAllSignaturesByReportId).not.toHaveBeenCalled()
-
-    expect(genericService.remove).not.toHaveBeenCalled()
+    expect(ReportDao.delete).not.toHaveBeenCalled()
 
   })
 
   it('When a Report is deleted, all report Events from this Report must be deleted too', function () {
     let report = defaultReport
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(report, null)
     })
 
@@ -207,11 +243,15 @@ describe('Delete Report', function () {
       callback(jasmine.any(Object), null)
     })
 
+    spyOn(teamService, 'delete').andCallFake(function (anyTeamd, callback) {
+      callback(jasmine.any(Object), null)
+    })
+
     spyOn(signService, 'deleteAllSignaturesByReportId').andCallFake(function (anyReportId, callback) {
       callback(jasmine.any(Object), null)
     })
 
-    spyOn(genericService, 'remove').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'delete').andCallFake(function (anyReport, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -220,17 +260,19 @@ describe('Delete Report', function () {
       expect(err).toBe(null)
     })
 
-    // Delete all events
+    expect(reportService.findById).toHaveBeenCalled()
     expect(eventService.deleteAllEventsByReportId).toHaveBeenCalledWith(report._id, jasmine.any(Object))
-
-    expect(genericService.remove).toHaveBeenCalledWith(report, jasmine.any(Object))
+    expect(personService.deleteAllPersonByReportId).toHaveBeenCalled()
+    expect(teamService.delete).toHaveBeenCalled()
+    expect(signService.deleteAllSignaturesByReportId).toHaveBeenCalled()
+    expect(ReportDao.delete).toHaveBeenCalledWith(report, jasmine.any(Object))
 
   })
 
   it('When a Report is deleted, all report Person from this Report must be deleted too', function () {
     let report = defaultReport
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(report, null)
     })
 
@@ -242,11 +284,15 @@ describe('Delete Report', function () {
       callback(jasmine.any(Object), null)
     })
 
+    spyOn(teamService, 'delete').andCallFake(function (anyTeamd, callback) {
+      callback(jasmine.any(Object), null)
+    })
+
     spyOn(signService, 'deleteAllSignaturesByReportId').andCallFake(function (anyReportId, callback) {
       callback(jasmine.any(Object), null)
     })
 
-    spyOn(genericService, 'remove').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'delete').andCallFake(function (anyReport, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -255,17 +301,19 @@ describe('Delete Report', function () {
       expect(err).toBe(null)
     })
 
-    // Delete all person
-    expect(personService.deleteAllPersonByReportId).toHaveBeenCalledWith(report._id, jasmine.any(Object))
-
-    expect(genericService.remove).toHaveBeenCalledWith(report, jasmine.any(Object))
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(eventService.deleteAllEventsByReportId).toHaveBeenCalled()
+    expect(personService.deleteAllPersonByReportId).toHaveBeenCalled()
+    expect(teamService.delete).toHaveBeenCalled()
+    expect(signService.deleteAllSignaturesByReportId).toHaveBeenCalled()
+    expect(ReportDao.delete).toHaveBeenCalledWith(report, jasmine.any(Object))
 
   })
 
   it('When a Report is deleted, local and visitor Teams from this Report must be deleted too', function () {
     let report = defaultReport
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(report, null)
     })
 
@@ -285,7 +333,7 @@ describe('Delete Report', function () {
       callback(jasmine.any(Object), null)
     })
 
-    spyOn(genericService, 'remove').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'delete').andCallFake(function (anyReport, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -294,17 +342,19 @@ describe('Delete Report', function () {
       expect(err).toBe(null)
     })
 
-    // Delete both teams
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(eventService.deleteAllEventsByReportId).toHaveBeenCalled()
+    expect(personService.deleteAllPersonByReportId).toHaveBeenCalled()
     expect(teamService.delete.calls.length).toBe(2)
-
-    expect(genericService.remove).toHaveBeenCalledWith(report, jasmine.any(Object))
+    expect(signService.deleteAllSignaturesByReportId).toHaveBeenCalled()
+    expect(ReportDao.delete).toHaveBeenCalledWith(report, jasmine.any(Object))
 
   })
 
   it('When a Report is deleted, all signatures from this Report must be deleted too', function () {
     let report = defaultReport
 
-    spyOn(genericService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(report, null)
     })
 
@@ -324,7 +374,7 @@ describe('Delete Report', function () {
       callback(jasmine.any(Object), null)
     })
 
-    spyOn(genericService, 'remove').andCallFake(function (anyReport, callback) {
+    spyOn(ReportDao, 'delete').andCallFake(function (anyReport, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -333,10 +383,12 @@ describe('Delete Report', function () {
       expect(err).toBe(null)
     })
 
-    // Delete all signs
-    expect(signService.deleteAllSignaturesByReportId).toHaveBeenCalledWith(report._id, jasmine.any(Object))
-
-    expect(genericService.remove).toHaveBeenCalledWith(report, jasmine.any(Object))
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(eventService.deleteAllEventsByReportId).toHaveBeenCalled()
+    expect(personService.deleteAllPersonByReportId).toHaveBeenCalled()
+    expect(teamService.delete.calls.length).toBe(2)
+    expect(signService.deleteAllSignaturesByReportId).toHaveBeenCalled()
+    expect(ReportDao.delete).toHaveBeenCalledWith(report, jasmine.any(Object))
 
   })
 
