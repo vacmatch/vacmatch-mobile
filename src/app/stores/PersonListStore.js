@@ -1,8 +1,8 @@
 import Reflux from 'reflux'
 
 import ReportActions from '../actions/ReportActions'
-import PersonService from '../services/PersonService'
 import PersonActions from '../actions/PersonActions'
+import ServiceFactory from '../api/ServiceFactory'
 
 let PersonListStore = Reflux.createStore({
   listenables: [ReportActions, PersonActions],
@@ -21,7 +21,7 @@ let PersonListStore = Reflux.createStore({
   },
 
   onUpdatePlayers: function (reportId, localTeamId, visitorTeamId, callback) {
-    PersonService.findByReportIdAndTeamId(reportId, localTeamId, (data, err) => {
+    ServiceFactory.getService('PersonService').findByReportIdAndTeamId(reportId, localTeamId, (data, err) => {
       if (err) {
         console.log('Error: ', err)
       } else {
@@ -29,7 +29,7 @@ let PersonListStore = Reflux.createStore({
         this.state.localTeamId = localTeamId
         this.trigger(this.state)
       }
-      PersonService.findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {
+      ServiceFactory.getService('PersonService').findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {
         if (err) {
           console.log('Error: ', err)
         } else {
@@ -68,7 +68,7 @@ let PersonListStore = Reflux.createStore({
 
   onToggleCallPerson: function (personId, reportId, teamId, newValue) {
     // Set new call state in DB
-    PersonService.setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
+    ServiceFactory.getService('PersonService').setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
       // Update call state in person list
       this.updatePersonInLists(person, teamId)
     })
@@ -76,7 +76,7 @@ let PersonListStore = Reflux.createStore({
 
   onUpdatePersonDorsal: function (personId, reportId, teamId, newDorsal, callback) {
     // Set new dorsal in DB
-    PersonService.setDorsal(personId, reportId, teamId, newDorsal, (person, err) => {
+    ServiceFactory.getService('PersonService').setDorsal(personId, reportId, teamId, newDorsal, (person, err) => {
       // Update dorsal in person list
       this.updatePersonInLists(person, teamId, function () {
         callback(person, err)
@@ -85,7 +85,7 @@ let PersonListStore = Reflux.createStore({
   },
 
   onDeletePerson: function (personId, reportId, teamId, callback) {
-    PersonService.deletePerson(personId, reportId, teamId, (data, err) => {
+    ServiceFactory.getService('PersonService').deletePerson(personId, reportId, teamId, (data, err) => {
       if (err === null) {
         // Check witch team and update that team list removing this person
         if (teamId === this.state.localTeamId) {

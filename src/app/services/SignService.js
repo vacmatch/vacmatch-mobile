@@ -1,68 +1,31 @@
-import GenericService from './GenericService'
-import Signature from '../models/signature/Signature'
+import SignDao from '../daos/SignDao'
 
-import Hashes from 'jshashes'
+class SignService {
 
-let SignStore = {
-
-  /**
-   * Returns the type of this service
-   * @returns {String} The type identifier
-   */
-  getType: function () {
-    return 'signature'
-  },
-
-  /**
-   * Callback to return lists in Signature Service
-   * @callback signatureListCallback
-   * @param {Object[]} list - A Signature list.
-   * @param {Object} err - An error object.
-   */
-
-  /**
-   * Callback to return an element in Signature Service
-   * @callback signatureCallback
-   * @param {Object} element - A Signature object.
-   * @param {Object} err - An error object.
-   */
+  constructor (authService, reportService, personService, teamService) {
+    this.AuthService = authService
+    this.ReportService = reportService
+    this.PersonService = personService
+    this.TeamService = teamService
+  }
 
   /**
    * Find a Signature by id
-   * @param {Number} signId Sinature identifier
+   * @param {String} signId Sinature identifier
    * @param {signatureCallback} callback A callback that returns the Signature element or error
    */
-  findById: function (signId, callback) {
-    GenericService.findById(signId, callback)
-  },
+  findById (signId, callback) {
+    SignDao.findById(signId, callback)
+  }
 
   /**
    * Find all Signatures in a Report by report id
-   * @param {Number} reportId Report identifier
+   * @param {String} reportId Report identifier
    * @param {signatureListCallback} callback A callback that returns the Signature list
    */
-  findAllByReportId: function (reportId, callback) {
-    let db = GenericService.getDatabase()
-    db.createIndex({
-      index: {fields: ['timeStamp', 'reportId']}
-    }).then(function () {
-      return db.find({
-        selector: {
-          timeStamp: {$exists: true},
-          reportId: {$eq: reportId}
-        },
-        sort: [
-          {'timeStamp': 'desc'},
-          {'reportId': 'asc'}
-        ]
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
-    })
-  },
+  findAllByReportId (reportId, callback) {
+    SignDao.findAllByReportId(reportId, callback)
+  }
 
   /**
    * Create a Signature
@@ -76,12 +39,29 @@ let SignStore = {
    * @param {String} fedId The Federation id from the signer Person (null if the signer is not an User)
    * @param {signatureCallback} callback A callback that returns the created Signature or error
    */
-  create: function (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
-    let hash = new Hashes.SHA512().hex(stringToHash)
-    let signature = new Signature(this.getType(), userId, reportId, hash, timeStamp, personId, name, teamId, fedId)
-    // Save it
-    GenericService.create(signature, callback)
-  },
+  create (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
+    this.AuthService.findById(userId, (data, err) => {
+      if (err !== null) {
+        return callback(null, err)
+      }
+      this.ReportService.findById(reportId, (data, err) => {
+        if (err !== null) {
+          return callback(null, err)
+        }
+        this.PersonService.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (data, err) => {
+          if (err !== null) {
+            return callback(null, err)
+          }
+          this.TeamService.findById(teamId, (data, err) => {
+            if (err !== null) {
+              return callback(null, err)
+            }
+            SignDao.create(userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
+          })
+        })
+      })
+    })
+  }
 
   /**
    * Delete a Signature
@@ -89,26 +69,26 @@ let SignStore = {
    * @param {signatureCallback} callback A callback that returns an object with
    * the deleted signId if the Signature was deleted
    */
-  delete: function (signId, callback) {
+  delete (signId, callback) {
     this.findById(signId, function (signature, err) {
       if (err === null) {
         // Remove it
-        GenericService.remove(signature, callback)
+        SignDao.deleteSignature(signature, callback)
       } else {
         callback(null, err)
       }
     })
-  },
+  }
 
   /**
    * Delete all Signature from a Report
    * @param {String} reportId Report identifier
    * @param {signatureCallback} callback A callback that returns if Signatures were removed
    */
-  deleteAllSignaturesByReportId: function (reportId, callback) {
+  deleteAllSignaturesByReportId (reportId, callback) {
     this.findAllByReportId(reportId, function (signatureList, err) {
       signatureList.map((sign) => {
-        this.delete(sign._id, function (res, err) {
+        SignDao.deleteSignature(sign, function (res, err) {
           if (err !== null) {
             return callback(null, err)
           }
@@ -119,4 +99,4 @@ let SignStore = {
   }
 }
 
-module.exports = SignStore
+module.exports = SignService

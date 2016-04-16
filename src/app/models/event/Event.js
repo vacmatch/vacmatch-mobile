@@ -1,23 +1,24 @@
 
 class Event {
 
-  constructor (type, reportId, person, team, eventType, matchTime, cause, timestamp) {
-    this.databaseType = type ? type : 'event'
-    this.reportId = reportId ? reportId : ''
+  constructor (id, reportId, person, team, eventType, matchTime, cause, timestamp) {
+    this._id = id
+    this.databaseType = 'event'
+    this.reportId = reportId
     this.person = {
-      _id: person ? person._id : '',
-      name: person ? person.name : '',
-      dorsal: person ? person.dorsal : '',
-      avatarUrl: person ? person.avatarUrl : ''
+      _id: person ? person._id : null,
+      name: person ? person.name : null,
+      dorsal: person ? person.dorsal : null,
+      avatarUrl: person ? person.avatarUrl : null
     }
     this.team = {
-      _id: team ? team._id : '',
-      name: team ? team.name : ''
+      _id: team ? team._id : null,
+      name: team ? team.name : null
     }
-    this.type = eventType ? eventType : ''
-    this.matchTime = matchTime ? matchTime : ''
-    this.text = cause ? cause : ''
-    this.timestamp = timestamp ? timestamp : ''
+    this.type = eventType
+    this.matchTime = matchTime
+    this.text = cause
+    this.timestamp = timestamp
     // TODO: Add user which create the event
   }
 
@@ -25,13 +26,14 @@ class Event {
 
 class ControlEvent {
 
-  constructor (type, reportId, eventType, matchTime, cause, timestamp) {
-    this.databaseType = type ? type : 'event'
-    this.reportId = reportId ? reportId : ''
-    this.type = eventType ? eventType : ''
-    this.matchTime = matchTime ? matchTime : ''
-    this.text = cause ? cause : ''
-    this.timestamp = timestamp ? timestamp : ''
+  constructor (id, reportId, eventType, matchTime, cause, timestamp) {
+    this._id = id
+    this.databaseType = 'event'
+    this.reportId = reportId
+    this.type = eventType
+    this.matchTime = matchTime
+    this.text = cause
+    this.timestamp = timestamp
     // TODO: Add user which create the event
   }
 

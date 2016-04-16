@@ -1,31 +1,52 @@
 jest.dontMock('../../src/app/services/PersonService')
+jest.dontMock('../../src/app/services/ReportService')
+jest.dontMock('../../src/app/services/TeamService')
+jest.dontMock('../../src/app/services/RefereeService')
+jest.dontMock('../../src/app/services/AuthService')
 
 // Services
-let genericService = require('../../src/app/services/GenericService')
-let personService = require('../../src/app/services/PersonService')
-let reportService = require('../../src/app/services/ReportService')
-let teamService = require('../../src/app/services/TeamService')
-let authService = require('../../src/app/services/AuthService')
+let PersonService = require('../../src/app/services/PersonService')
+let ReportService = require('../../src/app/services/ReportService')
+let TeamService = require('../../src/app/services/TeamService')
+let RefereeService = require('../../src/app/services/RefereeService')
+let AuthService = require('../../src/app/services/AuthService')
+let EventService = require('../../src/app/services/EventService')
 
 let Person = require('../../src/app/models/person/Person')
 let User = require('../../src/app/models/user/User')
+let EventElements = require('../../src/app/models/event/Event')
 let Team = require('../../src/app/models/team/Team')
 let Report = require('../../src/app/models/report/Report')
 let InstanceNotFoundException = require('../../src/app/models/exception/InstanceNotFoundException')
+let ExistingElementsException = require('../../src/app/models/exception/ExistingElementsException')
+
+let PersonDao = require('../../src/app/daos/PersonDao')
 
 // Default elements
 let defaultPerson = null
 let defaultUser = null
 let defaultTeam = null
 let defaultReport = null
+let personService = null
+let reportService = null
+let teamService = null
+let refereeService = null
+let authService = null
+let eventService = null
 
 describe('Create Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User('user', 'username', 'pass')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    teamService = new TeamService()
+    refereeService = new RefereeService()
+    authService = new AuthService(jasmine.createSpy('RefereeService'))
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
   it('Create a new Person with valid parameters', function () {
@@ -33,27 +54,19 @@ describe('Create Person', function () {
     // A valid Person
     let person = defaultPerson
 
-    // Set ReportService findById mock implementation
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      // Returns a valid report
       callback(defaultReport, null)
     })
 
-    // Set TeamService findById mock implementation
     spyOn(teamService, 'findById').andCallFake(function (anyTeamId, callback) {
-      // Returns a valid team
       callback(defaultTeam, null)
     })
 
-    // Set AuthService findById mock implementation
     spyOn(authService, 'findById').andCallFake(function (anyUserId, callback) {
-      // Returns a valid user
       callback(defaultUser, null)
     })
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create').andCallFake(function (person, callback) {
-      // Returns a valid Person
+    spyOn(PersonDao, 'create').andCallFake(function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
       callback(person, null)
     })
 
@@ -67,8 +80,10 @@ describe('Create Person', function () {
 
     })
 
-    // Check if create was called in GenericService
-    expect(genericService.create).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(teamService.findById).toHaveBeenCalled()
+    expect(authService.findById).toHaveBeenCalled()
+    expect(PersonDao.create).toHaveBeenCalled()
 
   })
 
@@ -83,20 +98,15 @@ describe('Create Person', function () {
     // An error
     let nonExistingReportException = new InstanceNotFoundException('Non existent report', 'person.reportId', person.reportId)
 
-    // Set ReportService findById mock implementation
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      // Returns a non existing report
       callback(null, nonExistingReportException)
     })
 
-    // Set TeamService findById mock implementation
     spyOn(teamService, 'findById')
 
-    // Set AuthService findById mock implementation
     spyOn(authService, 'findById')
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create')
+    spyOn(PersonDao, 'create')
 
     personService.create(person.mame, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff,
@@ -107,12 +117,10 @@ describe('Create Person', function () {
         expect(err).not.toBe(null)
     })
 
-    // Check if create wasn't called in TeamService
+    expect(reportService.findById).toHaveBeenCalled()
     expect(teamService.findById).not.toHaveBeenCalled()
-    // Check if create wasn't called in AuthService
     expect(authService.findById).not.toHaveBeenCalled()
-    // Check if create wasn't called in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(PersonDao.create).not.toHaveBeenCalled()
 
   })
 
@@ -127,23 +135,17 @@ describe('Create Person', function () {
     // An error
     let nonExistingTeamException = new InstanceNotFoundException('Non existent team', 'person.teamId', person.teamId)
 
-    // Set ReportService findById mock implementation
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      // Returns a valid report
       callback(defaultReport, null)
     })
 
-    // Set TeamService findById mock implementation
     spyOn(teamService, 'findById').andCallFake(function (anyTeamId, callback) {
-      // Returns a non existing team
       callback(null, nonExistingTeamException)
     })
 
-    // Set AuthService findById mock implementation
     spyOn(authService, 'findById')
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create')
+    spyOn(PersonDao, 'create')
 
     personService.create(person.mame, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff,
@@ -154,10 +156,10 @@ describe('Create Person', function () {
         expect(err).not.toBe(null)
     })
 
-    // Check if create wasn't called in AuthService
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(teamService.findById).toHaveBeenCalled()
     expect(authService.findById).not.toHaveBeenCalled()
-    // Check if create wasn't called in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(PersonDao.create).not.toHaveBeenCalled()
 
   })
 
@@ -172,25 +174,19 @@ describe('Create Person', function () {
         // An error
         let nonExistingUserException = new InstanceNotFoundException('Non existent user', 'person.userId', person.userId)
 
-        // Set ReportService findById mock implementation
         spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-          // Returns a valid report
           callback(defaultReport, null)
         })
 
-        // Set TeamService findById mock implementation
         spyOn(teamService, 'findById').andCallFake(function (anyTeamId, callback) {
-          // Returns a valid team
           callback(defaultTeam, null)
         })
 
-        // Set AuthService findById mock implementation
         spyOn(authService, 'findById').andCallFake(function (anyUserId, callback) {
           callback(null, nonExistingUserException)
         })
 
-        // Set GenericService.create mock implementation
-        spyOn(genericService, 'create')
+        spyOn(PersonDao, 'create')
 
         personService.create(person.mame, person.cardId, person.dorsal,
           person.avatarUrl, person.isCalled, person.isStaff,
@@ -201,9 +197,10 @@ describe('Create Person', function () {
             expect(err).not.toBe(null)
         })
 
-        // Check if create wasn't called in GenericService
-        expect(genericService.create).not.toHaveBeenCalled()
-
+        expect(reportService.findById).toHaveBeenCalled()
+        expect(teamService.findById).toHaveBeenCalled()
+        expect(authService.findById).toHaveBeenCalled()
+        expect(PersonDao.create).not.toHaveBeenCalled()
   })
 
   it('A Person can be created with a null userId as a temporal Person', function () {
@@ -214,24 +211,17 @@ describe('Create Person', function () {
     let person = defaultPerson
     person.userId = nullUserId
 
-    // Set ReportService findById mock implementation
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      // Returns a valid report
       callback(defaultReport, null)
     })
 
-    // Set TeamService findById mock implementation
     spyOn(teamService, 'findById').andCallFake(function (anyTeamId, callback) {
-      // Returns a valid team
       callback(defaultTeam, null)
     })
 
-    // Set AuthService findById mock implementation
     spyOn(authService, 'findById')
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create').andCallFake(function (anyUserId, callback) {
-      // Returns a valid person
+    spyOn(PersonDao, 'create').andCallFake(function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
       callback(person, null)
     })
 
@@ -244,11 +234,10 @@ describe('Create Person', function () {
         expect(err).toBe(null)
     })
 
-    // Check if findById wasn't called in AuthService
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(teamService.findById).toHaveBeenCalled()
     expect(authService.findById).not.toHaveBeenCalled()
-
-    // Check if create was called in GenericService
-    expect(genericService.create).toHaveBeenCalled()
+    expect(PersonDao.create).toHaveBeenCalled()
 
   })
 
@@ -258,8 +247,14 @@ describe('Create Person', function () {
 describe('Update Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultNewPerson = new Person(null, 'person', 'New person name', '', '', '', false, false, '', '', '')
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultNewPerson = new Person(null, 'New person name', '', '', '', false, false, '', '', '')
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    teamService = new TeamService()
+    refereeService = new RefereeService()
+    authService = new AuthService(jasmine.createSpy('RefereeService'))
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
   it('Update a Person with valid parameters', function () {
@@ -270,15 +265,11 @@ describe('Update Person', function () {
     // A valid new Person
     let newPerson = defaultNewPerson
 
-    // Set PersonService findById mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns a valid Person
       callback(person, null)
     })
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'update').andCallFake(function (person, callback) {
-      // Returns a valid Person
+    spyOn(PersonDao, 'update').andCallFake(function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback) {
       callback(newPerson, null)
     })
 
@@ -292,11 +283,8 @@ describe('Update Person', function () {
 
     })
 
-    // Check if findByPersonIdReportIdAndTeamId was called in PersonService
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalledWith(person._id, person.reportId, person.teamId, jasmine.any(Object))
-
-    // Check if update was called in GenericService
-    expect(genericService.update).toHaveBeenCalledWith(newPerson, jasmine.any(Object))
+    expect(PersonDao.update).toHaveBeenCalled()
 
   })
 
@@ -308,14 +296,11 @@ describe('Update Person', function () {
     // An error
     let nonExistingUserException = new InstanceNotFoundException('Non existent person', 'personId', newPerson._id)
 
-    // Set PersonService findById mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns an error
       callback(null, nonExistingUserException)
     })
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'update')
+    spyOn(PersonDao, 'update')
 
     personService.update(newPerson._id, newPerson.name, newPerson.cardId, newPerson.dorsal,
       newPerson.avatarUrl, newPerson.isCalled, newPerson.isStaff,
@@ -326,12 +311,10 @@ describe('Update Person', function () {
         expect(err).not.toBe(null)
     })
 
-    // Check if findByPersonIdReportIdAndTeamId was called in PersonService
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalledWith(newPerson._id,
       newPerson.reportId, newPerson.teamId, jasmine.any(Object))
 
-    // Check if update was called in GenericService
-    expect(genericService.update).not.toHaveBeenCalled()
+    expect(PersonDao.update).not.toHaveBeenCalled()
 
   })
 
@@ -343,11 +326,17 @@ let defaultNewPerson = null
 describe('Set called value in Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultNewPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User(null, 'user', 'username', 'pass')
-    defaultTeam = new Team(null, 'team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultNewPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    teamService = new TeamService()
+    refereeService = new RefereeService()
+    authService = new AuthService(jasmine.createSpy('RefereeService'))
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
   it('Called value must be changed if Person exists', function () {
@@ -358,19 +347,21 @@ describe('Set called value in Person', function () {
     // A valid Person
     let person = defaultPerson
 
+    let emptyEventsList = []
+
     // A Person with new called value
     let newPerson = defaultNewPerson
     newPerson.isCalled = newCalledValue
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns a valid person
       callback(person, null)
     })
 
-    // Set GenericService.update mock implementation
-    spyOn(genericService, 'update').andCallFake(function (newPerson, callback) {
-      // Returns a valid Person
+    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
+      callback(emptyEventsList, null)
+    })
+
+    spyOn(PersonDao, 'update').andCallFake(function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback) {
       callback(newPerson, null)
     })
 
@@ -380,9 +371,9 @@ describe('Set called value in Person', function () {
       expect(err).toBe(null)
     })
 
-    // Check if update was called in GenericService
-    expect(genericService.update).toHaveBeenCalledWith(newPerson, jasmine.any(Object))
-
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).toHaveBeenCalled()
+    expect(PersonDao.update).toHaveBeenCalled()
   })
 
   it('Called value cant be changed if Person doesnt exist', function () {
@@ -393,17 +384,18 @@ describe('Set called value in Person', function () {
     // A valid Person
     let person = defaultPerson
 
+    let emptyEventsList = []
+
     // An error
     let nonExistingPersonException = new InstanceNotFoundException('Non existent person', 'personId', person._id)
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns an error
       callback(null, nonExistingPersonException)
     })
 
-    // Set GenericService.update mock implementation
-    spyOn(genericService, 'update')
+    spyOn(eventService, 'findAllByReportIdAndPersonId')
+
+    spyOn(PersonDao, 'update')
 
     personService.setCalledValue(person._id, person.reportId, person.teamId, newCalledValue, (p, err) => {
       expect(p).toBe(null)
@@ -411,21 +403,67 @@ describe('Set called value in Person', function () {
       expect(err).toEqual(nonExistingPersonException)
     })
 
-    // Check if update was called in GenericService
-    expect(genericService.update).not.toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).not.toHaveBeenCalled()
+    expect(PersonDao.update).not.toHaveBeenCalled()
 
   })
+
+  it('A Person cant be uncalled if he has any event in this Report', function () {
+
+    // A new uncalled value
+    let newCalledValue = false
+
+    // A valid Person
+    let person = defaultPerson
+
+    // An event where this person is involved
+    let event = new EventElements.Event('event', '1', person, defaultTeam, 'goal', 1, 'cause', 1)
+
+    // A list with some event inside
+    let eventList = []
+    eventList.push(event)
+
+    // An error
+    let existingElementsException = new ExistingElementsException('Existing events assigned to this person', 'personId', person._id)
+
+    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
+    spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
+      callback(person, null)
+    })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
+      callback(eventList, null)
+    })
+
+    spyOn(PersonDao, 'update')
+
+    personService.setCalledValue(person._id, person.reportId, person.teamId, newCalledValue, (p, err) => {
+      expect(p).toBe(null)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(existingElementsException)
+    })
+
+    expect(PersonDao.update).not.toHaveBeenCalled()
+
+  })
+
 
 })
 
 describe('Set dorsal value in Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultNewPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User(null, 'user', 'username', 'pass')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultNewPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    teamService = new TeamService()
+    refereeService = new RefereeService()
+    authService = new AuthService(jasmine.createSpy('RefereeService'))
+    personService = new PersonService(reportService, teamService, authService)
   })
 
   it('Dorsal value must be changed if Person exists', function () {
@@ -439,26 +477,22 @@ describe('Set dorsal value in Person', function () {
     let newPerson = defaultNewPerson
     newPerson.dorsal = newDorsalValue
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns an valid person
       callback(person, null)
     })
 
-    // Set GenericService.update mock implementation
-    spyOn(genericService, 'update').andCallFake(function (person, callback) {
-      // Returns valid person
+    spyOn(PersonDao, 'setCalledValue').andCallFake(function (personId, reportId, teamId, newValue, oldPerson, callback) {
       callback(newPerson, null)
     })
 
-    personService.setCalledValue(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
+    personService.setDorsal(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
       expect(p).toEqual(newPerson)
       expect(p).not.toBe(null)
       expect(err).toBe(null)
     })
 
-    // Check if update was called in GenericService
-    expect(genericService.update).toHaveBeenCalledWith(person, jasmine.any(Object))
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(PersonDao.setCalledValue).toHaveBeenCalled()
 
   })
 
@@ -472,23 +506,20 @@ describe('Set dorsal value in Person', function () {
     // An error
     let nonExistingPersonException = new InstanceNotFoundException('Non existent person', 'personId', person._id)
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns an valid person
       callback(null, nonExistingPersonException)
     })
 
-    // Set GenericService.update mock implementation
-    spyOn(genericService, 'update')
+    spyOn(PersonDao, 'setCalledValue')
 
-    personService.setCalledValue(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
+    personService.setDorsal(person._id, person.reportId, person.teamId, newDorsalValue, (p, err) => {
       expect(err).toEqual(nonExistingPersonException)
       expect(err).not.toBe(null)
       expect(p).toBe(null)
     })
 
-    // Check if update was called in GenericService
-    expect(genericService.update).not.toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(PersonDao.setCalledValue).not.toHaveBeenCalled()
 
   })
 
@@ -497,10 +528,15 @@ describe('Set dorsal value in Person', function () {
 describe('Delete Person', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person(null, 'person', '', '', '', '', false, false, '', '', '')
-    defaultUser = new User(null, 'user', 'username', 'pass')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultUser = new User(null, 'username', 'password', 'avatarUrl', 'email', 'firstName', 'lastName', 'cardId', 'signKey')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    teamService = new TeamService()
+    refereeService = new RefereeService()
+    authService = new AuthService(jasmine.createSpy('RefereeService'))
+    personService = new PersonService(reportService, teamService, authService)
   })
 
   it('A Person must be deleted if it exists', function () {
@@ -508,15 +544,11 @@ describe('Delete Person', function () {
     // A valid Person
     let person = defaultPerson
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      // Returns an valid person
       callback(person, null)
     })
 
-    // Set GenericService.update mock implementation
-    spyOn(genericService, 'remove').andCallFake(function (anyPerson, callback) {
-      // Returns an object to confirm deletion
+    spyOn(PersonDao, 'deletePerson').andCallFake(function (anyPerson, callback) {
       callback(jasmine.any(Object), null)
     })
 
@@ -526,8 +558,8 @@ describe('Delete Person', function () {
       expect(err).toBe(null)
     })
 
-    // Check if remove was called in GenericService
-    expect(genericService.remove).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(PersonDao.deletePerson).toHaveBeenCalled()
 
   })
 
@@ -544,8 +576,7 @@ describe('Delete Person', function () {
       callback(null, nonExistingPersonException)
     })
 
-    // Set GenericService.update mock implementation
-    spyOn(genericService, 'remove')
+    spyOn(PersonDao, 'deletePerson')
 
     personService.deletePerson(person._id, person.reportId, person.teamId, (p, err) => {
       expect(err).toEqual(nonExistingPersonException)
@@ -553,8 +584,8 @@ describe('Delete Person', function () {
       expect(p).toBe(null)
     })
 
-    // Check if remove was called in GenericService
-    expect(genericService.remove).not.toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(PersonDao.deletePerson).not.toHaveBeenCalled()
 
   })
 
