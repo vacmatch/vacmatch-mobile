@@ -2,8 +2,8 @@ import PouchDB from 'pouchdb'
 import Exception from '../models/exception/Exception'
 PouchDB.plugin(require('pouchdb-find'))
 
-let db = new PouchDB('mobile')
-db.sync('http://localhost:5984/mobile', {live: true})
+import config from '../api/config'
+var db = new PouchDB('http://' + config[config._env].db.username + ':' + config[config._env].db.password + '@localhost:5984/mobile')
 window.PouchDB = PouchDB
 
 let GenericDao = {

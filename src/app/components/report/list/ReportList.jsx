@@ -11,6 +11,8 @@ import MenuActions from '../../../actions/MenuActions'
 import AuthStore from '../../../stores/AuthStore'
 import RefereeActions from '../../../actions/RefereeActions'
 import RefereeStore from '../../../stores/RefereeStore'
+import SnackBarActions from '../../../actions/SnackBarActions'
+import SnackBarStore from '../../../stores/SnackBarStore'
 
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
@@ -26,12 +28,9 @@ let ReportList = React.createClass({
     Reflux.connect(ReportStore, 'report'),
     Reflux.connect(MenuStore, 'menu'),
     Reflux.connect(RefereeStore, 'referee'),
-    Reflux.connect(AuthStore, 'auth')
+    Reflux.connect(AuthStore, 'auth'),
+    Reflux.connect(SnackBarStore, 'snackBar')
   ],
-
-  propTypes: {
-    setSnackbarMessage: React.PropTypes.func
-  },
 
   getInitialState: function () {
     return {
@@ -80,7 +79,7 @@ let ReportList = React.createClass({
               })
             } else {
               // Show errors in snackbar
-              this.props.setSnackbarMessage(err.message)
+              SnackBarActions.setError(err)
             }
           })
       }
@@ -89,19 +88,31 @@ let ReportList = React.createClass({
 
   handleEdit: function (reportId) {
     // Update report state
-    ReportActions.updateReport(reportId, () => {
-      this.toggleEditDialog()
+    ReportActions.updateReport(reportId, (data, err) => {
+      if (err !== null) {
+        SnackBarActions.setError(err)
+      } else {
+        this.toggleEditDialog()
+      }
     })
   },
 
   handleEditConfirm: function (report) {
     // Save new changes in report
     ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
-      report.localTeam, report.visitorTeam, report.incidences, (result, err) => {
-        // Update report list
-        ReportActions.updateLists(() => {
-          this.toggleEditDialog()
-        })
+      report.localTeam, report.visitorTeam, report.incidences, (data, err) => {
+        if (err !== null) {
+          SnackBarActions.setError(err)
+        } else {
+          // Update report list
+          ReportActions.updateLists((data, err) => {
+            if (err !== null) {
+              SnackBarActions.setError(err)
+            } else {
+              this.toggleEditDialog()
+            }
+          })
+        }
       })
   },
 

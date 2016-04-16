@@ -43,10 +43,13 @@ let ReportStore = Reflux.createStore({
       }
       this.state.report = report
       // Check if match has started
-      ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
+      ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents, err) => {
+        if (err !== null) {
+          return callback(startEvents, err)
+        }
         this.state.report.hasFinished = (startEvents.length > 0)
         // Update term
-        ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
+        ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents, err) => {
           if (termEvents.length) {
             this.state.term = termEvents[0].text
           } else {
