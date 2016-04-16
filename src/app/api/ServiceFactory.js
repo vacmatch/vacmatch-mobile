@@ -34,6 +34,7 @@ let ServiceFactory = {
     this._personService.ReportService = this._reportService
     this._personService.TeamService = this._teamService
     this._personService.AuthService = this._authService
+    this._personService.EventService = this._eventService
 
     this._reportService.PersonService = this._personService
     this._reportService.TeamService = this._teamService

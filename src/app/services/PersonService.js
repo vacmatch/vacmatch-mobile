@@ -1,12 +1,15 @@
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
+import ExistingElementsException from '../models/exception/ExistingElementsException'
+
 import PersonDao from '../daos/PersonDao'
 
 class PersonService {
 
-  constructor (reportService, teamService, authService) {
+  constructor (reportService, teamService, authService, eventService) {
     this.ReportService = reportService
     this.TeamService = teamService
     this.AuthService = authService
+    this.EventService = eventService
   }
   /**
     * Get an unique Person from a team in this report
@@ -117,13 +120,20 @@ class PersonService {
   setCalledValue (personId, reportId, teamId, newValue, callback) {
     // Get person
     this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (oldPerson, err) => {
-      if (err === null) {
+      if (err !== null) {
+        return callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
+      }
+      this.EventService.findAllByReportIdAndPersonId(reportId, personId, (events, err) => {
+        if (err !== null) {
+          return callback(events, err)
+        }
+        if (events.length > 0) {
+          return callback(null, new ExistingElementsException('Existing events assigned to this person', 'personId', personId))
+        }
         // Update it
         PersonDao.update(oldPerson._id, oldPerson.name, oldPerson.cardId, oldPerson.dorsal, oldPerson.avatarUrl,
           newValue, oldPerson.isStaff, oldPerson.reportId, oldPerson.teamId, oldPerson.userId, oldPerson, callback)
-      } else {
-        callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
-      }
+      })
     })
   }
 
@@ -140,7 +150,7 @@ class PersonService {
     this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (oldPerson, err) => {
       if (err === null) {
         // Update it
-        PersonDao.update(personId, reportId, teamId, newDorsal, oldPerson, callback)
+        PersonDao.setCalledValue(personId, reportId, teamId, newDorsal, oldPerson, callback)
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
