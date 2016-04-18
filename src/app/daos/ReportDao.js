@@ -24,7 +24,7 @@ let ReportDao = {
       callback(result.docs, null)
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(null, err)
+      callback(hasFinished, err)
     })
   },
 

@@ -38,7 +38,7 @@ let ReportStore = Reflux.createStore({
       // TODO: Handle error
       if (err !== null) {
         if (typeof callback === 'function') {
-          callback()
+          return callback(report, err)
         }
       }
       this.state.report = report
@@ -50,6 +50,9 @@ let ReportStore = Reflux.createStore({
         this.state.report.hasFinished = (startEvents.length > 0)
         // Update term
         ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents, err) => {
+          if (err !== null) {
+            return callback(termEvents, err)
+          }
           if (termEvents.length) {
             this.state.term = termEvents[0].text
           } else {
@@ -57,7 +60,7 @@ let ReportStore = Reflux.createStore({
           }
           this.trigger(this.state)
           if (typeof callback === 'function') {
-            callback()
+            callback(report, null)
           }
         })
       })
@@ -150,6 +153,9 @@ let ReportStore = Reflux.createStore({
 
   onEditReport: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
     ServiceFactory.getService('ReportService').update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, (report, err) => {
+      if (err !== null) {
+        return callback(report, err)
+      }
       // Update state
       this.state.report = report
       this.trigger(this.state)

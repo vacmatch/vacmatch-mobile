@@ -1,10 +1,13 @@
 import React from 'react'
+import Reflux from 'reflux'
 import mui from 'material-ui'
 import { History } from 'react-router'
 
 import urls from '../../../api/urls'
 import EventActions from '../../../actions/EventActions'
 import EndMatchEvent from '../../../models/web/event/control/EndMatchEvent'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 
 // Components
 let Dialog = mui.Dialog
@@ -12,7 +15,8 @@ let FlatButton = mui.FlatButton
 
 let Event = React.createClass({
   mixins: [
-    History
+    History,
+    Reflux.connect(ErrorHandlerStore, 'error')
   ],
 
   propTypes: {
@@ -41,20 +45,28 @@ let Event = React.createClass({
   _onDialogSubmit: function () {
     let event = new EndMatchEvent()
     // Check if there is an EndMatchEvent
-    EventActions.getEventsByReportIdAndType(this.props.reportId, event.type, (endEvents) => {
-      if (endEvents.length === 0) {
-        // Add event to the db
-        EventActions.addControlEvent(this.props.reportId, event.type, this.props.matchTime, '', (event) => {
+    EventActions.getEventsByReportIdAndType(this.props.reportId, event.type, (endEvents, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        if (endEvents.length === 0) {
+          // Add event to the db
+          EventActions.addControlEvent(this.props.reportId, event.type, this.props.matchTime, '', (event, err) => {
+            if (err !== null) {
+              ErrorActions.setError(err)
+            } else {
+              // Close dialog
+              this.toggleDialog()
+              // Go to the end match page
+              this.history.pushState(null, urls.report.end(this.props.reportId))
+            }
+          })
+        } else {
           // Close dialog
           this.toggleDialog()
           // Go to the end match page
           this.history.pushState(null, urls.report.end(this.props.reportId))
-        })
-      } else {
-        // Close dialog
-        this.toggleDialog()
-        // Go to the end match page
-        this.history.pushState(null, urls.report.end(this.props.reportId))
+        }
       }
     })
   },

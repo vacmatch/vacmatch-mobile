@@ -87,6 +87,9 @@ class SignService {
    */
   deleteAllSignaturesByReportId (reportId, callback) {
     this.findAllByReportId(reportId, function (signatureList, err) {
+      if (err !== null) {
+        return callback(signatureList, err)
+      }
       signatureList.map((sign) => {
         SignDao.deleteSignature(sign, function (res, err) {
           if (err !== null) {

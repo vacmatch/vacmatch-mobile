@@ -21,6 +21,7 @@ let EventDao = {
           reportId: {$eq: reportId}
         },
         sort: [
+          {'databaseType': 'asc'},
           {'timestamp': 'desc'},
           {'reportId': 'asc'}
         ]
@@ -39,7 +40,7 @@ let EventDao = {
       index: {
         fields: ['databaseType', 'timestamp', 'reportId', 'type']
       }
-    }).then(() => {
+    }).then((result) => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},
@@ -48,6 +49,7 @@ let EventDao = {
           type: {$eq: eventType}
         },
         sort: [
+          {'databaseType': 'asc'},
           {'timestamp': 'desc'},
           {'reportId': 'asc'},
           {'type': 'asc'}

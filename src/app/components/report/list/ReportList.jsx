@@ -11,8 +11,8 @@ import MenuActions from '../../../actions/MenuActions'
 import AuthStore from '../../../stores/AuthStore'
 import RefereeActions from '../../../actions/RefereeActions'
 import RefereeStore from '../../../stores/RefereeStore'
-import SnackBarActions from '../../../actions/SnackBarActions'
-import SnackBarStore from '../../../stores/SnackBarStore'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
@@ -29,7 +29,7 @@ let ReportList = React.createClass({
     Reflux.connect(MenuStore, 'menu'),
     Reflux.connect(RefereeStore, 'referee'),
     Reflux.connect(AuthStore, 'auth'),
-    Reflux.connect(SnackBarStore, 'snackBar')
+    Reflux.connect(ErrorHandlerStore, 'error')
   ],
 
   getInitialState: function () {
@@ -67,19 +67,20 @@ let ReportList = React.createClass({
     // TODO: Add more referees
     // Find Referee from logged User
     RefereeActions.findByUserId(userId, (referee, err) => {
-      if (err === null) {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
         let refereeList = [referee]
         // Save new changes in report
         ReportActions.addReport(newReport.date, newReport.location,
           newReport.localTeam, newReport.visitorTeam, refereeList, (result, err) => {
-            if (err === null) {
+            if (err !== null) {
+              ErrorActions.setError(err)
+            } else {
               // Update report list
               ReportActions.updateLists(() => {
                 this.toggleCreateDialog()
               })
-            } else {
-              // Show errors in snackbar
-              SnackBarActions.setError(err)
             }
           })
       }
@@ -90,7 +91,7 @@ let ReportList = React.createClass({
     // Update report state
     ReportActions.updateReport(reportId, (data, err) => {
       if (err !== null) {
-        SnackBarActions.setError(err)
+        ErrorActions.setError(err)
       } else {
         this.toggleEditDialog()
       }
@@ -102,12 +103,12 @@ let ReportList = React.createClass({
     ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
       report.localTeam, report.visitorTeam, report.incidences, (data, err) => {
         if (err !== null) {
-          SnackBarActions.setError(err)
+          ErrorActions.setError(err)
         } else {
           // Update report list
           ReportActions.updateLists((data, err) => {
             if (err !== null) {
-              SnackBarActions.setError(err)
+              ErrorActions.setError(err)
             } else {
               this.toggleEditDialog()
             }
@@ -117,7 +118,11 @@ let ReportList = React.createClass({
   },
 
   handleDeleteConfirm: function (id) {
-    ReportActions.deleteReport(id)
+    ReportActions.deleteReport(id, (data, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
   },
 
   render: function () {
