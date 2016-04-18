@@ -9,6 +9,26 @@ VACmatch mobile is a web app to manage match reports in sports from your mobile 
 
 - Gulp
 - Node.js
+- PouchDB
+- CouchDB up and running
+
+### Configuration
+
+Add your CouchDB login data in *src/app/api/config.json*
+
+Ex:
+```
+"production" : {
+},
+"development" : {
+  "db": {
+    "username": "admin",
+    "password": "admin"
+  }
+},
+
+"_env": "development"
+```
 
 ### Execution
 
@@ -21,8 +41,14 @@ npm install
 Run the app
 
 ```
+gulp build
+
 gulp run
 ```
+
+Navigate to `localhost:8080/#/login` in your browser, check *src/app/router.jsx* for other routes.
+
+In development mode, login is deactivated so you can access all app without login.
 
 ### Contributing
 
