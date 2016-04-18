@@ -21,6 +21,8 @@ npm install
 Run the app
 
 ```
+gulp build
+
 gulp run
 ```
 
