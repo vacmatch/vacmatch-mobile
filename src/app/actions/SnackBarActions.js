@@ -1,8 +1,8 @@
 import Reflux from 'reflux'
 
 let SnackBarActions = Reflux.createActions([
-  'getLastError',
-  'setError'
+  'getLastElement',
+  'setElement'
 ])
 
 module.exports = SnackBarActions

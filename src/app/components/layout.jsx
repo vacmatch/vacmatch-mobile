@@ -6,7 +6,7 @@ import { History } from 'react-router'
 import MenuStore from '../stores/MenuStore'
 import AuthStore from '../stores/AuthStore'
 import AuthActions from '../actions/AuthActions'
-import SnackBarActions from '../actions/SnackBarActions'
+import ErrorActions from '../actions/ErrorActions'
 
 import urls from '../api/urls'
 
@@ -61,7 +61,7 @@ let Layout = React.createClass({
     AuthActions.logOut((response, err) => {
       if (err !== null) {
         // Show logout error
-        SnackBarActions.setError(err)
+        ErrorActions.setError(err)
       } else {
         this.handleLeftNavToggle()
         this.history.pushState(null, urls.login.show)

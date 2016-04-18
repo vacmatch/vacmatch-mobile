@@ -16,15 +16,14 @@ let SnackBarStore = Reflux.createStore({
     return this.state
   },
 
-  onGetLastError: function () {
-    return this.state
+  onGetLastElement: function () {
+    return this.state.message
   },
 
-  onSetError: function (newErrorMessage) {
-    console.log('snack-', newErrorMessage)
+  onSetElement: function (newElement) {
     this.state = {
-      name: newErrorMessage.name,
-      message: newErrorMessage.message
+      name: newElement.name,
+      message: newElement.message
     }
     this.trigger(this.state)
   }
