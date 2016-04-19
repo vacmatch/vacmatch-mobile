@@ -21,7 +21,7 @@ let EventDao = {
           reportId: {$eq: reportId}
         },
         sort: [
-          {'databaseType': 'asc'},
+          {'databaseType': 'desc'},
           {'timestamp': 'desc'},
           {'reportId': 'asc'}
         ]
@@ -49,7 +49,7 @@ let EventDao = {
           type: {$eq: eventType}
         },
         sort: [
-          {'databaseType': 'asc'},
+          {'databaseType': 'desc'},
           {'timestamp': 'desc'},
           {'reportId': 'asc'},
           {'type': 'asc'}

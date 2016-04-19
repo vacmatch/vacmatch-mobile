@@ -6,6 +6,8 @@ import EventActions from '../../../actions/EventActions'
 import EventStore from '../../../stores/EventStore'
 import SportStore from '../../../stores/SportStore'
 import ReportActions from '../../../actions/ReportActions'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 
 import ControlEventItem from './ControlEventItem'
 import SportEventItem from './SportEventItem'
@@ -17,7 +19,8 @@ let List = mui.List
 let PersonList = React.createClass({
   mixins: [
     Reflux.connect(EventStore, 'events'),
-    Reflux.connect(SportStore, 'sport')
+    Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(ErrorHandlerStore, 'error')
   ],
 
   propTypes: {
@@ -28,19 +31,34 @@ let PersonList = React.createClass({
 
   componentWillMount: function () {
     // Update report state
-    ReportActions.updateReport(this.props.params.reportId, function () {})
+    ReportActions.updateReport(this.props.params.reportId, (report, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
     // Update event list
-    EventActions.updateEventList(this.props.params.reportId)
+    EventActions.updateEventList(this.props.params.reportId, (events, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
   },
 
   handleDeleteEvent: function (event) {
     // Delete event
     EventActions.deleteEvent(event, (ev, err) => {
-      // Only if it's a sport event (not a control event)
-      if (!this.state.sport.getEventByType(event.type).isControl()) {
-        // Update result in report
-        ReportActions.updateResultFields(event, this.state.sport, function (report, err) {
-        })
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        // Only if it's a sport event (not a control event)
+        if (!this.state.sport.getEventByType(event.type).isControl()) {
+          // Update result in report
+          ReportActions.updateResultFields(event, this.state.sport, (events, err) => {
+            if (err !== null) {
+              ErrorActions.setError(err)
+            }
+          })
+        }
       }
     })
   },

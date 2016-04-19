@@ -117,6 +117,9 @@ let ReportStore = Reflux.createStore({
   onUpdateResultFields: function (event, sport, callback) {
     // Get all events
     ServiceFactory.getService('EventService').findAllByReportIdAndEventType(event.reportId, event.type, (events, err) => {
+      if (err !== null) {
+        return callback(events, err)
+      }
       let goalEvent = new GoalEvent()
       if (event.type === goalEvent.type) {
         // Get the new value from Sport
@@ -146,7 +149,7 @@ let ReportStore = Reflux.createStore({
         }
       }
       if (typeof callback === 'function') {
-        callback()
+        callback(events, null)
       }
     })
   },

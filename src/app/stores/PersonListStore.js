@@ -24,19 +24,17 @@ let PersonListStore = Reflux.createStore({
     ServiceFactory.getService('PersonService').findByReportIdAndTeamId(reportId, localTeamId, (data, err) => {
       if (err !== null) {
         return callback(localTeamId, err)
-      } else {
-        this.state.localPeople = data
-        this.state.localTeamId = localTeamId
-        this.trigger(this.state)
       }
+      this.state.localPeople = data
+      this.state.localTeamId = localTeamId
+      this.trigger(this.state)
       ServiceFactory.getService('PersonService').findByReportIdAndTeamId(reportId, visitorTeamId, (data, err) => {
         if (err !== null) {
           return callback(visitorTeamId, err)
-        } else {
-          this.state.visitorPeople = data
-          this.state.visitorTeamId = visitorTeamId
-          this.trigger(this.state)
         }
+        this.state.visitorPeople = data
+        this.state.visitorTeamId = visitorTeamId
+        this.trigger(this.state)
         if (typeof callback === 'function') {
           callback(reportId, null)
         }
