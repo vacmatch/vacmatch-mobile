@@ -76,7 +76,7 @@ let AuthDao = {
   },
 
   deleteUser: function (user, callback) {
-    GenericDao.delete(user, callback)
+    GenericDao.remove(user, callback)
   }
 
 }

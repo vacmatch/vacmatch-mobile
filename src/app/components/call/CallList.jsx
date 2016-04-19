@@ -7,6 +7,8 @@ import ReportActions from '../../actions/ReportActions'
 import PersonStore from '../../stores/PersonStore'
 import ReportStore from '../../stores/ReportStore'
 import PersonActions from '../../actions/PersonActions'
+import ErrorActions from '../../actions/ErrorActions'
+import ErrorHandlerStore from '../../stores/utils/ErrorHandlerStore'
 
 import TabList from '../generic/TabList'
 import CallItem from './CallItem'
@@ -21,7 +23,8 @@ let CallList = React.createClass({
   mixins: [
     Reflux.connect(PersonListStore, 'personList'),
     Reflux.connect(PersonStore, 'person'),
-    Reflux.connect(ReportStore, 'report')
+    Reflux.connect(ReportStore, 'report'),
+    Reflux.connect(ErrorHandlerStore, 'error')
   ],
 
   propTypes: {
@@ -47,16 +50,28 @@ let CallList = React.createClass({
 
   componentWillMount: function () {
     // Update team names from this report
-    ReportActions.updateReport(this.props.params.reportId, () => {
-      // Update players lists (local and visitor)
-      ReportActions.updatePlayers(this.props.params.reportId,
-        this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id)
+    ReportActions.updateReport(this.props.params.reportId, (report, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        // Update players lists (local and visitor)
+        ReportActions.updatePlayers(this.props.params.reportId,
+          this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, (reportId, err) => {
+            if (err !== null) {
+              ErrorActions.setError(err)
+            }
+          })
+      }
     })
   },
 
   callToggle: function (personId, teamId, toggleEvent, newValue) {
     // Save toggle and update state
-    PersonActions.toggleCallPerson(personId, this.props.params.reportId, teamId, newValue)
+    PersonActions.toggleCallPerson(personId, this.props.params.reportId, teamId, newValue, (person, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
   },
 
   handleCreate: function (personId, reportId, teamId) {
@@ -66,19 +81,31 @@ let CallList = React.createClass({
   handleCreateConfirm: function (oldTeamId, person) {
     // Add person and update it in state
     PersonActions.addPerson(person.name, person.cardId, person.dorsal, person.avatarUrl,
-      person.isCalled, person.isStaff, person.reportId, person.teamId, person.userId, (data, err) => {
-        // Update person list
-        ReportActions.updatePlayers(this.props.params.reportId,
-          this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, () => {
-            this.toggleCreateDialog()
-          })
+      person.isCalled, person.isStaff, person.reportId, person.teamId, person.userId, (p, err) => {
+        if (err !== null) {
+          ErrorActions.setError(err)
+        } else {
+          // Update person list
+          ReportActions.updatePlayers(this.props.params.reportId,
+            this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, (reportId, err) => {
+              if (err !== null) {
+                ErrorActions.setError(err)
+              } else {
+                this.toggleCreateDialog()
+              }
+            })
+        }
       })
   },
 
   handleEdit: function (personId, reportId, teamId) {
     // Update report state
     PersonActions.updatePerson(personId, reportId, teamId, (person, err) => {
-      this.toggleEditDialog()
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        this.toggleEditDialog()
+      }
     })
   },
 
@@ -86,16 +113,28 @@ let CallList = React.createClass({
     // Save new changes in person
     PersonActions.editPerson(person._id, person.name, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff, person.reportId, oldTeamId, person.teamId, person.userId, (updatedPerson, err) => {
-        // Update person list
-        ReportActions.updatePlayers(this.props.params.reportId,
-          this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, () => {
-            this.toggleEditDialog()
-          })
+        if (err !== null) {
+          ErrorActions.setError(err)
+        } else {
+          // Update person list
+          ReportActions.updatePlayers(this.props.params.reportId,
+            this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, (reportId, err) => {
+              if (err !== null) {
+                ErrorActions.setError(err)
+              } else {
+                this.toggleEditDialog()
+              }
+            })
+        }
       })
   },
 
   handleDelete: function (personId, reportId, teamId) {
-    PersonActions.deletePerson(personId, reportId, teamId)
+    PersonActions.deletePerson(personId, reportId, teamId, (person, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
   },
 
   render: function () {

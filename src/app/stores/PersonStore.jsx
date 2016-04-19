@@ -17,8 +17,10 @@ let PersonStore = Reflux.createStore({
 
   onUpdatePerson: function (personId, reportId, teamId, callback) {
     ServiceFactory.getService('PersonService').findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
-      this.state = person
-      this.trigger(this.state)
+      if (err === null) {
+        this.state = person
+        this.trigger(this.state)
+      }
       callback(person, err)
     })
   },

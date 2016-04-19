@@ -79,11 +79,20 @@ class AuthService {
       // Create Referee if signup was ok
       this.RefereeService.create(firstName, cardId, avatarUrl, response.id, (referee, err) => {
         if (err !== null) {
-          this.deleteUser(response.id, function (resp, error) {
-            callback(referee, err)
+          let errorResult = err
+          this.logout((response, err) => {
+            if (err !== null) {
+              return callback(response, err)
+            }
+            this.deleteUser(response.id, function (resp, error) {
+              if (err !== null) {
+                return callback(resp, err)
+              }
+              callback(referee, errorResult)
+            })
           })
         } else {
-          callback(response, err)
+          callback(referee, err)
         }
       })
     })

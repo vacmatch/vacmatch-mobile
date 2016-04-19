@@ -60,13 +60,16 @@ let PersonListStore = Reflux.createStore({
       this.trigger(this.state)
     }
     if (typeof callback === 'function') {
-      callback()
+      callback(person, null)
     }
   },
 
-  onToggleCallPerson: function (personId, reportId, teamId, newValue) {
+  onToggleCallPerson: function (personId, reportId, teamId, newValue, callback) {
     // Set new call state in DB
     ServiceFactory.getService('PersonService').setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
+      if (err !== null) {
+        return callback(person, err)
+      }
       // Update call state in person list
       this.updatePersonInLists(person, teamId)
     })
@@ -75,15 +78,18 @@ let PersonListStore = Reflux.createStore({
   onUpdatePersonDorsal: function (personId, reportId, teamId, newDorsal, callback) {
     // Set new dorsal in DB
     ServiceFactory.getService('PersonService').setDorsal(personId, reportId, teamId, newDorsal, (person, err) => {
+      if (err !== null) {
+        return callback(person, err)
+      }
       // Update dorsal in person list
-      this.updatePersonInLists(person, teamId, function () {
+      this.updatePersonInLists(person, teamId, (person, err) => {
         callback(person, err)
       })
     })
   },
 
   onDeletePerson: function (personId, reportId, teamId, callback) {
-    ServiceFactory.getService('PersonService').deletePerson(personId, reportId, teamId, (data, err) => {
+    ServiceFactory.getService('PersonService').deletePerson(personId, reportId, teamId, (person, err) => {
       if (err === null) {
         // Check witch team and update that team list removing this person
         if (teamId === this.state.localTeamId) {
@@ -102,7 +108,7 @@ let PersonListStore = Reflux.createStore({
         }
       }
       if (typeof callback === 'function') {
-        callback(data, err)
+        callback(person, err)
       }
     })
   }
