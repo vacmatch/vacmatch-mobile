@@ -158,6 +158,7 @@ class EventService {
       }
       eventList.map((event) => {
         EventDao.deleteEvent(event, function (res, err) {
+          // TODO Check this errors
           if (err !== null) {
             return callback(null, err)
           }

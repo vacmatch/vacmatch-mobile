@@ -20,9 +20,7 @@ let SignStore = Reflux.createStore({
         this.state = data
         this.trigger(this.state)
       }
-      if (typeof callback === 'function') {
-        callback(data, err)
-      }
+      callback(data, err)
     })
   },
 
@@ -37,9 +35,7 @@ let SignStore = Reflux.createStore({
         this.state.push(data)
         this.trigger(this.state)
       }
-      if (typeof callback === 'function') {
-        callback(data, err)
-      }
+      callback(data, err)
     })
   },
 
@@ -60,18 +56,14 @@ let SignStore = Reflux.createStore({
     ServiceFactory.getService('AuthService').checkSignKey(userId, signKey, (value, err) => {
       // If sign key is not valid
       if (!value) {
-        if (typeof callback === 'function') {
-          callback(null, 'Invalid sign key')
-        }
+        callback(null, 'Invalid sign key')
       } else {
         // If it's ok
         if (err === null) {
           this.sign(userId, signKey, reportId, identifier, name, teamId, fedId, callback)
         } else {
-          if (typeof callback === 'function') {
-            // Otherwhise send error
-            callback(null, err)
-          }
+          // Otherwhise send error
+          callback(null, err)
         }
       }
     })

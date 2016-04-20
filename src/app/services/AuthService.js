@@ -78,6 +78,7 @@ class AuthService {
       }
       // Create Referee if signup was ok
       this.RefereeService.create(firstName, cardId, avatarUrl, response.id, (referee, err) => {
+        // TODO Check this errors
         if (err !== null) {
           let errorResult = err
           this.logout((response, err) => {
@@ -142,7 +143,6 @@ class AuthService {
   deleteUser (userId, callback) {
     this.findById(userId, function (user, err) {
       if (err !== null) {
-        console.log('err: ', err)
         callback(userId, err)
       } else {
         AuthDao.deleteUser(user, callback)

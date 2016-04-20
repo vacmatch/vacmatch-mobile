@@ -35,9 +35,7 @@ let PersonListStore = Reflux.createStore({
         this.state.visitorPeople = data
         this.state.visitorTeamId = visitorTeamId
         this.trigger(this.state)
-        if (typeof callback === 'function') {
-          callback(reportId, null)
-        }
+        callback(reportId, null)
       })
     })
   },
@@ -59,9 +57,7 @@ let PersonListStore = Reflux.createStore({
       this.state.visitorPeople[index] = person
       this.trigger(this.state)
     }
-    if (typeof callback === 'function') {
-      callback(person, null)
-    }
+    callback(person, null)
   },
 
   onToggleCallPerson: function (personId, reportId, teamId, newValue, callback) {
@@ -71,7 +67,7 @@ let PersonListStore = Reflux.createStore({
         return callback(person, err)
       }
       // Update call state in person list
-      this.updatePersonInLists(person, teamId)
+      this.updatePersonInLists(person, teamId, callback)
     })
   },
 
@@ -82,9 +78,7 @@ let PersonListStore = Reflux.createStore({
         return callback(person, err)
       }
       // Update dorsal in person list
-      this.updatePersonInLists(person, teamId, (person, err) => {
-        callback(person, err)
-      })
+      this.updatePersonInLists(person, teamId, callback)
     })
   },
 
@@ -107,9 +101,7 @@ let PersonListStore = Reflux.createStore({
           this.trigger(this.state)
         }
       }
-      if (typeof callback === 'function') {
-        callback(person, err)
-      }
+      callback(person, err)
     })
   }
 

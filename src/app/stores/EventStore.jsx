@@ -25,9 +25,7 @@ let EventStore = Reflux.createStore({
       }
       this.state = events
       this.trigger(this.state)
-      if (typeof callback === 'function') {
-        callback(events, err)
-      }
+      callback(events, err)
     })
   },
 

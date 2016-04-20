@@ -52,7 +52,11 @@ let ReportList = React.createClass({
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
     // Update report lists
-    ReportActions.updateLists()
+    ReportActions.updateLists((events, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
   },
 
   handleCreate: function () {
@@ -78,8 +82,12 @@ let ReportList = React.createClass({
               ErrorActions.setError(err)
             } else {
               // Update report list
-              ReportActions.updateLists(() => {
-                this.toggleCreateDialog()
+              ReportActions.updateLists((events, err) => {
+                if (err !== null) {
+                  ErrorActions.setError(err)
+                } else {
+                  this.toggleCreateDialog()
+                }
               })
             }
           })

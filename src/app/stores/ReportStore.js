@@ -37,9 +37,7 @@ let ReportStore = Reflux.createStore({
     ServiceFactory.getService('ReportService').findById(reportId, (report, err) => {
       // TODO: Handle error
       if (err !== null) {
-        if (typeof callback === 'function') {
-          return callback(report, err)
-        }
+        return callback(report, err)
       }
       this.state.report = report
       // Check if match has started
@@ -59,9 +57,7 @@ let ReportStore = Reflux.createStore({
             this.state.term = '1'
           }
           this.trigger(this.state)
-          if (typeof callback === 'function') {
-            callback(report, null)
-          }
+          callback(report, null)
         })
       })
     })
@@ -106,11 +102,13 @@ let ReportStore = Reflux.createStore({
     }
     // Update result in DB
     ServiceFactory.getService('ReportService').update(reportId, this.state.report.date, this.state.report.hasFinished, this.state.report.location,
-      this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport) => {
-        // Update state
-        this.state.report.localTeam = newReport.localTeam
-        this.state.report.visitorTeam = newReport.visitorTeam
-        this.trigger(this.state)
+      this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport, err) => {
+        if (err === null) {
+          // Update state
+          this.state.report.localTeam = newReport.localTeam
+          this.state.report.visitorTeam = newReport.visitorTeam
+          this.trigger(this.state)
+        }
       })
   },
 
@@ -148,9 +146,7 @@ let ReportStore = Reflux.createStore({
           this.updateTeam(event.reportId, this.state.report.visitorTeam)
         }
       }
-      if (typeof callback === 'function') {
-        callback(events, null)
-      }
+      callback(events, null)
     })
   },
 
@@ -162,9 +158,7 @@ let ReportStore = Reflux.createStore({
       // Update state
       this.state.report = report
       this.trigger(this.state)
-      if (typeof callback === 'function') {
-        callback(report, err)
-      }
+      callback(report, err)
     })
   }
 

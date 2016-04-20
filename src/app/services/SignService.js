@@ -92,6 +92,7 @@ class SignService {
       }
       signatureList.map((sign) => {
         SignDao.deleteSignature(sign, function (res, err) {
+          // TODO Check this errors
           if (err !== null) {
             return callback(null, err)
           }

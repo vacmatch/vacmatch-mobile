@@ -47,6 +47,7 @@ class ReportService {
       localTeam._id = local._id
       // Create a new visitor team
       this.TeamService.create(visitorTeam.name, (visitor, err) => {
+        // TODO Check this errors
         if (err !== null) {
           return callback(null, err)
         }
@@ -103,6 +104,7 @@ class ReportService {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent report', 'reportId', reportId))
       }
+      // TODO Check this errors
       this.EventService.deleteAllEventsByReportId(reportId, (res, err) => {
         this.PersonService.deleteAllPersonByReportId(reportId, (res, err) => {
           this.TeamService.delete(report.localTeam._id, (res, err) => {

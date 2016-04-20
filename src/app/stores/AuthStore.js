@@ -19,23 +19,17 @@ let AuthStore = Reflux.createStore({
   setUser: function (newUser, callback) {
     this.state.user = newUser
     this.trigger(this.state)
-    if (typeof callback === 'function') {
-      callback(newUser)
-    }
+    callback(newUser)
   },
 
   onLogIn: function (username, password, callback) {
     ServiceFactory.getService('AuthService').login(username, password, (user, err) => {
       if (err === null) {
         this.setUser(user, function () {
-          if (typeof callback === 'function') {
-            callback(user, err)
-          }
+          callback(user, err)
         })
       } else {
-        if (typeof callback === 'function') {
-          callback(user, err)
-        }
+        callback(user, err)
       }
     })
   },
@@ -45,9 +39,7 @@ let AuthStore = Reflux.createStore({
       if (err === null) {
         // Set an null active user in state
         this.setUser(null, () => {
-          if (typeof callback === 'function') {
-            callback(response, err)
-          }
+          callback(response, err)
         })
       } else {
         callback(response, err)
@@ -60,7 +52,11 @@ let AuthStore = Reflux.createStore({
     let avatarUrl = ''
     ServiceFactory.getService('AuthService').signup(username, password, secondPassword, avatarUrl, email, firstName,
       surname, cardId, signKey, secondSignKey, (user, err) => {
-        this.onLogIn(username, password, callback(user, err))
+        if (err !== null) {
+          callback(user, err)
+        } else {
+          this.onLogIn(username, password, callback(user, err))
+        }
       })
   },
 

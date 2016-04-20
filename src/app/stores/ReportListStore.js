@@ -32,19 +32,16 @@ let ReportListStore = Reflux.createStore({
       this.state.lastReports = events
       this.trigger(this.state)
     })
-    if (typeof callback === 'function') {
-      callback(this.state, null)
-    }
+    callback(this.state, null)
   },
 
   onAddReport: function (date, location, localTeam, visitorTeam, refereeList, callback) {
     let hasFinished = false
-    ServiceFactory.getService('ReportService').create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (doc, err) => {
+    ServiceFactory.getService('ReportService').create(date, location, hasFinished, localTeam, visitorTeam, refereeList, (report, err) => {
       if (err !== null) {
-        return callback(null, err)
+        return callback(report, err)
       }
-      this.onUpdateLists()
-      callback(doc, null)
+      this.onUpdateLists(callback)
     })
   },
 
@@ -53,7 +50,7 @@ let ReportListStore = Reflux.createStore({
       if (err !== null) {
         return callback(res, err)
       } else {
-        this.onUpdateLists()
+        this.onUpdateLists(callback)
       }
     })
   }
