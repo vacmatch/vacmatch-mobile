@@ -37,25 +37,27 @@ let ReportStore = Reflux.createStore({
     ServiceFactory.getService('ReportService').findById(reportId, (report, err) => {
       // TODO: Handle error
       if (err !== null) {
-        if (typeof callback === 'function') {
-          callback()
-        }
+        return callback(report, err)
       }
       this.state.report = report
       // Check if match has started
-      ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents) => {
+      ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, startEvent.type, (startEvents, err) => {
+        if (err !== null) {
+          return callback(startEvents, err)
+        }
         this.state.report.hasFinished = (startEvents.length > 0)
         // Update term
-        ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents) => {
+        ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, termEvent.type, (termEvents, err) => {
+          if (err !== null) {
+            return callback(termEvents, err)
+          }
           if (termEvents.length) {
             this.state.term = termEvents[0].text
           } else {
             this.state.term = '1'
           }
           this.trigger(this.state)
-          if (typeof callback === 'function') {
-            callback()
-          }
+          callback(report, null)
         })
       })
     })
@@ -100,17 +102,22 @@ let ReportStore = Reflux.createStore({
     }
     // Update result in DB
     ServiceFactory.getService('ReportService').update(reportId, this.state.report.date, this.state.report.hasFinished, this.state.report.location,
-      this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport) => {
-        // Update state
-        this.state.report.localTeam = newReport.localTeam
-        this.state.report.visitorTeam = newReport.visitorTeam
-        this.trigger(this.state)
+      this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport, err) => {
+        if (err === null) {
+          // Update state
+          this.state.report.localTeam = newReport.localTeam
+          this.state.report.visitorTeam = newReport.visitorTeam
+          this.trigger(this.state)
+        }
       })
   },
 
   onUpdateResultFields: function (event, sport, callback) {
     // Get all events
     ServiceFactory.getService('EventService').findAllByReportIdAndEventType(event.reportId, event.type, (events, err) => {
+      if (err !== null) {
+        return callback(events, err)
+      }
       let goalEvent = new GoalEvent()
       if (event.type === goalEvent.type) {
         // Get the new value from Sport
@@ -139,20 +146,19 @@ let ReportStore = Reflux.createStore({
           this.updateTeam(event.reportId, this.state.report.visitorTeam)
         }
       }
-      if (typeof callback === 'function') {
-        callback()
-      }
+      callback(events, null)
     })
   },
 
   onEditReport: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
     ServiceFactory.getService('ReportService').update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, (report, err) => {
+      if (err !== null) {
+        return callback(report, err)
+      }
       // Update state
       this.state.report = report
       this.trigger(this.state)
-      if (typeof callback === 'function') {
-        callback(report, err)
-      }
+      callback(report, err)
     })
   }
 

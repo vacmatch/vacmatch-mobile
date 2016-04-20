@@ -2,8 +2,12 @@ import PouchDB from 'pouchdb'
 import Exception from '../models/exception/Exception'
 PouchDB.plugin(require('pouchdb-find'))
 
-let db = new PouchDB('mobile')
-db.sync('http://localhost:5984/mobile', {live: true})
+import config from '../api/config'
+let remoteUrl = 'http://' + config[config._env].db.username + ':' + config[config._env].db.password + '@localhost:5984/mobile'
+
+var db = new PouchDB('mobile')
+db.sync(remoteUrl, {live: true})
+
 window.PouchDB = PouchDB
 
 let GenericDao = {
@@ -22,7 +26,7 @@ let GenericDao = {
       callback(doc, null)
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(null, err)
+      callback(id, err)
     })
   },
 
@@ -45,7 +49,7 @@ let GenericDao = {
       })
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(null, err)
+      callback(object, err)
     })
   },
 
@@ -65,7 +69,7 @@ let GenericDao = {
       })
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(null, err)
+      callback(object, err)
     })
   },
 
@@ -79,7 +83,7 @@ let GenericDao = {
       callback(result, null)
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(null, err)
+      callback(object, err)
     })
   }
 }

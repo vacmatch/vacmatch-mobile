@@ -19,12 +19,13 @@ let EventStore = Reflux.createStore({
   },
 
   onUpdateEventList: function (reportId, callback) {
-    ServiceFactory.getService('EventService').findAllByReportId(reportId, (data) => {
-      this.state = data
-      this.trigger(this.state)
-      if (typeof callback === 'function') {
-        callback()
+    ServiceFactory.getService('EventService').findAllByReportId(reportId, (events, err) => {
+      if (err !== null) {
+        return callback(events, err)
       }
+      this.state = events
+      this.trigger(this.state)
+      callback(events, err)
     })
   },
 
@@ -39,15 +40,15 @@ let EventStore = Reflux.createStore({
   },
 
   onDeleteEvent: function (event, callback) {
-    ServiceFactory.getService('EventService').deleteEvent(event._id, (data, err) => {
-      if (err == null) {
-        // Delete from state this event
-        let filterList = this.state.filter(function (e) { return e._id !== event._id })
-        this.state = filterList
-        this.trigger(this.state)
-        callback(data, err)
+    ServiceFactory.getService('EventService').deleteEvent(event._id, (e, err) => {
+      if (err !== null) {
+        return callback(e, err)
       }
-      callback(data, err)
+      // Delete from state this event
+      let filterList = this.state.filter(function (e) { return e._id !== event._id })
+      this.state = filterList
+      this.trigger(this.state)
+      callback(e, err)
     })
   }
 

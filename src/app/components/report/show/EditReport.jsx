@@ -1,4 +1,5 @@
 import React from 'react'
+import Reflux from 'reflux'
 import mui from 'material-ui'
 
 import style from './report-style'
@@ -6,12 +7,18 @@ import style from './report-style'
 import ChangeTermEvent from '../../../models/web/event/control/ChangeTermEvent'
 
 import EventActions from '../../../actions/EventActions'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 
 let FlatButton = mui.FlatButton
 let Dialog = mui.Dialog
 let TextField = mui.TextField
 
 let EditReport = React.createClass({
+  mixins: [
+    Reflux.connect(ErrorHandlerStore, 'error')
+  ],
+
   propTypes: {
     reportId: React.PropTypes.string,
     cronoUpdate: React.PropTypes.func,
@@ -39,9 +46,13 @@ let EditReport = React.createClass({
   _handleModifyTerm: function () {
     let term = this.refs.term.getValue()
     let event = new ChangeTermEvent()
-    EventActions.addControlEvent(this.props.reportId, event.type, this.props.time, term, () => {
-      this.props.termUpdate(term)
-      this.toggleDialog()
+    EventActions.addControlEvent(this.props.reportId, event.type, this.props.time, term, (event, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        this.props.termUpdate(term)
+        this.toggleDialog()
+      }
     })
   },
 

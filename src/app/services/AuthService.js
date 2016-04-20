@@ -78,12 +78,22 @@ class AuthService {
       }
       // Create Referee if signup was ok
       this.RefereeService.create(firstName, cardId, avatarUrl, response.id, (referee, err) => {
+        // TODO Check this errors
         if (err !== null) {
-          this.deleteUser(response.id, function (resp, error) {
-            callback(referee, err)
+          let errorResult = err
+          this.logout((response, err) => {
+            if (err !== null) {
+              return callback(response, err)
+            }
+            this.deleteUser(response.id, function (resp, error) {
+              if (err !== null) {
+                return callback(resp, err)
+              }
+              callback(referee, errorResult)
+            })
           })
         } else {
-          callback(response, err)
+          callback(referee, err)
         }
       })
     })
@@ -133,7 +143,6 @@ class AuthService {
   deleteUser (userId, callback) {
     this.findById(userId, function (user, err) {
       if (err !== null) {
-        console.log('err: ', err)
         callback(userId, err)
       } else {
         AuthDao.deleteUser(user, callback)

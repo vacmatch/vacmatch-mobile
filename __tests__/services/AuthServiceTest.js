@@ -271,6 +271,10 @@ describe('Signup', function () {
       callback(null, jasmine.any(Object))
     })
 
+    spyOn(authService, 'logout').andCallFake(function (callback) {
+      callback(jasmine.any(Object), null)
+    })
+
     spyOn(authService, 'deleteUser').andCallFake(function (userId, callback) {
       callback(jasmine.any(Object), null)
     })
@@ -283,6 +287,7 @@ describe('Signup', function () {
 
     expect(AuthDao.signup).toHaveBeenCalled()
     expect(refereeService.create).toHaveBeenCalled()
+    expect(authService.logout).toHaveBeenCalled()
     expect(authService.deleteUser).toHaveBeenCalled()
 
   })

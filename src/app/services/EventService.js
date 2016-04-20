@@ -163,8 +163,12 @@ class EventService {
     */
   deleteAllEventsByReportId (reportId, callback) {
     this.findAllByReportId(reportId, (eventList, err) => {
+      if (err !== null) {
+        return callback(eventList, err)
+      }
       eventList.map((event) => {
         EventDao.deleteEvent(event, function (res, err) {
+          // TODO Check this errors
           if (err !== null) {
             return callback(null, err)
           }

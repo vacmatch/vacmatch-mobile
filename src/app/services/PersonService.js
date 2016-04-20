@@ -182,9 +182,13 @@ class PersonService {
     */
   deleteAllPersonByReportId (reportId, callback) {
     this.findAllByReportId(reportId, function (personList, err) {
+      if (err !== null) {
+        return callback(reportId, err)
+      }
       // Remove all person
       personList.map((person) => {
         PersonDao.deletePerson(person, function (res, err) {
+          // TODO Check this errors
         })
       })
       callback(personList, err)

@@ -17,8 +17,10 @@ let PersonStore = Reflux.createStore({
 
   onUpdatePerson: function (personId, reportId, teamId, callback) {
     ServiceFactory.getService('PersonService').findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
-      this.state = person
-      this.trigger(this.state)
+      if (err === null) {
+        this.state = person
+        this.trigger(this.state)
+      }
       callback(person, err)
     })
   },
@@ -29,19 +31,17 @@ let PersonStore = Reflux.createStore({
         this.state = person
         this.trigger(this.state)
       }
-      if (typeof callback === 'function') {
-        callback(person, err)
-      }
+      callback(person, err)
     })
   },
 
   onEditPerson: function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, callback) {
     ServiceFactory.getService('PersonService').update(personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, oldTeamId, teamId, userId, (person, err) => {
-      this.state = person
-      this.trigger(this.state)
-      if (typeof callback === 'function') {
-        callback(person, err)
+      if (err === null) {
+        this.state = person
+        this.trigger(this.state)
       }
+      callback(person, err)
     })
   }
 

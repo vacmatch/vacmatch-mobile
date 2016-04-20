@@ -15,30 +15,29 @@ import StartMatchEvent from '../../../models/web/event/control/StartMatchEvent'
 import MenuStore from '../../../stores/MenuStore'
 import MenuActions from '../../../actions/MenuActions'
 import EndMatchDialog from './EndMatchDialog'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import SnackBarActions from '../../../actions/SnackBarActions'
+import SnackBarStore from '../../../stores/SnackBarStore'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
-let Snackbar = mui.Snackbar
 
 let Report = React.createClass({
   mixins: [
     Reflux.connect(ReportStore, 'report'),
     Reflux.connect(SportStore, 'sport'),
-    Reflux.connect(MenuStore, 'menu')
+    Reflux.connect(MenuStore, 'menu'),
+    Reflux.connect(ErrorHandlerStore, 'error'),
+    Reflux.connect(SnackBarStore, 'snack')
   ],
 
   propTypes: {
     params: React.PropTypes.shape({
       reportId: React.PropTypes.string
     })
-  },
-
-  getInitialState: function () {
-    return {
-      snackbarMessage: ''
-    }
   },
 
   // Add elements to the rigth menu in the AppBar
@@ -54,17 +53,24 @@ let Report = React.createClass({
     // Set right menu buttons in AppBar
     this.addRigthMenuElements(rightMenuElements)
     // Update report state
-    ReportActions.updateReport(this.props.params.reportId, function () {})
+    ReportActions.updateReport(this.props.params.reportId, function (report, err) {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      }
+    })
   },
 
   _handleStartMatch: function () {
     // Create start match control event
     let event = new StartMatchEvent()
     EventActions.addControlEvent(this.props.params.reportId, event.type, this.state.report.timer.ms, '', (event, err) => {
-      // Set match has started in state
-      ReportActions.toggleStartMatch()
-      this.setState({snackbarMessage: 'Match started'})
-      this.refs.snack.show()
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        // Set match has started in state
+        ReportActions.toggleStartMatch()
+        SnackBarActions.setElement('Match started')
+      }
     })
   },
 
@@ -129,11 +135,6 @@ let Report = React.createClass({
           {events}
         </div>
       </div>
-      <Snackbar
-        ref='snack'
-        message={this.state.snackbarMessage}
-        autoHideDuration={4000} />
-
       <EndMatchDialog reportId={this.props.params.reportId}
         matchTime={this.state.report.timer.ms} addMenuElements={this.addRigthMenuElements}/>
     </div>

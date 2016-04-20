@@ -47,6 +47,7 @@ class ReportService {
       localTeam._id = local._id
       // Create a new visitor team
       this.TeamService.create(visitorTeam.name, (visitor, err) => {
+        // TODO Check this errors
         if (err !== null) {
           return callback(null, err)
         }
@@ -69,25 +70,25 @@ class ReportService {
     * @param {reportCallback} callback A callback that returns the updated Report or error
     */
   update (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
+    // Check if report exists
     this.findById(reportId, (oldReport, err) => {
-      if (err === null) {
-        // Check if localTeam exists
-        this.TeamService.findById(localTeam._id, (lt, err) => {
-          if (err !== null) {
-            return callback(null, new InstanceNotFoundException('Non existent local team', 'report.localTeam._id', localTeam._id))
-          }
-          // Check if visitorTeam exists
-          this.TeamService.findById(visitorTeam._id, (vt, err) => {
-            if (err !== null) {
-              return callback(null, new InstanceNotFoundException('Non existent visitor team', 'report.visitorTeam._id', visitorTeam._id))
-            }
-            // Save it
-            ReportDao.update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback)
-          })
-        })
-      } else {
-        callback(null, err)
+      if (err !== null) {
+        return callback(null, err)
       }
+      // Check if localTeam exists
+      this.TeamService.findById(localTeam._id, (lt, err) => {
+        if (err !== null) {
+          return callback(null, new InstanceNotFoundException('Non existent local team', 'report.localTeam._id', localTeam._id))
+        }
+        // Check if visitorTeam exists
+        this.TeamService.findById(visitorTeam._id, (vt, err) => {
+          if (err !== null) {
+            return callback(null, new InstanceNotFoundException('Non existent visitor team', 'report.visitorTeam._id', visitorTeam._id))
+          }
+          // Save it
+          ReportDao.update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback)
+        })
+      })
     })
   }
 
@@ -103,6 +104,7 @@ class ReportService {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent report', 'reportId', reportId))
       }
+      // TODO Check this errors
       this.EventService.deleteAllEventsByReportId(reportId, (res, err) => {
         this.PersonService.deleteAllPersonByReportId(reportId, (res, err) => {
           this.TeamService.delete(report.localTeam._id, (res, err) => {

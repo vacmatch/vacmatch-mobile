@@ -23,6 +23,7 @@ let SignDao = {
           reportId: {$eq: reportId}
         },
         sort: [
+          {'databaseType': 'asc'},
           {'timeStamp': 'desc'},
           {'reportId': 'asc'}
         ]

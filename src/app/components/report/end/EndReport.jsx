@@ -9,6 +9,8 @@ import MenuActions from '../../../actions/MenuActions'
 import PersonListStore from '../../../stores/PersonListStore'
 import SignStore from '../../../stores/SignStore'
 import SignActions from '../../../actions/SignActions'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 import Incidences from './Incidences'
@@ -22,7 +24,8 @@ let EndReport = React.createClass({
     Reflux.connect(ReportStore, 'report'),
     Reflux.connect(PersonListStore, 'personLists'),
     Reflux.connect(SignStore, 'signatures'),
-    Reflux.connect(MenuStore, 'menu')
+    Reflux.connect(MenuStore, 'menu'),
+    Reflux.connect(ErrorHandlerStore, 'error')
   ],
 
   propTypes: {
@@ -36,11 +39,22 @@ let EndReport = React.createClass({
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
     // Update report state
-    ReportActions.updateReport(this.props.params.reportId, () => {
-      ReportActions.updatePlayers(this.state.report.report._id, this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, () => {
-        SignActions.updateSignatures(this.state.report.report._id, () => {
+    ReportActions.updateReport(this.props.params.reportId, (report, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        ReportActions.updatePlayers(this.state.report.report._id, this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, (reportId, err) => {
+          if (err !== null) {
+            ErrorActions.setError(err)
+          } else {
+            SignActions.updateSignatures(this.state.report.report._id, (signatures, err) => {
+              if (err !== null) {
+                ErrorActions.setError(err)
+              }
+            })
+          }
         })
-      })
+      }
     })
   },
 
