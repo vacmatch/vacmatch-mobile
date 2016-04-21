@@ -64,31 +64,16 @@ let EventDao = {
   },
 
   findAllByReportIdAndPersonId: function (reportId, personId, callback) {
-    let db = GenericDao.getDatabase()
-    db.createIndex({
-      index: {
-        fields: ['databaseType', 'timestamp', 'reportId', 'personId']
+    this.findAllByReportId(reportId, (events, err) => {
+      if (err !== null) {
+        callback(events, err)
+      } else {
+        let elements = events.filter((value, index, array) => {
+          return (value.person) && (value.person._id === personId)
+        })
+        console.log(elements)
+        callback(elements, null)
       }
-    }).then(() => {
-      return db.find({
-        selector: {
-          databaseType: {$eq: this.databaseType},
-          timestamp: {$exists: true},
-          reportId: {$eq: reportId},
-          person: {
-            _id: {$eq: personId}
-          }
-        },
-        sort: [
-          {'timestamp': 'desc'},
-          {'reportId': 'asc'}
-        ]
-      })
-    }).then(function (result) {
-      callback(result.docs, null)
-    }).catch(function (err) {
-      console.log('err: ', err)
-      callback(null, err)
     })
   },
 

@@ -123,17 +123,24 @@ class PersonService {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
-      this.EventService.findAllByReportIdAndPersonId(reportId, personId, (events, err) => {
-        if (err !== null) {
-          return callback(events, err)
-        }
-        if (events.length > 0) {
-          return callback(null, new ExistingElementsException('Existing events assigned to this person', 'personId', personId))
-        }
+      if (newValue === true) {
         // Update it
         PersonDao.update(oldPerson._id, oldPerson.name, oldPerson.cardId, oldPerson.dorsal, oldPerson.avatarUrl,
           newValue, oldPerson.isStaff, oldPerson.reportId, oldPerson.teamId, oldPerson.userId, oldPerson, callback)
-      })
+      } else {
+        // If person is going to be uncalled, check if person has any event assigned
+        this.EventService.findAllByReportIdAndPersonId(reportId, personId, (events, err) => {
+          if (err !== null) {
+            return callback(events, err)
+          }
+          if (events.length > 0) {
+            return callback(null, new ExistingElementsException('Existing events assigned to this person', 'personId', personId))
+          }
+          // Update it
+          PersonDao.update(oldPerson._id, oldPerson.name, oldPerson.cardId, oldPerson.dorsal, oldPerson.avatarUrl,
+            newValue, oldPerson.isStaff, oldPerson.reportId, oldPerson.teamId, oldPerson.userId, oldPerson, callback)
+        })
+      }
     })
   }
 
@@ -165,10 +172,19 @@ class PersonService {
     * @param {personCallback} callback A callback that returns if the delete was correctly
     */
   deletePerson (personId, reportId, teamId, callback) {
-    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, function (person, err) {
+    this.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (person, err) => {
       if (err === null) {
-        // Remove it
-        PersonDao.deletePerson(person, callback)
+        // If person is going to be removed, check if person has any event assigned
+        this.EventService.findAllByReportIdAndPersonId(reportId, personId, (events, err) => {
+          if (err !== null) {
+            return callback(events, err)
+          }
+          if (events.length > 0) {
+            return callback(null, new ExistingElementsException('Existing events assigned to this person', 'personId', personId))
+          }
+          // Remove it
+          PersonDao.deletePerson(person, callback)
+        })
       } else {
         callback(null, new InstanceNotFoundException('Non existent person', 'personId', personId))
       }
