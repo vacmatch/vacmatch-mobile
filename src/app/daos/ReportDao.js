@@ -9,35 +9,35 @@ let ReportDao = {
     GenericDao.findById(reportId, callback)
   },
 
-  findAllByFinished: function (hasFinished, callback) {
+  findAllByStatus: function (status, callback) {
     let db = GenericDao.getDatabase()
     db.createIndex({
-      index: {fields: ['databaseType', 'hasFinished']}
+      index: {fields: ['databaseType', 'status']}
     }).then(() => {
       return db.find({
         selector: {
           databaseType: {$eq: this.databaseType},
-          hasFinished: {$eq: hasFinished}
+          status: {$eq: status}
         }
       })
     }).then(function (result) {
       callback(result.docs, null)
     }).catch(function (err) {
       console.log('err: ', err)
-      callback(hasFinished, err)
+      callback(status, err)
     })
   },
 
-  create: function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
+  create: function (date, location, status, localTeam, visitorTeam, refereeList, callback) {
     // Create the new report
-    let report = new Report(null, date, location, hasFinished, localTeam, visitorTeam, refereeList)
+    let report = new Report(null, date, location, status, localTeam, visitorTeam, refereeList)
     GenericDao.create(report, callback)
   },
 
-  update: function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback) {
+  update: function (reportId, date, location, status, localTeam, visitorTeam, incidences, oldReport, callback) {
     oldReport.date = date
     oldReport.location = location
-    oldReport.hasFinished = hasFinished
+    oldReport.status = status
     oldReport.localTeam._id = localTeam._id
     oldReport.localTeam.name = localTeam.name
     oldReport.localTeam.result = localTeam.result

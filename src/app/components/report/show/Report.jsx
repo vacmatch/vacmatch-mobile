@@ -19,6 +19,8 @@ import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 import SnackBarActions from '../../../actions/SnackBarActions'
 import SnackBarStore from '../../../stores/SnackBarStore'
+import ReportStatus from '../../../models/report/ReportStatus'
+import { History } from 'react-router'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
@@ -31,7 +33,8 @@ let Report = React.createClass({
     Reflux.connect(SportStore, 'sport'),
     Reflux.connect(MenuStore, 'menu'),
     Reflux.connect(ErrorHandlerStore, 'error'),
-    Reflux.connect(SnackBarStore, 'snack')
+    Reflux.connect(SnackBarStore, 'snack'),
+    History
   ],
 
   propTypes: {
@@ -74,16 +77,31 @@ let Report = React.createClass({
     })
   },
 
+  _handleFinishedMatch: function () {
+    this.history.pushState(null, urls.report.end(this.props.params.reportId))
+  },
+
   render: function () {
     // For start match event creation
     let playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
-    // If Match has started
-    if (this.state.report.report.hasFinished) {
-      let playButtonLabel = 'Play'
-      if (this.state.report.isPlaying) {
-        playButtonLabel = 'Stop'
+
+    // Check match state to set button
+    switch (this.state.report.report.status) {
+      case ReportStatus.READY: {
+        playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
+        break
       }
-      playButton = <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
+      case ReportStatus.STARTED: {
+        let playButtonLabel = this.state.report.isPlaying ? 'Stop' : 'Play'
+        playButton = <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
+        break
+      }
+      case ReportStatus.FINISHED: {
+        playButton = <RaisedButton label='Match finished' primary={true} onClick={this._handleFinishedMatch} />
+        break
+      }
+      default:
+
     }
 
     // Create Sport Events, only 2 for each row

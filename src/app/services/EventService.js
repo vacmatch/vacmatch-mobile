@@ -1,6 +1,8 @@
 import EventDao from '../daos/EventDao'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
 import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
+import StartMatchEvent from '../models/web/event/control/StartMatchEvent'
+import ReportStatus from '../models/report/ReportStatus'
 
 class EventService {
 
@@ -92,29 +94,31 @@ class EventService {
     * @param {eventCallback} callback A callback that returns the created element or error
     */
   createControl (reportId, eventType, matchTime, text, timestamp, callback) {
-    // Check if report exists
-    this.ReportService.findById(reportId, (report, err) => {
-      if (err !== null) {
-        return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
+    let endEvent = new EndMatchEvent()
+    let startEvent = new StartMatchEvent()
+    let status = ReportStatus.STARTED
+    switch (eventType) {
+      case endEvent.type: {
+        status = ReportStatus.FINISHED
+        this._updateReportStatus(reportId, status, (event, err) => {
+          // Save the event
+          EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
+        })
+        break
       }
-      // Check if it's an end match event
-      let endEvent = new EndMatchEvent()
-      if (eventType === endEvent.type) {
-        let hasFinished = true
-        // Update report state with new value
-        this.ReportService.update(reportId, report.date, hasFinished, report.location,
-          report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
-            if (err !== null) {
-              return callback(null, err)
-            }
-            // Save the event
-            EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
-          })
-      } else {
+      case startEvent.type: {
+        status = ReportStatus.STARTED
+        this._updateReportStatus(reportId, status, (event, err) => {
+          // Save the event
+          EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
+        })
+        break
+      }
+      default: {
         // Save the event
         EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
       }
-    })
+    }
   }
 
   /**
@@ -127,32 +131,57 @@ class EventService {
     // Get the event
     this.findById(eventId, (event, err) => {
       if (err === null) {
-        // Check if it's an end match event
         let endEvent = new EndMatchEvent()
-        if (event.type === endEvent.type) {
-          let hasFinished = false
-          // Find report
-          this.ReportService.findById(event.reportId, (report, err) => {
-            if (err !== null) {
-              return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId))
-            }
-            // Update report state with new value
-            this.ReportService.update(event.reportId, report.date, hasFinished, report.location,
-              report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
-                if (err !== null) {
-                  return callback(null, err)
-                }
-                // Remove the event
-                EventDao.deleteEvent(event, callback)
-              })
-          })
-        } else {
-          // Remove the event
-          EventDao.deleteEvent(event, callback)
+        let startEvent = new StartMatchEvent()
+        let status = ReportStatus.STARTED
+        switch (event.type) {
+          case endEvent.type: {
+            status = ReportStatus.STARTED
+            this._updateReportStatus(event.reportId, status, (r, err) => {
+              if (err !== null) {
+                return callback(r, err)
+              }
+              // Remove the event
+              EventDao.deleteEvent(event, callback)
+            })
+            break
+          }
+          case startEvent.type: {
+            status = ReportStatus.READY
+            this._updateReportStatus(event.reportId, status, (r, err) => {
+              if (err !== null) {
+                return callback(r, err)
+              }
+              // Remove the event
+              EventDao.deleteEvent(event, callback)
+            })
+            break
+          }
+          default: {
+            // Remove the event
+            EventDao.deleteEvent(event, callback)
+          }
         }
       } else {
         callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
       }
+    })
+  }
+
+  _updateReportStatus (reportId, status, callback) {
+    // Find report
+    this.ReportService.findById(reportId, (report, err) => {
+      if (err !== null) {
+        return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
+      }
+      // Update report state with new value
+      this.ReportService.update(reportId, report.date, report.location, status,
+        report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
+          if (err !== null) {
+            return callback(null, err)
+          }
+          callback(report, err)
+        })
     })
   }
 

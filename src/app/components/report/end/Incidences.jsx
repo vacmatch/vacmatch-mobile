@@ -28,7 +28,7 @@ let Incidences = React.createClass({
     let newIncidences = this.refs.incidences.getValue()
     let report = this.state.report.report
     // Add/update incidences in report
-    ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
+    ReportActions.editReport(report._id, report.date, report.location, report.status,
       report.localTeam, report.visitorTeam, newIncidences, (report, err) => {
         if (err !== null) {
           ErrorActions.setError(err)
