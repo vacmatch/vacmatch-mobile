@@ -13,7 +13,11 @@ let EventElements = require('../../src/app/models/event/Event')
 let Person = require('../../src/app/models/person/Person')
 let Team = require('../../src/app/models/team/Team')
 let Report = require('../../src/app/models/report/Report')
+let StartMatchEvent = require('../../src/app/models/web/event/control/StartMatchEvent')
+let EndMatchEvent = require('../../src/app/models/web/event/control/EndMatchEvent')
+
 let InstanceNotFoundException = require('../../src/app/models/exception/InstanceNotFoundException')
+let ReportStatus = require('../../src/app/models/report/ReportStatus')
 
 let EventDao = require('../../src/app/daos/EventDao')
 
@@ -33,7 +37,7 @@ describe('create Sport Event', function () {
   beforeEach(function () {
     defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
     defaultTeam = new Team(null, 'Team name')
-    defaultReport = new Report(null, '', '', false, defaultTeam, defaultTeam, [])
+    defaultReport = new Report(null, '', '', ReportStatus.READY, defaultTeam, defaultTeam, [])
     defaultEvent = new EventElements.Event('event', '1', defaultPerson, defaultTeam, 'goal', 1, 'cause', 1)
     reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
     personService = new PersonService(jasmine.createSpy('ReportService'), jasmine.createSpy('TeamService'), jasmine.createSpy('AuthService'))
@@ -211,14 +215,13 @@ describe('Create Control Event', function () {
     defaultControlEvent = new EventElements.ControlEvent('event', '1', 'goal', 1, 'cause', 1)
   })
 
-  it('Control Event can be created if report exists', function () {
+  it('Control Event can be created if Report exists and Event is not a Start or End MatchEvent', function () {
 
     // A valid Control Event
     let event = defaultControlEvent
 
     let validReport = defaultReport
 
-    // Mock ReportService findById method to return a valid report
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(validReport, null)
     })
@@ -240,6 +243,75 @@ describe('Create Control Event', function () {
 
     expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).toHaveBeenCalled()
+
+  })
+
+  it('Control Event can be created if Report exists and Report must be updated if Event is a StartMatchEvent', function () {
+
+    let event = new StartMatchEvent()
+
+    let validReport = defaultReport
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
+      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
+      text, timestamp, callback) {
+      callback(event, null)
+    })
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toEqual(event)
+      expect(createdEvent).not.toBe(null)
+      expect(err).toBe(null)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    expect(EventDao.createControl).toHaveBeenCalled()
+
+  })
+
+  it('Control Event can be created if Report exists and Report must be updated if Event is a EndMatchEvent', function () {
+
+    let event = new EndMatchEvent()
+
+    let validReport = defaultReport
+
+    // Mock ReportService findById method to return a valid report
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
+      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
+      text, timestamp, callback) {
+      callback(event, null)
+    })
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toEqual(event)
+      expect(createdEvent).not.toBe(null)
+      expect(err).toBe(null)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
     expect(EventDao.createControl).toHaveBeenCalled()
 
   })
@@ -385,7 +457,7 @@ describe('Delete Event', function () {
 
   })
 
-  it('Event cannot be deleted if this event doesnt exists', function () {
+  it('Event cannot be deleted if this event doesnt exists', function() {
 
     // An non existent event
     let event = defaultEvent
@@ -417,6 +489,45 @@ describe('Delete Event', function () {
 
   })
 
+  it('Report status should be modified when removing a StartMatchEvent which exists', function() {
+
+    // An existent EndMatchEvent
+    let event = defaultEvent
+    event.type = 'start-match'
+
+    // A valid Report
+    let validReport = defaultReport
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, status, location,
+      localTeam, visitorTeam, incidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
+    })
+
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).not.toBe(null)
+      expect(err).toBe(null)
+    })
+
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
+
+  })
+
   it('Report status should be modified when removing a EndMatchEvent which exists', function () {
 
     // An existent EndMatchEvent
@@ -434,7 +545,7 @@ describe('Delete Event', function () {
       callback(validReport, null)
     })
 
-    spyOn(reportService, 'update').andCallFake(function (reportId, date, hasFinished, location,
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, status, location,
       localTeam, visitorTeam, incidences, callback) {
       callback(validReport, null)
     })
@@ -473,7 +584,7 @@ describe('Delete Event', function () {
       callback(validReport, null)
     })
 
-    spyOn(reportService, 'update').andCallFake(function (reportId, date, hasFinished, location,
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, status, location,
       localTeam, visitorTeam, incidences, callback) {
       callback(null, jasmine.any(Object))
     })

@@ -47,11 +47,11 @@ describe('Create Report', function () {
       callback(team, null)
     })
 
-    spyOn(ReportDao, 'create').andCallFake(function (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
+    spyOn(ReportDao, 'create').andCallFake(function (date, location, status, localTeam, visitorTeam, refereeList, callback) {
       callback(report, null)
     })
 
-    reportService.create(report.date, report.location, report.hasFinished, report.localTeam,
+    reportService.create(report.date, report.location, report.status, report.localTeam,
       report.visitorTeam, report.refereeList, (p, err) => {
       expect(p).toEqual(report)
       expect(p).not.toBe(null)
@@ -92,11 +92,11 @@ describe('Update Report', function () {
       callback(team, null)
     })
 
-    spyOn(ReportDao, 'update').andCallFake(function (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback) {
+    spyOn(ReportDao, 'update').andCallFake(function (reportId, date, location, status, localTeam, visitorTeam, incidences, oldReport, callback) {
       callback(report, null)
     })
 
-    reportService.update(report._id, report.date, report.location, report.hasFinished, report.localTeam,
+    reportService.update(report._id, report.date, report.location, report.status, report.localTeam,
       report.visitorTeam, report.incidences, (p, err) => {
       expect(p).toEqual(report)
       expect(p).not.toBe(null)
@@ -126,7 +126,7 @@ describe('Update Report', function () {
 
     spyOn(ReportDao, 'update')
 
-    reportService.update(report._id, report.date, report.location, report.hasFinished, report.localTeam,
+    reportService.update(report._id, report.date, report.location, report.status, report.localTeam,
       report.visitorTeam, report.incidences, (p, err) => {
         expect(err).toEqual(error)
         expect(err).not.toBe(null)

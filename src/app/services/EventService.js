@@ -100,7 +100,10 @@ class EventService {
     switch (eventType) {
       case endEvent.type: {
         status = ReportStatus.FINISHED
-        this._updateReportStatus(reportId, status, (event, err) => {
+        this._updateReportStatus(reportId, status, (report, err) => {
+          if (err !== null) {
+            return callback(report, err)
+          }
           // Save the event
           EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
         })
@@ -108,15 +111,23 @@ class EventService {
       }
       case startEvent.type: {
         status = ReportStatus.STARTED
-        this._updateReportStatus(reportId, status, (event, err) => {
+        this._updateReportStatus(reportId, status, (report, err) => {
+          if (err !== null) {
+            return callback(report, err)
+          }
           // Save the event
           EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
         })
         break
       }
       default: {
-        // Save the event
-        EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
+        this.ReportService.findById(reportId, (report, err) => {
+          if (err !== null) {
+            return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
+          }
+          // Save the event
+          EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
+        })
       }
     }
   }
