@@ -339,7 +339,7 @@ describe('Set called value in Person', function () {
     personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
-  it('Called value must be changed if Person exists', function () {
+  it('A Person can be called if Person exists', function () {
 
     // A new called value
     let newCalledValue = true
@@ -357,9 +357,7 @@ describe('Set called value in Person', function () {
       callback(person, null)
     })
 
-    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
-      callback(emptyEventsList, null)
-    })
+    spyOn(eventService, 'findAllByReportIdAndPersonId')
 
     spyOn(PersonDao, 'update').andCallFake(function (personId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, oldPerson, callback) {
       callback(newPerson, null)
@@ -372,41 +370,8 @@ describe('Set called value in Person', function () {
     })
 
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
-    expect(eventService.findAllByReportIdAndPersonId).toHaveBeenCalled()
-    expect(PersonDao.update).toHaveBeenCalled()
-  })
-
-  it('Called value cant be changed if Person doesnt exist', function () {
-
-    // A new called value
-    let newCalledValue = true
-
-    // A valid Person
-    let person = defaultPerson
-
-    let emptyEventsList = []
-
-    // An error
-    let nonExistingPersonException = new InstanceNotFoundException('Non existent person', 'personId', person._id)
-
-    spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
-      callback(null, nonExistingPersonException)
-    })
-
-    spyOn(eventService, 'findAllByReportIdAndPersonId')
-
-    spyOn(PersonDao, 'update')
-
-    personService.setCalledValue(person._id, person.reportId, person.teamId, newCalledValue, (p, err) => {
-      expect(p).toBe(null)
-      expect(err).not.toBe(null)
-      expect(err).toEqual(nonExistingPersonException)
-    })
-
-    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
     expect(eventService.findAllByReportIdAndPersonId).not.toHaveBeenCalled()
-    expect(PersonDao.update).not.toHaveBeenCalled()
-
+    expect(PersonDao.update).toHaveBeenCalled()
   })
 
   it('A Person cant be uncalled if he has any event in this Report', function () {
@@ -444,10 +409,44 @@ describe('Set called value in Person', function () {
       expect(err).toEqual(existingElementsException)
     })
 
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).toHaveBeenCalled()
     expect(PersonDao.update).not.toHaveBeenCalled()
 
   })
 
+  it('Called value cant be changed if Person doesnt exist', function () {
+
+    // A new called value
+    let newCalledValue = true
+
+    // A valid Person
+    let person = defaultPerson
+
+    let emptyEventsList = []
+
+    // An error
+    let nonExistingPersonException = new InstanceNotFoundException('Non existent person', 'personId', person._id)
+
+    spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
+      callback(null, nonExistingPersonException)
+    })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId')
+
+    spyOn(PersonDao, 'update')
+
+    personService.setCalledValue(person._id, person.reportId, person.teamId, newCalledValue, (p, err) => {
+      expect(p).toBe(null)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(nonExistingPersonException)
+    })
+
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).not.toHaveBeenCalled()
+    expect(PersonDao.update).not.toHaveBeenCalled()
+
+  })
 
 })
 
@@ -536,16 +535,23 @@ describe('Delete Person', function () {
     teamService = new TeamService()
     refereeService = new RefereeService()
     authService = new AuthService(jasmine.createSpy('RefereeService'))
-    personService = new PersonService(reportService, teamService, authService)
+    eventService = new EventService(jasmine.createSpy('ReportService'), jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'))
+    personService = new PersonService(reportService, teamService, authService, eventService)
   })
 
-  it('A Person must be deleted if it exists', function () {
+  it('A Person must be deleted if it exists and Person doesnt have any assigned event', function () {
 
     // A valid Person
     let person = defaultPerson
 
+    let emptyEventsList = []
+
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
       callback(person, null)
+    })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
+      callback(emptyEventsList, null)
     })
 
     spyOn(PersonDao, 'deletePerson').andCallFake(function (anyPerson, callback) {
@@ -559,7 +565,41 @@ describe('Delete Person', function () {
     })
 
     expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).toHaveBeenCalled()
     expect(PersonDao.deletePerson).toHaveBeenCalled()
+
+  })
+
+  it('A Person cant be deleted if it have any assigned event', function () {
+
+    // A valid Person
+    let person = defaultPerson
+
+    let nonEmptyList = [jasmine.any(Object)]
+
+    let exception = new ExistingElementsException('Existing events assigned to this person', 'personId', person._id)
+
+    spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
+      callback(person, null)
+    })
+
+    spyOn(eventService, 'findAllByReportIdAndPersonId').andCallFake(function (anyReportId, anyPersonId, callback) {
+      callback(nonEmptyList, null)
+    })
+
+    spyOn(PersonDao, 'deletePerson').andCallFake(function (anyPerson, callback) {
+      callback(jasmine.any(Object), null)
+    })
+
+    personService.deletePerson(person._id, person.reportId, person.teamId, (p, err) => {
+      expect(p).toBe(null)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(exception)
+    })
+
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(eventService.findAllByReportIdAndPersonId).toHaveBeenCalled()
+    expect(PersonDao.deletePerson).not.toHaveBeenCalled()
 
   })
 

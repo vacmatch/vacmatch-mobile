@@ -20,25 +20,25 @@ class ReportService {
   }
 
   /**
-    * Find finished Reports
-    * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
+    * Find Reports by status
+    * @param {Integer} status Check if the game was finished and a EndGame event was added or not
     * @param {reportListCallback} callback A callback that returns the a list of Reports
     */
-  findAllByFinished (hasFinished, callback) {
-    ReportDao.findAllByFinished(hasFinished, callback)
+  findAllByStatus (status, callback) {
+    ReportDao.findAllByStatus(status, callback)
   }
 
   /**
     * Create a Report
     * @param {String} date A string with the date when the game is played
     * @param {String} location The place where the game is played
-    * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
+    * @param {Integer} status Check if the game was finished and a EndGame event was added or not
     * @param {Object} localTeam The team which is local in the game
     * @param {Object} visitorTeam The team which is visitor in the game
     * @param {String} refereeList The list with all referees assigned to this game
     * @param {reportCallback} callback A callback that returns the created Report or error
     */
-  create (date, location, hasFinished, localTeam, visitorTeam, refereeList, callback) {
+  create (date, location, status, localTeam, visitorTeam, refereeList, callback) {
     // Create a new local team
     this.TeamService.create(localTeam.name, (local, err) => {
       if (err !== null) {
@@ -53,7 +53,7 @@ class ReportService {
         }
         visitorTeam._id = visitor._id
         // Create it
-        ReportDao.create(date, location, hasFinished, localTeam, visitorTeam, refereeList, callback)
+        ReportDao.create(date, location, status, localTeam, visitorTeam, refereeList, callback)
       })
     })
   }
@@ -63,13 +63,13 @@ class ReportService {
     * @param {String} reportId The report identifier
     * @param {String} date A string with the date when the game is played
     * @param {String} location The place where the game is played
-    * @param {Boolean} hasFinished Check if the game was finished and a EndGame event was added or not
+    * @param {Integer} status Check if the game was finished and a EndGame event was added or not
     * @param {Object} localTeam The team which is local in the game
     * @param {Object} visitorTeam The team which is visitor in the game
     * @param {String} incidences Text field to write incidences and other information in the game
     * @param {reportCallback} callback A callback that returns the updated Report or error
     */
-  update (reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, callback) {
+  update (reportId, date, location, status, localTeam, visitorTeam, incidences, callback) {
     // Check if report exists
     this.findById(reportId, (oldReport, err) => {
       if (err !== null) {
@@ -86,7 +86,7 @@ class ReportService {
             return callback(null, new InstanceNotFoundException('Non existent visitor team', 'report.visitorTeam._id', visitorTeam._id))
           }
           // Save it
-          ReportDao.update(reportId, date, location, hasFinished, localTeam, visitorTeam, incidences, oldReport, callback)
+          ReportDao.update(reportId, date, location, status, localTeam, visitorTeam, incidences, oldReport, callback)
         })
       })
     })

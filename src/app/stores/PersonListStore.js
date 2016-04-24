@@ -60,10 +60,38 @@ let PersonListStore = Reflux.createStore({
     callback(person, null)
   },
 
+  resetCalledState: function (teamId, personId) {
+    // Update player in local Team list
+    if (teamId === this.state.localTeamId) {
+      let index = this.state.localPeople.findIndex(function (e, index) {
+        return (e._id === personId)
+      })
+      this.state.localPeople[index].isCalled = false
+      this.trigger(this.state)
+      this.state.localPeople[index].isCalled = true
+      this.trigger(this.state)
+    }
+    // Update player in visitor Team list
+    if (teamId === this.state.visitorTeamId) {
+      let index = this.state.visitorPeople.findIndex(function (e, index) {
+        return (e._id === personId)
+      })
+      this.state.visitorPeople[index].isCalled = false
+      this.trigger(this.state)
+      this.state.visitorPeople[index].isCalled = true
+      this.trigger(this.state)
+    }
+  },
+
   onToggleCallPerson: function (personId, reportId, teamId, newValue, callback) {
     // Set new call state in DB
     ServiceFactory.getService('PersonService').setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
       if (err !== null) {
+        // TODO add check errors
+        // If this person has some assigned events
+        if (err.name === 'ExistingElementsException') {
+          this.resetCalledState(teamId, personId)
+        }
         return callback(person, err)
       }
       // Update call state in person list

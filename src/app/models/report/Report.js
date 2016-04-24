@@ -1,12 +1,12 @@
+import ReportStatus from './ReportStatus'
 
 class Report {
 
-  constructor (id, date, location, hasFinished, localTeam, visitorTeam, refereeList) {
+  constructor (id, date, location, status, localTeam, visitorTeam, refereeList) {
     this._id = id
     this.databaseType = 'report'
     this.date = date
     this.location = location
-    this.hasFinished = hasFinished
     this.localTeam = {
       _id: localTeam ? localTeam._id : null,
       name: localTeam ? localTeam.name : null,
@@ -19,6 +19,7 @@ class Report {
       result: visitorTeam ? visitorTeam.result : '0',
       secondaryField: visitorTeam ? visitorTeam.secondaryField : '0'
     }
+    this.status = status ? status : ReportStatus.READY
     this.incidences = ''
     this.refereeList = refereeList
   }

@@ -108,7 +108,7 @@ let ReportList = React.createClass({
 
   handleEditConfirm: function (report) {
     // Save new changes in report
-    ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
+    ReportActions.editReport(report._id, report.date, report.location, report.status,
       report.localTeam, report.visitorTeam, report.incidences, (data, err) => {
         if (err !== null) {
           ErrorActions.setError(err)

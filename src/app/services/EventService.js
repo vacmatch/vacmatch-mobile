@@ -1,6 +1,7 @@
 import EventDao from '../daos/EventDao'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
-import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
+import ReportStatusManager from '../models/report/ReportStatusManager'
+import ReportStatusException from '../models/exception/ReportStatusException'
 
 class EventService {
 
@@ -92,26 +93,30 @@ class EventService {
     * @param {eventCallback} callback A callback that returns the created element or error
     */
   createControl (reportId, eventType, matchTime, text, timestamp, callback) {
-    // Check if report exists
+    // Get report and status
     this.ReportService.findById(reportId, (report, err) => {
       if (err !== null) {
-        return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
+        return callback(report, err)
       }
-      // Check if it's an end match event
-      let endEvent = new EndMatchEvent()
-      if (eventType === endEvent.type) {
-        let hasFinished = true
-        // Update report state with new value
-        this.ReportService.update(reportId, report.date, hasFinished, report.location,
+      // Create oldStatus
+      let oldStatus = ReportStatusManager.getStatusFromType(report.status)
+      let newStatus = oldStatus.addEvent(eventType) // Get the new event
+
+      // Check if status must be changed
+      if (newStatus !== null) {
+        // Check if there is an error
+        if (newStatus.name === new ReportStatusException().name) {
+          return callback(eventType, newStatus)
+        }
+
+        this.ReportService.update(report._id, report.date, report.location, newStatus,
           report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
             if (err !== null) {
               return callback(null, err)
             }
-            // Save the event
             EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
           })
       } else {
-        // Save the event
         EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
       }
     })
@@ -127,29 +132,32 @@ class EventService {
     // Get the event
     this.findById(eventId, (event, err) => {
       if (err === null) {
-        // Check if it's an end match event
-        let endEvent = new EndMatchEvent()
-        if (event.type === endEvent.type) {
-          let hasFinished = false
-          // Find report
-          this.ReportService.findById(event.reportId, (report, err) => {
-            if (err !== null) {
-              return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId))
+        // Get report and status
+        this.ReportService.findById(event.reportId, (report, err) => {
+          if (err !== null) {
+            return callback(report, err)
+          }
+          // Create oldStatus
+          let oldStatus = ReportStatusManager.getStatusFromType(report.status)
+          let newStatus = oldStatus.removeEvent(event.type) // Get the new event
+
+          // Check if status must be changed
+          if (newStatus !== null) {
+            // Check if there is an error
+            if (newStatus.name === new ReportStatusException().name) {
+              return callback(event.type, newStatus)
             }
-            // Update report state with new value
-            this.ReportService.update(event.reportId, report.date, hasFinished, report.location,
+            this.ReportService.update(report._id, report.date, report.location, newStatus,
               report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
                 if (err !== null) {
                   return callback(null, err)
                 }
-                // Remove the event
                 EventDao.deleteEvent(event, callback)
               })
-          })
-        } else {
-          // Remove the event
-          EventDao.deleteEvent(event, callback)
-        }
+          } else {
+            EventDao.deleteEvent(event, callback)
+          }
+        })
       } else {
         callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
       }
