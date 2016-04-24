@@ -83,7 +83,7 @@ let PersonListStore = Reflux.createStore({
     }
   },
 
-  onToggleCallPerson: function (personId, reportId, teamId, newValue, toggleEvent, callback) {
+  onToggleCallPerson: function (personId, reportId, teamId, newValue, callback) {
     // Set new call state in DB
     ServiceFactory.getService('PersonService').setCalledValue(personId, reportId, teamId, newValue, (person, err) => {
       if (err !== null) {

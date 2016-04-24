@@ -1,8 +1,7 @@
 import EventDao from '../daos/EventDao'
 import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
-import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
-import StartMatchEvent from '../models/web/event/control/StartMatchEvent'
-import ReportStatus from '../models/report/ReportStatus'
+import ReportStatusManager from '../models/report/ReportStatusManager'
+import ReportStatusException from '../models/exception/ReportStatusException'
 
 class EventService {
 
@@ -94,42 +93,33 @@ class EventService {
     * @param {eventCallback} callback A callback that returns the created element or error
     */
   createControl (reportId, eventType, matchTime, text, timestamp, callback) {
-    let endEvent = new EndMatchEvent()
-    let startEvent = new StartMatchEvent()
-    let status = ReportStatus.STARTED
-    switch (eventType) {
-      case endEvent.type: {
-        status = ReportStatus.FINISHED
-        this._updateReportStatus(reportId, status, (report, err) => {
-          if (err !== null) {
-            return callback(report, err)
-          }
-          // Save the event
-          EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
-        })
-        break
+    // Get report and status
+    this.ReportService.findById(reportId, (report, err) => {
+      if (err !== null) {
+        return callback(report, err)
       }
-      case startEvent.type: {
-        status = ReportStatus.STARTED
-        this._updateReportStatus(reportId, status, (report, err) => {
-          if (err !== null) {
-            return callback(report, err)
-          }
-          // Save the event
-          EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
-        })
-        break
+      // Create oldStatus
+      let oldStatus = ReportStatusManager.getStatusFromType(report.status)
+      let newStatus = oldStatus.addEvent(eventType) // Get the new event
+
+      // Check if status must be changed
+      if (newStatus !== null) {
+        // Check if there is an error
+        if (newStatus.name === new ReportStatusException().name) {
+          return callback(eventType, newStatus)
+        }
+
+        this.ReportService.update(report._id, report.date, report.location, newStatus,
+          report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
+            if (err !== null) {
+              return callback(null, err)
+            }
+            EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
+          })
+      } else {
+        EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
       }
-      default: {
-        this.ReportService.findById(reportId, (report, err) => {
-          if (err !== null) {
-            return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
-          }
-          // Save the event
-          EventDao.createControl(reportId, eventType, matchTime, text, timestamp, callback)
-        })
-      }
-    }
+    })
   }
 
   /**
@@ -142,57 +132,35 @@ class EventService {
     // Get the event
     this.findById(eventId, (event, err) => {
       if (err === null) {
-        let endEvent = new EndMatchEvent()
-        let startEvent = new StartMatchEvent()
-        let status = ReportStatus.STARTED
-        switch (event.type) {
-          case endEvent.type: {
-            status = ReportStatus.STARTED
-            this._updateReportStatus(event.reportId, status, (r, err) => {
-              if (err !== null) {
-                return callback(r, err)
-              }
-              // Remove the event
-              EventDao.deleteEvent(event, callback)
-            })
-            break
+        // Get report and status
+        this.ReportService.findById(event.reportId, (report, err) => {
+          if (err !== null) {
+            return callback(report, err)
           }
-          case startEvent.type: {
-            status = ReportStatus.READY
-            this._updateReportStatus(event.reportId, status, (r, err) => {
-              if (err !== null) {
-                return callback(r, err)
-              }
-              // Remove the event
-              EventDao.deleteEvent(event, callback)
-            })
-            break
-          }
-          default: {
-            // Remove the event
+          // Create oldStatus
+          let oldStatus = ReportStatusManager.getStatusFromType(report.status)
+          let newStatus = oldStatus.removeEvent(event.type) // Get the new event
+
+          // Check if status must be changed
+          if (newStatus !== null) {
+            // Check if there is an error
+            if (newStatus.name === new ReportStatusException().name) {
+              return callback(event.type, newStatus)
+            }
+            this.ReportService.update(report._id, report.date, report.location, newStatus,
+              report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
+                if (err !== null) {
+                  return callback(null, err)
+                }
+                EventDao.deleteEvent(event, callback)
+              })
+          } else {
             EventDao.deleteEvent(event, callback)
           }
-        }
+        })
       } else {
         callback(null, new InstanceNotFoundException('Non existent event', 'eventId', eventId))
       }
-    })
-  }
-
-  _updateReportStatus (reportId, status, callback) {
-    // Find report
-    this.ReportService.findById(reportId, (report, err) => {
-      if (err !== null) {
-        return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
-      }
-      // Update report state with new value
-      this.ReportService.update(reportId, report.date, report.location, status,
-        report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
-          if (err !== null) {
-            return callback(null, err)
-          }
-          callback(report, err)
-        })
     })
   }
 
