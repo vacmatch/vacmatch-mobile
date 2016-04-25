@@ -4,6 +4,7 @@ import { default as Router, Route, IndexRoute } from 'react-router'
 
 import Layout from './components/layout'
 import Home from './components/home'
+import About from './components/app/About'
 import Login from './components/auth/Login'
 import ReportList from './components/report/list/ReportList'
 import Report from './components/report/show/Report'
@@ -17,6 +18,7 @@ let routes = (
   <Route path='/' component={Layout}>
     <IndexRoute component={Home} />
     <Route path='/home' component={Home}/>
+    <Route path='/about' component={About}/>
     <Route path='/login' component={Login}/>
     <Route path='/reports' component={ReportList}/>
     <Route path='/report/:reportId' component={Report}/>
