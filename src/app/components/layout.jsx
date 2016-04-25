@@ -88,7 +88,8 @@ let Layout = React.createClass({
     }
     let menuItems = [
       {type: MenuItem.Types.SUBHEADER, text: 'Settings'},
-      {route: 'about', text: 'About'}
+      {route: 'about', text: 'About'},
+      {route: 'settings', text: 'Settings'}
     ]
     return <div>
       <AppBar
