@@ -1,6 +1,7 @@
 import Reflux from 'reflux'
 
 import EventActions from '../actions/EventActions'
+import ReportActions from '../actions/ReportActions'
 import ServiceFactory from '../api/ServiceFactory'
 
 let EventStore = Reflux.createStore({
@@ -44,11 +45,17 @@ let EventStore = Reflux.createStore({
       if (err !== null) {
         return callback(e, err)
       }
-      // Delete from state this event
-      let filterList = this.state.filter(function (e) { return e._id !== event._id })
-      this.state = filterList
-      this.trigger(this.state)
-      callback(e, err)
+      // Update report
+      ReportActions.updateReport(event.reportId, (report, err) => {
+        if (err !== null) {
+          return callback(report, err)
+        }
+        // Delete from state this event
+        let filterList = this.state.filter(function (e) { return e._id !== event._id })
+        this.state = filterList
+        this.trigger(this.state)
+        callback(e, err)
+      })
     })
   }
 

@@ -114,7 +114,7 @@ let ReportStore = Reflux.createStore({
       this.state.report.visitorTeam = newTeam
     }
     // Update result in DB
-    ServiceFactory.getService('ReportService').update(reportId, this.state.report.date, this.state.report.status, this.state.report.location,
+    ServiceFactory.getService('ReportService').update(reportId, this.state.report.date, this.state.report.location, this.state.report.status,
       this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport, err) => {
         if (err === null) {
           // Update state
