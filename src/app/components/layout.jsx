@@ -15,7 +15,7 @@ let AppBar = mui.AppBar
 let Avatar = mui.Avatar
 let LeftNav = mui.LeftNav
 let IconMenu = mui.IconMenu
-let MenuItem = require('material-ui/lib/menus/menu-item')
+let MenuItem = mui.MenuItem
 let IconButton = mui.IconButton
 let FlatButton = mui.FlatButton
 import SnackBar from './generic/SnackBar'
@@ -86,6 +86,11 @@ let Layout = React.createClass({
         </div>
       )
     }
+    let menuItems = [
+      {type: MenuItem.Types.SUBHEADER, text: 'Settings'},
+      {route: 'about', text: 'About'},
+      {route: 'settings', text: 'Settings'}
+    ]
     return <div>
       <AppBar
         title='VACmatch'
@@ -99,7 +104,7 @@ let Layout = React.createClass({
           </IconMenu>
         }
         />
-      <LeftNav ref='leftNav' docked={false} menuItems={[]}
+      <LeftNav ref='leftNav' docked={false} menuItems={menuItems}
         header={
           <div style={style.center}>
             <Avatar src='assets/img/logos/vacmatch.png' size={100} />
