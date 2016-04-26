@@ -1,8 +1,7 @@
 import Reflux from 'reflux'
 
-import SignService from '../services/SignService'
 import SignActions from '../actions/SignActions'
-import AuthService from '../services/AuthService'
+import ServiceFactory from '../api/ServiceFactory'
 
 let SignStore = Reflux.createStore({
   listenables: SignActions,
@@ -16,14 +15,12 @@ let SignStore = Reflux.createStore({
   },
 
   onUpdateSignatures: function (reportId, callback) {
-    SignService.findAllByReportId(reportId, (data, err) => {
+    ServiceFactory.getService('SignService').findAllByReportId(reportId, (data, err) => {
       if (err === null) {
         this.state = data
         this.trigger(this.state)
       }
-      if (typeof callback === 'function') {
-        callback(data, err)
-      }
+      callback(data, err)
     })
   },
 
@@ -33,14 +30,12 @@ let SignStore = Reflux.createStore({
   sign: function (userId, signKey, reportId, identifier, name, teamId, fedId, callback) {
     let stringToHash = '' // TODO: Add report info
     let timestamp = Date.now()
-    SignService.create(userId, reportId, stringToHash, timestamp, identifier, name, teamId, fedId, (data, err) => {
+    ServiceFactory.getService('SignService').create(userId, reportId, stringToHash, timestamp, identifier, name, teamId, fedId, (data, err) => {
       if (err === null) {
         this.state.push(data)
         this.trigger(this.state)
       }
-      if (typeof callback === 'function') {
-        callback(data, err)
-      }
+      callback(data, err)
     })
   },
 
@@ -58,21 +53,17 @@ let SignStore = Reflux.createStore({
    */
   onUserSignReport: function (userId, signKey, reportId, identifier, name, teamId, fedId, callback) {
     // Check if signKey is valid
-    AuthService.checkSignKey(userId, signKey, (value, err) => {
+    ServiceFactory.getService('AuthService').checkSignKey(userId, signKey, (value, err) => {
       // If sign key is not valid
       if (!value) {
-        if (typeof callback === 'function') {
-          callback(null, 'Invalid sign key')
-        }
+        callback(null, 'Invalid sign key')
       } else {
         // If it's ok
         if (err === null) {
           this.sign(userId, signKey, reportId, identifier, name, teamId, fedId, callback)
         } else {
-          if (typeof callback === 'function') {
-            // Otherwhise send error
-            callback(null, err)
-          }
+          // Otherwhise send error
+          callback(null, err)
         }
       }
     })

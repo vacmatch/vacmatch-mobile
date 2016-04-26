@@ -1,11 +1,8 @@
 import Reflux from 'reflux'
 
-import EventService from '../services/EventService'
 import EventActions from '../actions/EventActions'
-
-import ReportService from '../services/ReportService'
-
-import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
+import ReportActions from '../actions/ReportActions'
+import ServiceFactory from '../api/ServiceFactory'
 
 let EventStore = Reflux.createStore({
   listenables: EventActions,
@@ -19,39 +16,46 @@ let EventStore = Reflux.createStore({
   },
 
   onGetEventsByReportIdAndType: function (reportId, eventType, callback) {
-    EventService.findAllByReportIdAndEventType(reportId, eventType, callback)
+    ServiceFactory.getService('EventService').findAllByReportIdAndEventType(reportId, eventType, callback)
   },
 
   onUpdateEventList: function (reportId, callback) {
-    EventService.findAllByReportId(reportId, (data) => {
-      this.state = data
-      this.trigger(this.state)
-      if (typeof callback === 'function') {
-        callback()
+    ServiceFactory.getService('EventService').findAllByReportId(reportId, (events, err) => {
+      if (err !== null) {
+        return callback(events, err)
       }
+      this.state = events
+      this.trigger(this.state)
+      callback(events, err)
     })
   },
 
   onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
     let timestamp = Date.now()
-    EventService.create(reportId, person, team, eventType, matchTime, cause, timestamp, callback)
+    ServiceFactory.getService('EventService').create(reportId, person, team, eventType, matchTime, cause, timestamp, callback)
   },
 
   onAddControlEvent: function (reportId, eventType, matchTime, text, callback) {
     let timestamp = Date.now()
-    EventService.createControl(reportId, eventType, matchTime, text, timestamp, callback)
+    ServiceFactory.getService('EventService').createControl(reportId, eventType, matchTime, text, timestamp, callback)
   },
 
   onDeleteEvent: function (event, callback) {
-    EventService.deleteEvent(event._id, (data, err) => {
-      if (err == null) {
+    ServiceFactory.getService('EventService').deleteEvent(event._id, (e, err) => {
+      if (err !== null) {
+        return callback(e, err)
+      }
+      // Update report
+      ReportActions.updateReport(event.reportId, (report, err) => {
+        if (err !== null) {
+          return callback(report, err)
+        }
         // Delete from state this event
         let filterList = this.state.filter(function (e) { return e._id !== event._id })
         this.state = filterList
         this.trigger(this.state)
-        callback(data, err)
-      }
-      callback(data, err)
+        callback(e, err)
+      })
     })
   }
 

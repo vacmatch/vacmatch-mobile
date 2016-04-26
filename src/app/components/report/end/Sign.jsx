@@ -8,9 +8,11 @@ import Card from 'material-ui/lib/card/card'
 import CardHeader from 'material-ui/lib/card/card-header'
 import CardText from 'material-ui/lib/card/card-text'
 import dateFormat from 'dateformat'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import SnackBarActions from '../../../actions/SnackBarActions'
 
 let RaisedButton = mui.RaisedButton
-let Snackbar = mui.Snackbar
 let Dialog = mui.Dialog
 let FlatButton = mui.FlatButton
 let TextField = mui.TextField
@@ -19,7 +21,8 @@ let Avatar = mui.Avatar
 
 let Sign = React.createClass({
   mixins: [
-    Reflux.connect(SignStore, 'signatures')
+    Reflux.connect(SignStore, 'signatures'),
+    Reflux.connect(ErrorHandlerStore, 'error')
   ],
 
   propTypes: {
@@ -32,35 +35,22 @@ let Sign = React.createClass({
   getInitialState: function () {
     return {
       dialogIsOpen: false,
-      snackbarMessage: '',
       index: 0,
       value: {},
       userId: null
     }
   },
 
-  toggleSnackBar: function (newText) {
-    this.setState({
-      dialogIsOpen: this.state.dialogIsOpen,
-      snackbarMessage: newText,
-      index: this.state.index,
-      value: this.state.value,
-      userId: this.state.userId
-    })
-    this.refs.snack.show()
-  },
-
   toggleDialog: function () {
-    if (this.props.personList.length !== 0) {
+    if ((this.props.personList.length !== 0) && !(this.props.personList.length === 1 && this.props.personList[0] === null)) {
       this.setState({
         dialogIsOpen: !this.state.dialogIsOpen,
-        snackbarMessage: this.state.snackbarMessage,
         index: this.state.index,
         value: this.props.personList[this.state.index],
         userId: this.props.personList[this.state.index].userId
       })
     } else {
-      this.toggleSnackBar('Empty people list')
+      SnackBarActions.setElement({name: 'Mensaje', message: 'Empty people list'})
     }
   },
 
@@ -78,7 +68,7 @@ let Sign = React.createClass({
       SignActions.nonUserSignReport(this.props.reportId, this.state.value._id,
         this.state.value.name, this.state.value.teamId, (data, err) => {
           if (err !== null) {
-            this.toggleSnackBar(err)
+            ErrorActions.setError(err)
           } else {
             this.toggleDialog()
           }
@@ -90,7 +80,7 @@ let Sign = React.createClass({
         this.state.value._id, this.state.value.name,
         this.state.value.teamId, this.state.value.fedId, (data, err) => {
           if (err !== null) {
-            this.toggleSnackBar(err)
+            ErrorActions.setError(err)
           } else {
             this.toggleDialog()
           }
@@ -158,10 +148,6 @@ let Sign = React.createClass({
           <RaisedButton label='Sign report'
             primary={true}
             onClick={this.toggleDialog} />
-          <Snackbar
-            ref='snack'
-            message={this.state.snackbarMessage}
-            autoHideDuration={4000} />
         </div>
         <div style={genericStyle.container}>
           <Card initiallyExpanded={true}>

@@ -6,6 +6,8 @@ import PersonListStore from '../../../stores/PersonListStore'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
 import EventActions from '../../../actions/EventActions'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 
 import TabList from '../../generic/TabList'
 import urls from '../../../api/urls'
@@ -19,6 +21,7 @@ let PersonList = React.createClass({
     Reflux.connect(PersonListStore, 'personList'),
     Reflux.connect(ReportStore, 'report'),
     Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(ErrorHandlerStore, 'error'),
     History
   ],
 
@@ -31,21 +34,37 @@ let PersonList = React.createClass({
 
   _handleEventSubmit: function (reportId, person, team, eventType, matchTime, cause) {
     // Add event to the db
-    EventActions.addEvent(reportId, person, team, eventType, matchTime, cause, (event) => {
-      // Update result in report
-      ReportActions.updateResultFields(event, this.state.sport, () => {
-        // Go to show report view
-        this.history.pushState(null, urls.report.show(this.props.params.reportId))
-      })
+    EventActions.addEvent(reportId, person, team, eventType, matchTime, cause, (event, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        // Update result in report
+        ReportActions.updateResultFields(event, this.state.sport, (events, err) => {
+          if (err !== null) {
+            ErrorActions.setError(err)
+          } else {
+            // Go to show report view
+            this.history.pushState(null, urls.report.show(this.props.params.reportId))
+          }
+        })
+      }
     })
   },
 
   componentWillMount: function () {
     // Update teams from this report
-    ReportActions.updateReport(this.props.params.reportId, () => {
-      // Update players lists (local and visitor)
-      ReportActions.updatePlayers(this.props.params.reportId,
-        this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id)
+    ReportActions.updateReport(this.props.params.reportId, (report, err) => {
+      if (err !== null) {
+        ErrorActions.setError(err)
+      } else {
+        // Update players lists (local and visitor)
+        ReportActions.updatePlayers(this.props.params.reportId,
+          this.state.report.report.localTeam._id, this.state.report.report.visitorTeam._id, (reportId, err) => {
+            if (err !== null) {
+              ErrorActions.setError(err)
+            }
+          })
+      }
     })
   },
 

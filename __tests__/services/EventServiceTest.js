@@ -1,17 +1,28 @@
 jest.dontMock('../../src/app/services/EventService')
+jest.dontMock('../../src/app/services/ReportService')
+jest.dontMock('../../src/app/services/PersonService')
+jest.dontMock('../../src/app/services/TeamService')
+jest.dontMock('../../src/app/models/report/status/StartedStatus')
 
 // Services
-let eventService = require('../../src/app/services/EventService')
-let genericService = require('../../src/app/services/GenericService')
-let reportService = require('../../src/app/services/ReportService')
-let personService = require('../../src/app/services/PersonService')
-let teamService = require('../../src/app/services/TeamService')
+let EventService = require('../../src/app/services/EventService')
+let ReportService = require('../../src/app/services/ReportService')
+let PersonService = require('../../src/app/services/PersonService')
+let TeamService = require('../../src/app/services/TeamService')
 
 let EventElements = require('../../src/app/models/event/Event')
 let Person = require('../../src/app/models/person/Person')
 let Team = require('../../src/app/models/team/Team')
 let Report = require('../../src/app/models/report/Report')
+let StartMatchEvent = require('../../src/app/models/web/event/control/StartMatchEvent')
+let EndMatchEvent = require('../../src/app/models/web/event/control/EndMatchEvent')
+
 let InstanceNotFoundException = require('../../src/app/models/exception/InstanceNotFoundException')
+let ReportStatusException = require('../../src/app/models/exception/ReportStatusException')
+let ReportStatus = require('../../src/app/models/report/ReportStatus')
+let StartedStatus = require('../../src/app/models/report/status/StartedStatus')
+
+let EventDao = require('../../src/app/daos/EventDao')
 
 // Default elements
 let defaultPerson = null
@@ -19,40 +30,43 @@ let defaultTeam = null
 let defaultReport = null
 let defaultEvent = null
 let defaultControlEvent = null
+let eventService = null
+let teamService = null
+let personService = null
+let reportService = null
+let startedStatus = new StartedStatus()
 
 describe('create Sport Event', function () {
 
   beforeEach(function () {
-    defaultPerson = new Person('person', '', '', '', '', false, false, '', '', '')
-    defaultTeam = new Team('team', 'Team name')
-    defaultReport = new Report('report', '', '', false, defaultTeam, defaultTeam, [])
+    defaultPerson = new Person(null, '', '', '', '', false, false, '', '', '')
+    defaultTeam = new Team(null, 'Team name')
+    defaultReport = new Report(null, '', '', ReportStatus.READY, defaultTeam, defaultTeam, [])
     defaultEvent = new EventElements.Event('event', '1', defaultPerson, defaultTeam, 'goal', 1, 'cause', 1)
+    reportService = new ReportService(jasmine.createSpy('PersonService'), jasmine.createSpy('TeamService'), jasmine.createSpy('EventService'), jasmine.createSpy('SignService'))
+    personService = new PersonService(jasmine.createSpy('ReportService'), jasmine.createSpy('TeamService'), jasmine.createSpy('AuthService'))
+    teamService = new TeamService()
+    eventService = new EventService(reportService, personService, teamService)
   })
 
   it('Create a new Sport Event with valid parameters', function () {
 
-    let existentReportId = 1
-
-    // Set ReportService findById mock implementation
-    spyOn(reportService, 'findById').andCallFake(function (existentReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       // Returns a valid report
       callback(defaultReport, null)
     })
 
-    // Set PersonService findByPersonIdReportIdAndTeamId mock implementation
     spyOn(personService, 'findByPersonIdReportIdAndTeamId').andCallFake(function (anyPersonId, anyReportId, anyTeamId, callback) {
       // Returns a valid person
       callback(defaultPerson, null)
     })
 
-    // Set TeamService findById mock implementation
     spyOn(teamService, 'findById').andCallFake(function (anyTeamId, callback) {
       // Returns a valid team
       callback(defaultTeam, null)
     })
 
-    // Set GenericService.create mock implementation
-    spyOn(genericService, 'create').andCallFake(function (defaultEvent, callback) {
+    spyOn(EventDao, 'create').andCallFake(function (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
       // Returns a valid Event
       callback(defaultEvent, null)
     })
@@ -60,15 +74,15 @@ describe('create Sport Event', function () {
     eventService.create(defaultEvent.reportId, defaultEvent.person, defaultEvent.team,
       defaultEvent.type, defaultEvent.matchTime, defaultEvent.text, defaultEvent.timestamp,
       (event, err) => {
-      expect(event).toEqual(defaultEvent)
-      expect(event).not.toBe(null)
-      expect(err).toBe(null)
-
+        expect(event).toEqual(defaultEvent)
+        expect(event).not.toBe(null)
+        expect(err).toBe(null)
     })
 
-    // Check if create was called in GenericService
-    expect(genericService.create).toHaveBeenCalled()
-
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(teamService.findById).toHaveBeenCalled()
+    expect(EventDao.create).toHaveBeenCalled()
   })
 
   it('Create a new Sport Event with non existent report', function () {
@@ -88,9 +102,9 @@ describe('create Sport Event', function () {
       callback(null, nonExistentError)
     })
 
-    // Set spy on GenericService.create
-    spyOn(genericService, 'create')
-
+    spyOn(personService, 'findByPersonIdReportIdAndTeamId')
+    spyOn(teamService, 'findById')
+    spyOn(EventDao, 'create')
 
     eventService.create(nonValidEvent.reportId, nonValidEvent.person, nonValidEvent.team,
       nonValidEvent.type, nonValidEvent.matchTime, nonValidEvent.text, nonValidEvent.timestamp,
@@ -101,8 +115,10 @@ describe('create Sport Event', function () {
 
     })
 
-    // Check if create wasn't called in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).not.toHaveBeenCalled()
+    expect(teamService.findById).not.toHaveBeenCalled()
+    expect(EventDao.create).not.toHaveBeenCalled()
 
   })
 
@@ -129,8 +145,9 @@ describe('create Sport Event', function () {
       callback(null, nonExistentError)
     })
 
-    // Set spy on GenericService.create
-    spyOn(genericService, 'create')
+    spyOn(teamService, 'findById')
+
+    spyOn(EventDao, 'create')
 
     eventService.create(nonValidEvent.reportId, nonValidEvent.person, nonValidEvent.team,
       nonValidEvent.type, nonValidEvent.matchTime, nonValidEvent.text, nonValidEvent.timestamp,
@@ -141,10 +158,13 @@ describe('create Sport Event', function () {
 
     })
 
-    // Check if create was called in GenericService
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+    expect(teamService.findById).not.toHaveBeenCalled()
+    expect(EventDao.create).not.toHaveBeenCalled()
 
   })
+
   it('Create a new Sport Event with non existent team', function () {
 
         let nonExistentTeamId = -1
@@ -174,8 +194,7 @@ describe('create Sport Event', function () {
           callback(null, nonExistentError)
         })
 
-        // Set spy on GenericService.create
-        spyOn(genericService, 'create')
+        spyOn(EventDao, 'create')
 
         eventService.create(nonValidEvent.reportId, nonValidEvent.person, nonValidEvent.team,
           nonValidEvent.type, nonValidEvent.matchTime, nonValidEvent.text, nonValidEvent.timestamp,
@@ -185,8 +204,12 @@ describe('create Sport Event', function () {
           expect(event).toBe(null)
 
         })
-        // Check if create was called in GenericService
-        expect(genericService.create).not.toHaveBeenCalled()
+
+        expect(reportService.findById).toHaveBeenCalled()
+        expect(personService.findByPersonIdReportIdAndTeamId).toHaveBeenCalled()
+        expect(teamService.findById).toHaveBeenCalled()
+        expect(EventDao.create).not.toHaveBeenCalled()
+
   })
 })
 
@@ -196,18 +219,21 @@ describe('Create Control Event', function () {
     defaultControlEvent = new EventElements.ControlEvent('event', '1', 'goal', 1, 'cause', 1)
   })
 
-  it('Control Event can be created if report exists', function () {
+  it('Control Event can be created if Report exists', function () {
 
     // A valid Control Event
     let event = defaultControlEvent
 
-    // Mock ReportService findById method to return a valid report
+    let validReport = defaultReport
+
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      callback(event, null)
+      callback(validReport, null)
     })
 
-    // Mock GenericService create to return a valid new ControlEvent
-    spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
+      text, timestamp, callback) {
       callback(event, null)
     })
 
@@ -219,12 +245,13 @@ describe('Create Control Event', function () {
       expect(err).toBe(null)
     })
 
-    // Check if genericService create method was called
-    expect(genericService.create).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).toHaveBeenCalled()
 
   })
 
-  it('Control Event cannot be created if report doesnt exists', function () {
+  it("Control Event cannot be created if Report doesnt exists", function () {
 
     // A ControlEvent with non existent report
     let event = defaultControlEvent
@@ -237,8 +264,8 @@ describe('Create Control Event', function () {
       callback(null, notFoundError)
     })
 
-    // Mock GenericService create without return value (Just to check if it wasn't called)
-    spyOn(genericService, 'create')
+    spyOn(reportService, 'update')
+    spyOn(EventDao, 'createControl')
 
     // Create a new ControlEvent
     eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
@@ -248,34 +275,65 @@ describe('Create Control Event', function () {
       expect(err).toEqual(notFoundError)
     })
 
-    // Check if genericService create method was called
-    expect(genericService.create).not.toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
 
   })
 
-  it('Report status should be modified when creating an EndMatchEvent and report exists', function () {
+  it("When creating a Control Event that should modify Report status, if Report status cannot be modified, new Control Event shouldn't be created", function () {
 
-      // A valid EndMatchEvent
-      let event = defaultControlEvent
-      event.type = 'end-match'
+    // A valid EndMatchEvent
+    let event = new EndMatchEvent()
 
-      // A valid Report
+    // A valid Report
+    let validReport = defaultReport
+    validReport.status = ReportStatus.STARTED
+
+    // Mock ReportService findById method to return a valid report
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    // Mock ReportService update to send an ERROR
+    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
+      reportLocation, reportStatus, reportLocal, reportVisitor, reportIncidences, callback) {
+      callback(null, jasmine.any(Object))
+    })
+
+    spyOn(EventDao, 'createControl')
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toBe(null)
+      expect(err).not.toBe(null)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
+
+  })
+
+  it('A match can be STARTED if actual status is READY', function () {
+      let event = new StartMatchEvent()
+
       let validReport = defaultReport
+      validReport.status = ReportStatus.READY
 
-      // Mock ReportService findById method to return a valid report
       spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-        callback(event, null)
-      })
-
-      // Mock GenericService create to return a valid new ControlEvent
-      spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
-        callback(event, null)
-      })
-
-      // Mock ReportService update to modify report status
-      spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
-        reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
         callback(validReport, null)
+      })
+
+      spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
+        reportLocation, reportStatus, reportLocal, reportVisitor, reportIncidences, callback) {
+        callback(validReport, null)
+      })
+
+      spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
+        text, timestamp, callback) {
+        callback(event, null)
       })
 
       // Create a new ControlEvent
@@ -286,52 +344,166 @@ describe('Create Control Event', function () {
         expect(err).toBe(null)
       })
 
-      // Check if genericService create method was called
-      expect(genericService.create).toHaveBeenCalled()
-
-      // Check if reportService update method was called to update Report status
+      expect(reportService.findById).toHaveBeenCalled()
       expect(reportService.update).toHaveBeenCalled()
-
+      // Check the new status to be set
+      expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.STARTED)
+      expect(EventDao.createControl).toHaveBeenCalled()
   })
 
-  it('If report status cant be modified when creating an EndMatchEvent, new control event shouldnt be created', function () {
+  it("A match cannot be FINISHED if actual status is READY", function () {
+    let event = new EndMatchEvent()
 
-    // A valid EndMatchEvent
-    let event = defaultControlEvent
-    event.type = 'end-match'
-
-    // A valid Report
     let validReport = defaultReport
+    validReport.status = ReportStatus.READY
+
+    let statusError = new ReportStatusException("You can't add a finish match event, match must be started first", 'ReportStatus', ReportStatus.STARTED)
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'createControl')
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      // It should return event type
+      expect(createdEvent).toBe(event.type)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(statusError)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
+  })
+
+  it("A match cannot be STARTED again if actual status is STARTED", function () {
+    let event = new StartMatchEvent()
+
+    let validReport = defaultReport
+    validReport.status = ReportStatus.STARTED
+
+    let statusError = new ReportStatusException("You can't add another start match event", 'ReportStatus', ReportStatus.STARTED)
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'createControl')
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toBe(event.type)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(statusError)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
+  })
+
+  it("A match can be FINISHED if actual status is STARTED", function () {
+    let event = new EndMatchEvent()
+
+    let validReport = defaultReport
+    validReport.status = ReportStatus.STARTED
 
     // Mock ReportService findById method to return a valid report
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      callback(event, null)
+      callback(validReport, null)
     })
 
-    // Mock GenericService create to return a valid new ControlEvent
-    spyOn(genericService, 'create').andCallFake(function (anyControlEvent, callback) {
-      callback(event, null)
-    })
-
-    // Mock ReportService update to send an ERROR
     spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
-      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
-      callback(null, jasmine.any(Object))
+      reportLocation, reportStatus, reportLocal, reportVisitor, reportIncidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'createControl').andCallFake(function (reportId, eventType, matchTime,
+      text, timestamp, callback) {
+      callback(event, null)
     })
 
     // Create a new ControlEvent
     eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
       event.timestamp, (createdEvent, err) => {
-      expect(createdEvent).toBe(null)
-      expect(err).not.toBe(null)
+      expect(createdEvent).toEqual(event)
+      expect(createdEvent).not.toBe(null)
+      expect(err).toBe(null)
     })
 
-    // Check if genericService create method was called
-    expect(genericService.create).not.toHaveBeenCalled()
-
-    // Check if reportService update method was called trying to update Report status
+    expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).toHaveBeenCalled()
+    // Check the new status to be set
+    expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.FINISHED)
+    expect(EventDao.createControl).toHaveBeenCalled()
+  })
 
+  it("A match cannot be STARTED if actual status is FINISHED", function () {
+    let event = new StartMatchEvent()
+
+    let validReport = defaultReport
+    validReport.status = ReportStatus.FINISHED
+
+    let statusError = new ReportStatusException("You can't add a start match event because match is finished", 'ReportStatus', ReportStatus.FINISHED)
+
+    // Mock ReportService findById method to return a valid report
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'createControl')
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toEqual(event.type)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(statusError)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
+  })
+
+  it("A match cannot be FINISHED if actual status is FINISHED", function () {
+    let event = new EndMatchEvent()
+
+    let validReport = defaultReport
+    validReport.status = ReportStatus.FINISHED
+
+    let statusError = new ReportStatusException("You can't add an end match event because match is already finished", 'ReportStatus', ReportStatus.FINISHED)
+
+    // Mock ReportService findById method to return a valid report
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'createControl')
+
+    // Create a new ControlEvent
+    eventService.createControl(event.reportId, event.type, event.matchTime, event.text,
+      event.timestamp, (createdEvent, err) => {
+      expect(createdEvent).toEqual(event.type)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(statusError)
+    })
+
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.createControl).not.toHaveBeenCalled()
   })
 })
 
@@ -342,14 +514,20 @@ describe('Delete Event', function () {
     // An existent event
     let event = defaultEvent
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    let validReport = defaultReport
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    // Mock GenericService remove to return an OK result
-    spyOn(genericService, 'remove').andCallFake(function (anyEvent, callback) {
-      callback(jasmine.any(Object), null)
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
     })
 
     // Delete this event
@@ -358,12 +536,14 @@ describe('Delete Event', function () {
       expect(err).toBe(null)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).toHaveBeenCalled()
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
 
   })
 
-  it('Event cannot be deleted if this event doesnt exists', function () {
+  it('Event cannot be deleted if this event doesnt exist', function() {
 
     // An non existent event
     let event = defaultEvent
@@ -371,13 +551,15 @@ describe('Delete Event', function () {
     // An error to show not found event
     let notFoundError = new InstanceNotFoundException('Non existent event', 'eventId', event._id)
 
-    // Mock GenericService findById to return a not found error
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(null, notFoundError)
     })
 
-    // Mock GenericService remove (just to check if it wasn't called)
-    spyOn(genericService, 'remove')
+    spyOn(reportService, 'findById')
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'deleteEvent')
 
     // Delete this event
     eventService.deleteEvent(event._id, (result, err) => {
@@ -386,39 +568,35 @@ describe('Delete Event', function () {
       expect(result).toBe(null)
     })
 
-    // Check if genericService remove method wasn't called
-    expect(genericService.remove).not.toHaveBeenCalled()
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).not.toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.deleteEvent).not.toHaveBeenCalled()
 
   })
 
-  it('Report status should be modified when removing a EndMatchEvent which exists', function () {
-
-    // An existent EndMatchEvent
-    let event = defaultEvent
-    event.type = 'end-match'
+  it("A StartMatchEvent can be removed if actual status is READY but status should stay READY", function () {
+    let event = new EndMatchEvent()
 
     // A valid Report
     let validReport = defaultReport
+    validReport.status = ReportStatus.READY
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    // Mock ReportService findById to return the report from this event
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(validReport, null)
     })
 
-    // Mock ReportService update to modify report status
-    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
-      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, location, status,
+      localTeam, visitorTeam, incidences, callback) {
       callback(validReport, null)
     })
 
-    // Mock GenericService remove to return an OK result
-    spyOn(genericService, 'remove').andCallFake(function (anyEvent, callback) {
-      callback(jasmine.any(Object), null)
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
     })
 
     // Delete this event
@@ -427,95 +605,198 @@ describe('Delete Event', function () {
       expect(err).toBe(null)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).toHaveBeenCalled()
-
-    // Check if reportService update method was called to update Report status
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
     expect(reportService.update).toHaveBeenCalled()
-
+    // Check the new status to be set
+    expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.READY)
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
   })
 
-  it('If report status cant be modified when an EndMatchEvent is being deleted, Event shouldnt be deleted', function () {
-
-    // An existent EndMatchEvent
-    let event = defaultEvent
-    event.type = 'end-match'
+  it("A EndMatchEvent can be removed if actual status is READY but status should stay READY", function () {
+    let event = new EndMatchEvent()
 
     // A valid Report
     let validReport = defaultReport
+    validReport.status = ReportStatus.READY
 
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
       callback(event, null)
     })
 
-    // Mock ReportService findById to return the report from this event
     spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
       callback(validReport, null)
     })
 
-    // Mock ReportService update to return an ERROR
-    spyOn(reportService, 'update').andCallFake(function (anyReportId, reportDate,
-      reportFinished, reportLocation, reportLocal, reportVisitor, reportIncidences, callback) {
-      callback(null, jasmine.any(Object))
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, location, status,
+      localTeam, visitorTeam, incidences, callback) {
+      callback(validReport, null)
     })
 
-    // Mock GenericService remove
-    spyOn(genericService, 'remove')
-
-    // Delete this event
-    eventService.deleteEvent(event._id, (result, err) => {
-      expect(result).toBe(null)
-      expect(err).not.toBe(null)
-    })
-
-    // Check if genericService remove method was called
-    expect(genericService.remove).not.toHaveBeenCalled()
-
-    // Check if reportService update method was called to update Report status
-    expect(reportService.update).toHaveBeenCalled()
-
-  })
-
-  it('If report doesnt exists when an EndMatchEvent is being deleted, Event shouldnt be deleted', function () {
-
-    // An existent EndMatchEvent
-    let event = defaultEvent
-    event.type = 'end-match'
-
-    // A valid Report
-    let validReport = defaultReport
-
-    // Mock GenericService findById to return this event
-    spyOn(genericService, 'findById').andCallFake(function (anyEventId, callback) {
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
       callback(event, null)
     })
 
-    let notFoundError = new InstanceNotFoundException('Non existent report', 'event.reportId', event.reportId)
-
-    // Mock ReportService findById to return not found ERROR
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
-      callback(null, notFoundError)
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).not.toBe(null)
+      expect(err).toBe(null)
     })
 
-    // Mock ReportService update
-    spyOn(reportService, 'update')
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    // Check the new status to be set
+    expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.READY)
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
+  })
 
-    // Mock GenericService remove
-    spyOn(genericService, 'remove')
+  it("A StartMatchEvent can be removed and new report status be set to READY if actual status is STARTED", function () {
+    let event = new StartMatchEvent()
+
+    // A valid Report
+    let validReport = defaultReport
+    validReport.status = ReportStatus.STARTED
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, location, status,
+      localTeam, visitorTeam, incidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
+    })
 
     // Delete this event
     eventService.deleteEvent(event._id, (result, err) => {
-      expect(result).toBe(null)
-      expect(err).not.toBe(null)
-      expect(err).toEqual(notFoundError)
+      expect(result).not.toBe(null)
+      expect(err).toBe(null)
     })
 
-    // Check if genericService remove method was called
-    expect(genericService.remove).not.toHaveBeenCalled()
-
-    // Check if reportService update method was called to update Report status
-    expect(reportService.update).not.toHaveBeenCalled()
-
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    // Check the new status to be set
+    expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.READY)
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
   })
+
+  it("A EndMatchEvent can be removed if actual status is STARTED but status should stay STARTED", function () {
+    let event = new EndMatchEvent()
+
+    // A valid Report
+    let validReport = defaultReport
+    validReport.status = ReportStatus.STARTED
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, location, status,
+      localTeam, visitorTeam, incidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
+    })
+
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).not.toBe(null)
+      expect(err).toBe(null)
+    })
+
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    // Check the new status to be set
+    expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.STARTED)
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
+  })
+
+  it("A StartMatchEvent cannot be removed if actual status is FINISHED, EndMatchEvent should be removed first", function () {
+    let event = new StartMatchEvent()
+
+    // A valid Report
+    let validReport = defaultReport
+    validReport.status = ReportStatus.FINISHED
+
+    let statusError = new ReportStatusException("You can't remove a start match event because match is already finished", 'ReportStatus', ReportStatus.FINISHED)
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update')
+
+    spyOn(EventDao, 'deleteEvent')
+
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).toEqual(event.type)
+      expect(err).not.toBe(null)
+      expect(err).toEqual(statusError)
+    })
+
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).not.toHaveBeenCalled()
+    expect(EventDao.deleteEvent).not.toHaveBeenCalled()
+  })
+
+  it("A EndMatchEvent can be removed if actual status is FINISHED", function () {
+    let event = new EndMatchEvent()
+
+    // A valid Report
+    let validReport = defaultReport
+    validReport.status = ReportStatus.FINISHED
+
+    spyOn(EventDao, 'findById').andCallFake(function (anyEventId, callback) {
+      callback(event, null)
+    })
+
+    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(reportService, 'update').andCallFake(function (reportId, date, location, status,
+      localTeam, visitorTeam, incidences, callback) {
+      callback(validReport, null)
+    })
+
+    spyOn(EventDao, 'deleteEvent').andCallFake(function (anyEvent, callback) {
+      callback(event, null)
+    })
+
+    // Delete this event
+    eventService.deleteEvent(event._id, (result, err) => {
+      expect(result).not.toBe(null)
+      expect(err).toBe(null)
+    })
+
+    expect(EventDao.findById).toHaveBeenCalled()
+    expect(reportService.findById).toHaveBeenCalled()
+    expect(reportService.update).toHaveBeenCalled()
+    // Check the new status to be set
+    expect(reportService.update.calls[0].args[3]).toEqual(ReportStatus.STARTED)
+    expect(EventDao.deleteEvent).toHaveBeenCalled()
+  })
+
 })

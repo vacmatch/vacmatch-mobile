@@ -6,6 +6,8 @@ import { History } from 'react-router'
 import MenuStore from '../stores/MenuStore'
 import AuthStore from '../stores/AuthStore'
 import AuthActions from '../actions/AuthActions'
+import ErrorActions from '../actions/ErrorActions'
+
 import urls from '../api/urls'
 
 // Components
@@ -13,10 +15,10 @@ let AppBar = mui.AppBar
 let Avatar = mui.Avatar
 let LeftNav = mui.LeftNav
 let IconMenu = mui.IconMenu
-let MenuItem = require('material-ui/lib/menus/menu-item')
+let MenuItem = mui.MenuItem
 let IconButton = mui.IconButton
 let FlatButton = mui.FlatButton
-let Snackbar = mui.Snackbar
+import SnackBar from './generic/SnackBar'
 
 import style from '../../assets/style/generic-style'
 
@@ -40,19 +42,8 @@ let Layout = React.createClass({
     children: React.PropTypes.element.isRequired
   },
 
-  getInitialState: function () {
-    return {
-      snackbarMessage: ''
-    }
-  },
-
   handleLeftNavToggle: function () {
     this.refs.leftNav.toggle()
-  },
-
-  setSnackbarMessage: function (message) {
-    this.setState({snackbarMessage: message})
-    this.refs.snack.show()
   },
 
   _handleClickRightMenu: function (element) {
@@ -70,7 +61,7 @@ let Layout = React.createClass({
     AuthActions.logOut((response, err) => {
       if (err !== null) {
         // Show logout error
-        this.setSnackbarMessage(err.message)
+        ErrorActions.setError(err)
       } else {
         this.handleLeftNavToggle()
         this.history.pushState(null, urls.login.show)
@@ -95,10 +86,11 @@ let Layout = React.createClass({
         </div>
       )
     }
-    // Add setSnackbarMessage function as a property to all children
-    var childrenWithProps = React.Children.map(this.props.children, (child) => {
-      return React.cloneElement(child, { setSnackbarMessage: this.setSnackbarMessage })
-    })
+    let menuItems = [
+      {type: MenuItem.Types.SUBHEADER, text: 'Settings'},
+      {route: 'about', text: 'About'},
+      {route: 'settings', text: 'Settings'}
+    ]
     return <div>
       <AppBar
         title='VACmatch'
@@ -112,18 +104,15 @@ let Layout = React.createClass({
           </IconMenu>
         }
         />
-      <LeftNav ref='leftNav' docked={false} menuItems={[]}
+      <LeftNav ref='leftNav' docked={false} menuItems={menuItems}
         header={
           <div style={style.center}>
             <Avatar src='assets/img/logos/vacmatch.png' size={100} />
             {loggedInfo}
           </div>
         }/>
-        <Snackbar
-          ref='snack'
-          message={this.state.snackbarMessage}
-          autoHideDuration={4000} />
-        {childrenWithProps}
+        <SnackBar/>
+        {this.props.children}
       </div>
   }
 })

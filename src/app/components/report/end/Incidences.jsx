@@ -4,21 +4,20 @@ import mui from 'material-ui'
 import style from '../../../../assets/style/generic-style'
 import ReportStore from '../../../stores/ReportStore'
 import ReportActions from '../../../actions/ReportActions'
+import ErrorActions from '../../../actions/ErrorActions'
+import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import SnackBarActions from '../../../actions/SnackBarActions'
+import SnackBarStore from '../../../stores/SnackBarStore'
 
 let RaisedButton = mui.RaisedButton
 let TextField = mui.TextField
-let Snackbar = mui.Snackbar
 
 let Incidences = React.createClass({
   mixins: [
-    Reflux.connect(ReportStore, 'report')
+    Reflux.connect(ReportStore, 'report'),
+    Reflux.connect(ErrorHandlerStore, 'error'),
+    Reflux.connect(SnackBarStore, 'snack')
   ],
-
-  getInitialState: function () {
-    return {
-      snackbarMessage: 'Incidences were updated'
-    }
-  },
 
   componentWillUpdate: function () {
     // Update new incidences value
@@ -29,12 +28,13 @@ let Incidences = React.createClass({
     let newIncidences = this.refs.incidences.getValue()
     let report = this.state.report.report
     // Add/update incidences in report
-    ReportActions.editReport(report._id, report.date, report.location, report.hasFinished,
+    ReportActions.editReport(report._id, report.date, report.location, report.status,
       report.localTeam, report.visitorTeam, newIncidences, (report, err) => {
         if (err !== null) {
-          this.setState({snackbarMessage: err})
+          ErrorActions.setError(err)
+        } else {
+          SnackBarActions.setElement('Report incidences updated')
         }
-        this.refs.snack.show()
       })
   },
 
@@ -50,10 +50,6 @@ let Incidences = React.createClass({
       <RaisedButton label='Modify incidences'
         primary={true}
         onClick={this.handleAddIncidences} />
-      <Snackbar
-        ref='snack'
-        message={this.state.snackbarMessage}
-        autoHideDuration={4000} />
     </div>
   }
 

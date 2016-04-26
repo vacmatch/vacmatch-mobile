@@ -25,7 +25,7 @@ let ReportItem = React.createClass({
       }),
       date: React.PropTypes.string,
       location: React.PropTypes.string,
-      hasFinished: React.PropTypes.bool
+      status: React.PropTypes.number
     }),
     editDialog: React.PropTypes.func,
     deleteDialog: React.PropTypes.func
