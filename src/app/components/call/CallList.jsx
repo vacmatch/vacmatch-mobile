@@ -19,6 +19,8 @@ import AuthenticatedComponent from '../generic/AuthenticatedComponent'
 
 let FloatingActionButton = mui.FloatingActionButton
 
+import style from '../../../assets/style/generic-style'
+
 let CallList = React.createClass({
   mixins: [
     Reflux.connect(PersonListStore, 'personList'),
@@ -190,7 +192,7 @@ let CallList = React.createClass({
           handleUpdate={this.handleCreateConfirm}
           teams={teams}/>
         <TabList tabsNames={tabs} tabsItems={items}/>
-        <FloatingActionButton onClick={this.handleCreate}>
+        <FloatingActionButton style={style.addButton} onClick={this.handleCreate}>
           <i className='material-icons'>add</i>
         </FloatingActionButton>
       </div>

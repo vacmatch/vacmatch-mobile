@@ -15,7 +15,8 @@ let AppBar = mui.AppBar
 let Avatar = mui.Avatar
 let LeftNav = mui.LeftNav
 let IconMenu = mui.IconMenu
-let MenuItem = mui.MenuItem
+let MenuItem = require('material-ui/lib/menus/menu-item')
+let MenuItemTemp = mui.MenuItem
 let IconButton = mui.IconButton
 let FlatButton = mui.FlatButton
 import SnackBar from './generic/SnackBar'
@@ -69,6 +70,11 @@ let Layout = React.createClass({
     })
   },
 
+  handleLogIn: function () {
+    this.handleLeftNavToggle()
+    this.history.pushState(null, urls.login.show)
+  },
+
   render: function () {
     // Set right menu elements
     let rightMenuElements = (
@@ -76,21 +82,34 @@ let Layout = React.createClass({
         return <MenuItem key={index} index={index} primaryText={element.text} onClick={this._handleClickRightMenu.bind(null, element)}/>
       })
     )
+
+    let menuItems = [
+      {type: MenuItemTemp.Types.SUBHEADER, text: 'Settings'},
+      {route: 'about', text: 'About'},
+      {route: '#settings', text: 'Settings'}
+    ]
+
     // Show logged info or not
     let loggedInfo = <h4>Please, log in!</h4>
     if (AuthStore.isLoggedIn()) {
+      menuItems.unshift({route: '/reports', text: 'Report list'})
+      menuItems.unshift({type: MenuItemTemp.Types.SUBHEADER, text: 'Report'})
       loggedInfo = (
         <div>
           <h4>{this.state.auth.user.name}</h4>
           <FlatButton label='Log out' primary={true} onClick={this.handleLogOut}/>
         </div>
       )
+    } else {
+      loggedInfo = (
+        <div>
+          <p>
+            <FlatButton label='Log in' primary={true} onClick={this.handleLogIn}/>
+          </p>
+        </div>
+      )
     }
-    let menuItems = [
-      {type: MenuItem.Types.SUBHEADER, text: 'Settings'},
-      {route: 'about', text: 'About'},
-      {route: 'settings', text: 'Settings'}
-    ]
+
     return <div>
       <AppBar
         title='VACmatch'

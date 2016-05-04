@@ -18,6 +18,8 @@ import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
 import Report from '../../../models/report/Report'
 
+import style from '../../../../assets/style/generic-style'
+
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
 let FloatingActionButton = mui.FloatingActionButton
@@ -165,7 +167,7 @@ let ReportList = React.createClass({
     return (
       <div>
         <TabList tabsNames={tabs} tabsItems={items}/>
-        <FloatingActionButton onClick={this.handleCreate}>
+        <FloatingActionButton style={style.addButton} onClick={this.handleCreate}>
           <i className='material-icons'>add</i>
         </FloatingActionButton>
         <EditReport
