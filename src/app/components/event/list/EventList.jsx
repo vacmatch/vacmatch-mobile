@@ -8,6 +8,10 @@ import SportStore from '../../../stores/SportStore'
 import ReportActions from '../../../actions/ReportActions'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import MenuStore from '../../../stores/MenuStore'
+import MenuActions from '../../../actions/MenuActions'
+import { History } from 'react-router'
+import urls from '../../../api/urls'
 
 import ControlEventItem from './ControlEventItem'
 import SportEventItem from './SportEventItem'
@@ -20,7 +24,9 @@ let PersonList = React.createClass({
   mixins: [
     Reflux.connect(EventStore, 'events'),
     Reflux.connect(SportStore, 'sport'),
-    Reflux.connect(ErrorHandlerStore, 'error')
+    Reflux.connect(MenuStore, 'menu'),
+    Reflux.connect(ErrorHandlerStore, 'error'),
+    History
   ],
 
   propTypes: {
@@ -29,7 +35,13 @@ let PersonList = React.createClass({
     })
   },
 
+  _handleBackEvent: function () {
+    this.history.pushState(null, urls.report.show(this.props.params.reportId))
+  },
+
   componentWillMount: function () {
+    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
       if (err !== null) {
@@ -42,6 +54,11 @@ let PersonList = React.createClass({
         ErrorActions.setError(err)
       }
     })
+  },
+
+  componentWillUnmount: function () {
+    MenuActions.clearRightMenu()
+    MenuActions.resetLeftMenu()
   },
 
   handleDeleteEvent: function (event) {

@@ -9,6 +9,9 @@ import ReportStore from '../../stores/ReportStore'
 import PersonActions from '../../actions/PersonActions'
 import ErrorActions from '../../actions/ErrorActions'
 import ErrorHandlerStore from '../../stores/utils/ErrorHandlerStore'
+import MenuStore from '../../stores/MenuStore'
+import MenuActions from '../../actions/MenuActions'
+import { History } from 'react-router'
 
 import TabList from '../generic/TabList'
 import CallItem from './CallItem'
@@ -16,6 +19,7 @@ import EditPerson from './EditPerson'
 import Person from '../../models/person/Person'
 
 import AuthenticatedComponent from '../generic/AuthenticatedComponent'
+import urls from '../../api/urls'
 
 let FloatingActionButton = mui.FloatingActionButton
 
@@ -26,7 +30,9 @@ let CallList = React.createClass({
     Reflux.connect(PersonListStore, 'personList'),
     Reflux.connect(PersonStore, 'person'),
     Reflux.connect(ReportStore, 'report'),
-    Reflux.connect(ErrorHandlerStore, 'error')
+    Reflux.connect(MenuStore, 'menu'),
+    Reflux.connect(ErrorHandlerStore, 'error'),
+    History
   ],
 
   propTypes: {
@@ -50,7 +56,13 @@ let CallList = React.createClass({
     this.setState({createDialogIsOpen: !this.state.createDialogIsOpen})
   },
 
+  _handleBackEvent: function () {
+    this.history.pushState(null, urls.report.show(this.props.params.reportId))
+  },
+
   componentWillMount: function () {
+    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+
     // Update team names from this report
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
       if (err !== null) {
@@ -65,6 +77,11 @@ let CallList = React.createClass({
           })
       }
     })
+  },
+
+  componentWillUnmount: function () {
+    MenuActions.clearRightMenu()
+    MenuActions.resetLeftMenu()
   },
 
   callToggle: function (personId, teamId, toggleEvent, newValue) {

@@ -8,6 +8,8 @@ import ReportActions from '../../../actions/ReportActions'
 import EventActions from '../../../actions/EventActions'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import MenuStore from '../../../stores/MenuStore'
+import MenuActions from '../../../actions/MenuActions'
 
 import TabList from '../../generic/TabList'
 import urls from '../../../api/urls'
@@ -21,6 +23,7 @@ let PersonList = React.createClass({
     Reflux.connect(PersonListStore, 'personList'),
     Reflux.connect(ReportStore, 'report'),
     Reflux.connect(SportStore, 'sport'),
+    Reflux.connect(MenuStore, 'menu'),
     Reflux.connect(ErrorHandlerStore, 'error'),
     History
   ],
@@ -51,7 +54,13 @@ let PersonList = React.createClass({
     })
   },
 
+  _handleBackEvent: function () {
+    this.history.pushState(null, urls.report.show(this.props.params.reportId))
+  },
+
   componentWillMount: function () {
+    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+
     // Update teams from this report
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
       if (err !== null) {
@@ -66,6 +75,11 @@ let PersonList = React.createClass({
           })
       }
     })
+  },
+
+  componentWillUnmount: function () {
+    MenuActions.clearRightMenu()
+    MenuActions.resetLeftMenu()
   },
 
   render: function () {

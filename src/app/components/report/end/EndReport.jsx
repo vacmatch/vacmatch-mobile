@@ -37,6 +37,10 @@ let EndReport = React.createClass({
     })
   },
 
+  _handleBackEvent: function () {
+    this.history.pushState(null, urls.report.show(this.props.params.reportId))
+  },
+
   componentWillMount: function () {
     let rightMenuElements = [
       {text: 'Events', url: urls.event.list(this.props.params.reportId)}
@@ -44,7 +48,7 @@ let EndReport = React.createClass({
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
 
-    MenuActions.setLeftMenu('chevron_left', this._handleLeftNavToggle, [])
+    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
 
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
@@ -69,10 +73,6 @@ let EndReport = React.createClass({
   componentWillUnmount: function () {
     MenuActions.clearRightMenu()
     MenuActions.resetLeftMenu()
-  },
-
-  _handleLeftNavToggle: function () {
-    this.history.pushState(null, urls.report.show(this.props.params.reportId))
   },
 
   render: function () {
