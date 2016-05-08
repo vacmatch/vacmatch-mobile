@@ -7,6 +7,12 @@ let MenuStore = Reflux.createStore({
 
   init: function () {
     this.state = {
+      resetLeftMenuFunction: null,
+      leftMenu: {
+        icon: '',
+        action: '',
+        elements: []
+      },
       rightMenu: []
     }
   },
@@ -36,6 +42,24 @@ let MenuStore = Reflux.createStore({
   onClearRightMenu: function () {
     this.state.rightMenu = []
     this.trigger(this.state)
+  },
+
+  onSetLeftMenu: function (icon, actionFunction, elements) {
+    this.state.leftMenu = {
+      icon: icon,
+      action: actionFunction,
+      elements: elements
+    }
+    this.trigger(this.state)
+  },
+
+  onSetResetLeftMenuFunction: function (action) {
+    this.state.resetLeftMenuFunction = action
+    this.trigger(this.state)
+  },
+
+  onResetLeftMenu: function () {
+    this.state.resetLeftMenuFunction()
   }
 })
 
