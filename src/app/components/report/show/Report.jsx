@@ -63,6 +63,10 @@ let Report = React.createClass({
     })
   },
 
+  componentWillUnmount: function () {
+    MenuActions.clearRightMenu()
+  },
+
   _handleStartMatch: function () {
     // Create start match control event
     let event = new StartMatchEvent()
@@ -142,7 +146,7 @@ let Report = React.createClass({
         <ReportProperty value={this.state.report.time} isPrimary={true} />
         {playButton}
         <EditReport reportId={this.props.params.reportId} cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
-           termUpdate={ReportActions.updateTerm} term={this.state.report.term}/>
+           termUpdate={ReportActions.updateTerm} term={this.state.report.term} addMenuElements={this.addRigthMenuElements}/>
          <Link to={urls.event.list(this.props.params.reportId)}>
           <RaisedButton label='Events' secondary={true} style={style.button}/>
         </Link>

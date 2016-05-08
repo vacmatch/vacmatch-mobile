@@ -58,6 +58,10 @@ let EndReport = React.createClass({
     })
   },
 
+  componentWillUnmount: function () {
+    MenuActions.clearRightMenu()
+  },
+
   render: function () {
     let refereeTitle = 'Sign report referee'
     let localTitle = 'Sign report ' + this.state.report.report.localTeam.name

@@ -24,13 +24,21 @@ let EditReport = React.createClass({
     cronoUpdate: React.PropTypes.func,
     termUpdate: React.PropTypes.func,
     time: React.PropTypes.string,
-    term: React.PropTypes.string
+    term: React.PropTypes.string,
+    addMenuElements: React.PropTypes.func
   },
 
   getInitialState: function () {
     return {
       dialogIsOpen: false
     }
+  },
+
+  componentWillMount: function () {
+    let elements = [
+      {text: 'Edit', callback: this.toggleDialog}
+    ]
+    this.props.addMenuElements(elements)
   },
 
   toggleDialog: function () {
