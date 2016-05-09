@@ -126,7 +126,6 @@ let Layout = React.createClass({
     return <div>
       <AppBar
         title='VACmatch'
-        onLeftIconButtonTouchTap={this.state.menu.leftMenu.action}
         iconElementLeft={
               <IconButton
                 onClick={this.state.menu.leftMenu.action}

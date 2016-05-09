@@ -24,5 +24,9 @@ module.exports =
 
   buttonRow: {
     marginTop: '2%'
+  },
+
+  content: {
+    marginTop: '5%'
   }
 }

@@ -12,16 +12,16 @@ let ReportItem = React.createClass({
   mixins: [History],
 
   propTypes: {
-    key: React.PropTypes.number,
+    key: React.PropTypes.string,
     report: React.PropTypes.shape({
       _id: React.PropTypes.string,
       localTeam: React.PropTypes.shape({
         name: React.PropTypes.string,
-        result: React.PropTypes.number
+        result: React.PropTypes.string
       }),
       visitorTeam: React.PropTypes.shape({
         name: React.PropTypes.string,
-        result: React.PropTypes.number
+        result: React.PropTypes.string
       }),
       date: React.PropTypes.string,
       location: React.PropTypes.string,

@@ -41,7 +41,7 @@ let SportEventItem = React.createClass({
           <i>{CronoUtils.milisecondsToString(this.props.event.matchTime) + ' - ' + this.props.event.text}</i>
         </p>
       }
-      rightIcon={
+      rightIconButton={
         <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
           <i className='material-icons'>delete</i>
         </IconButton>
