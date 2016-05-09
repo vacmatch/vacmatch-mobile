@@ -29,7 +29,7 @@ let ControlEventItem = React.createClass({
       primaryText={<b>{this.props.eventType.title}
       </b>}
       secondaryText={this.props.event.text}
-      rightIcon={
+      rightIconButton={
         <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
           <i className='material-icons'>delete</i>
         </IconButton>

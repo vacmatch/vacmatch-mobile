@@ -167,9 +167,6 @@ let ReportList = React.createClass({
     return (
       <div>
         <TabList tabsNames={tabs} tabsItems={items}/>
-        <FloatingActionButton style={style.addButton} onClick={this.handleCreate}>
-          <i className='material-icons'>add</i>
-        </FloatingActionButton>
         <EditReport
           report={this.state.report.report}
           title='Edit report'
@@ -182,6 +179,9 @@ let ReportList = React.createClass({
           dialogIsOpen={this.state.createDialogIsOpen}
           toggleDialog={this.toggleCreateDialog}
           handleUpdate={this.handleCreateConfirm} />
+        <FloatingActionButton style={style.addButton} onClick={this.handleCreate}>
+          <i className='material-icons'>add</i>
+        </FloatingActionButton>
       </div>
     )
   }

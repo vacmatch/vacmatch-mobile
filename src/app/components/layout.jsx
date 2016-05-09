@@ -4,6 +4,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 import mui from 'material-ui'
 import { History } from 'react-router'
 import MenuStore from '../stores/MenuStore'
+import MenuActions from '../actions/MenuActions'
 import AuthStore from '../stores/AuthStore'
 import AuthActions from '../actions/AuthActions'
 import ErrorActions from '../actions/ErrorActions'
@@ -43,7 +44,34 @@ let Layout = React.createClass({
     children: React.PropTypes.element.isRequired
   },
 
-  handleLeftNavToggle: function () {
+  componentWillMount: function () {
+    this._setLeftMenuItems()
+    // Save reset function in store to reset left menu from other places in the APP
+    MenuActions.setResetLeftMenuFunction(this._setLeftMenuItems)
+  },
+
+  _setLeftMenuItems: function () {
+    let menuItems = [
+      {type: MenuItemTemp.Types.SUBHEADER, text: 'Settings'},
+      {route: 'about', text: 'About'},
+      {route: '#settings', text: 'Settings'}
+    ]
+    if (AuthStore.isLoggedIn()) {
+      menuItems.unshift({route: '/reports', text: 'Report list'})
+      menuItems.unshift({type: MenuItemTemp.Types.SUBHEADER, text: 'Report'})
+    }
+    MenuActions.setLeftMenu('menu', this._handleLeftNavToggle, menuItems)
+  },
+
+  _getRightMenuItems: function () {
+    return (
+      this.state.menu.rightMenu.map((element, index) => {
+        return <MenuItem key={index} index={index} primaryText={element.text} onClick={this._handleClickRightMenu.bind(null, element)}/>
+      })
+    )
+  },
+
+  _handleLeftNavToggle: function () {
     this.refs.leftNav.toggle()
   },
 
@@ -58,53 +86,38 @@ let Layout = React.createClass({
     }
   },
 
-  handleLogOut: function () {
+  _handleLogOut: function () {
     AuthActions.logOut((response, err) => {
       if (err !== null) {
         // Show logout error
         ErrorActions.setError(err)
       } else {
-        this.handleLeftNavToggle()
+        this._handleLeftNavToggle()
         this.history.pushState(null, urls.login.show)
       }
     })
   },
 
-  handleLogIn: function () {
-    this.handleLeftNavToggle()
+  _handleLogIn: function () {
+    this._handleLeftNavToggle()
     this.history.pushState(null, urls.login.show)
   },
 
   render: function () {
-    // Set right menu elements
-    let rightMenuElements = (
-      this.state.menu.rightMenu.map((element, index) => {
-        return <MenuItem key={index} index={index} primaryText={element.text} onClick={this._handleClickRightMenu.bind(null, element)}/>
-      })
-    )
-
-    let menuItems = [
-      {type: MenuItemTemp.Types.SUBHEADER, text: 'Settings'},
-      {route: 'about', text: 'About'},
-      {route: '#settings', text: 'Settings'}
-    ]
-
     // Show logged info or not
     let loggedInfo = <h4>Please, log in!</h4>
     if (AuthStore.isLoggedIn()) {
-      menuItems.unshift({route: '/reports', text: 'Report list'})
-      menuItems.unshift({type: MenuItemTemp.Types.SUBHEADER, text: 'Report'})
       loggedInfo = (
         <div>
           <h4>{this.state.auth.user.name}</h4>
-          <FlatButton label='Log out' primary={true} onClick={this.handleLogOut}/>
+          <FlatButton label='Log out' primary={true} onClick={this._handleLogOut}/>
         </div>
       )
     } else {
       loggedInfo = (
         <div>
           <p>
-            <FlatButton label='Log in' primary={true} onClick={this.handleLogIn}/>
+            <FlatButton label='Log in' primary={true} onClick={this._handleLogIn}/>
           </p>
         </div>
       )
@@ -113,17 +126,21 @@ let Layout = React.createClass({
     return <div>
       <AppBar
         title='VACmatch'
-        onLeftIconButtonTouchTap={this.handleLeftNavToggle}
+        iconElementLeft={
+              <IconButton
+                onClick={this.state.menu.leftMenu.action}
+              ><i className='material-icons'>{this.state.menu.leftMenu.icon}</i></IconButton>
+        }
         iconElementRight={
           <IconMenu
             iconButtonElement={
               <IconButton><i className='material-icons'>more_vert</i></IconButton>
             }>
-            {rightMenuElements}
+            {this._getRightMenuItems()}
           </IconMenu>
         }
         />
-      <LeftNav ref='leftNav' docked={false} menuItems={menuItems}
+      <LeftNav ref='leftNav' docked={false} menuItems={this.state.menu.leftMenu.elements}
         header={
           <div style={style.center}>
             <Avatar src='assets/img/logos/vacmatch.png' size={100} />

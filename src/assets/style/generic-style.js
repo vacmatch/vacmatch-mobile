@@ -23,8 +23,8 @@ module.exports =
   },
 
   addButton: {
-    marginTop: '60%',
-    marginLeft: '80%'
+    marginTop: '80%',
+    marginLeft: '85%'
   }
 
 }

@@ -11,10 +11,12 @@ import SignStore from '../../../stores/SignStore'
 import SignActions from '../../../actions/SignActions'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import { History } from 'react-router'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 import Incidences from './Incidences'
 import Sign from './Sign'
+import urls from '../../../api/urls'
 
 let Tabs = mui.Tabs
 let Tab = mui.Tab
@@ -25,7 +27,8 @@ let EndReport = React.createClass({
     Reflux.connect(PersonListStore, 'personLists'),
     Reflux.connect(SignStore, 'signatures'),
     Reflux.connect(MenuStore, 'menu'),
-    Reflux.connect(ErrorHandlerStore, 'error')
+    Reflux.connect(ErrorHandlerStore, 'error'),
+    History
   ],
 
   propTypes: {
@@ -34,10 +37,19 @@ let EndReport = React.createClass({
     })
   },
 
+  _handleBackEvent: function () {
+    this.history.pushState(null, urls.report.show(this.props.params.reportId))
+  },
+
   componentWillMount: function () {
-    let rightMenuElements = []
+    let rightMenuElements = [
+      {text: 'Events', url: urls.event.list(this.props.params.reportId)}
+    ]
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
+
+    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
       if (err !== null) {
@@ -60,6 +72,7 @@ let EndReport = React.createClass({
 
   componentWillUnmount: function () {
     MenuActions.clearRightMenu()
+    MenuActions.resetLeftMenu()
   },
 
   render: function () {
