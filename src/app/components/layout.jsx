@@ -8,6 +8,7 @@ import MenuActions from '../actions/MenuActions'
 import AuthStore from '../stores/AuthStore'
 import AuthActions from '../actions/AuthActions'
 import ErrorActions from '../actions/ErrorActions'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 import urls from '../api/urls'
 
@@ -30,6 +31,29 @@ import style from '../../assets/style/generic-style'
 // https://ADFgithub.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin()
 
+const messages = defineMessages({
+  settings: {
+    id: 'leftnav.settings',
+    description: 'Settings divider in left menu',
+    defaultMessage: 'Settings'
+  },
+  about: {
+    id: 'leftnav.about',
+    description: 'About section in left menu',
+    defaultMessage: 'About'
+  },
+  report: {
+    id: 'leftnav.report',
+    description: 'Report divider in left menu',
+    defaultMessage: 'Report'
+  },
+  reportList: {
+    id: 'leftnav.reportList',
+    description: 'Report list section in left menu',
+    defaultMessage: 'Report list'
+  }
+})
+
 /*
  * Layout component
  */
@@ -41,7 +65,8 @@ let Layout = React.createClass({
   ],
 
   propTypes: {
-    children: React.PropTypes.element.isRequired
+    children: React.PropTypes.element.isRequired,
+    intl: intlShape.isRequired
   },
 
   componentWillMount: function () {
@@ -52,13 +77,13 @@ let Layout = React.createClass({
 
   _setLeftMenuItems: function () {
     let menuItems = [
-      {type: MenuItemTemp.Types.SUBHEADER, text: 'Settings'},
-      {route: 'about', text: 'About'},
-      {route: '#settings', text: 'Settings'}
+      {type: MenuItemTemp.Types.SUBHEADER, text: this.props.intl.formatMessage(messages.settings)},
+      {route: 'about', text: this.props.intl.formatMessage(messages.about)},
+      {route: '#settings', text: this.props.intl.formatMessage(messages.settings)}
     ]
     if (AuthStore.isLoggedIn()) {
-      menuItems.unshift({route: '/reports', text: 'Report list'})
-      menuItems.unshift({type: MenuItemTemp.Types.SUBHEADER, text: 'Report'})
+      menuItems.unshift({route: '/reports', text: this.props.intl.formatMessage(messages.reportList)})
+      menuItems.unshift({type: MenuItemTemp.Types.SUBHEADER, text: this.props.intl.formatMessage(messages.report)})
     }
     MenuActions.setLeftMenu('menu', this._handleLeftNavToggle, menuItems)
   },
@@ -110,14 +135,26 @@ let Layout = React.createClass({
       loggedInfo = (
         <div>
           <h4>{this.state.auth.user.name}</h4>
-          <FlatButton label='Log out' primary={true} onClick={this._handleLogOut}/>
+          <FlatButton label={
+            <FormattedMessage
+                id='leftnav.logout'
+                description='Logout button text in left menu'
+                defaultMessage='Log out'
+            />
+          } primary={true} onClick={this._handleLogOut}/>
         </div>
       )
     } else {
       loggedInfo = (
         <div>
           <p>
-            <FlatButton label='Log in' primary={true} onClick={this._handleLogIn}/>
+            <FlatButton label={
+              <FormattedMessage
+                  id='leftnav.login'
+                  description='Login button text in left menu'
+                  defaultMessage='Log in'
+              />
+            } primary={true} onClick={this._handleLogIn}/>
           </p>
         </div>
       )
@@ -153,4 +190,4 @@ let Layout = React.createClass({
   }
 })
 
-module.exports = Layout
+module.exports = injectIntl(Layout)
