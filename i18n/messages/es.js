@@ -15,11 +15,18 @@ export default {
   'button.cancel': 'Cancelar',
   'button.edit': 'Editar',
   'button.modify': 'Modificar',
+  'button.accept': 'Aceptar',
 
   // Report
   'report.edit': 'Editar acta',
   'report.edit.insertTime': 'Insertar tiempo',
   'report.edit.modifyTime': 'Modificar tiempo',
   'report.edit.modifyTerm.input': 'Insertar nuevo período',
-  'report.edit.modifyTerm.button': 'Modificar período'
+  'report.edit.modifyTerm.button': 'Modificar período',
+
+  // End match
+  'report.endMatchDialog.endMatch': 'Terminar partido',
+  'report.endMatchDialog.confirmDialog': '¿Seguro que desea terminar este partido?',
+  'report.endMatchDialog.button.endGame': 'Terminar partido'
+
 }
