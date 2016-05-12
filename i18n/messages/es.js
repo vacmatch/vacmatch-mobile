@@ -9,6 +9,17 @@ export default {
   'leftnav.settings': 'Opciones',
   'leftnav.about': 'Acerca de',
   'leftnav.report': 'Acta',
-  'leftnav.reportList': 'Lista de actas'
+  'leftnav.reportList': 'Lista de actas',
 
+  // generic
+  'button.cancel': 'Cancelar',
+  'button.edit': 'Editar',
+  'button.modify': 'Modificar',
+
+  // Report
+  'report.edit': 'Editar acta',
+  'report.edit.insertTime': 'Insertar tiempo',
+  'report.edit.modifyTime': 'Modificar tiempo',
+  'report.edit.modifyTerm.input': 'Insertar nuevo período',
+  'report.edit.modifyTerm.button': 'Modificar período'
 }
