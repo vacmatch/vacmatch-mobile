@@ -47,6 +47,17 @@ export default {
   'report.endMatchDialog.button.endGame': 'End match',
   'report.endReport.events': 'Events',
   'report.endReport.signTab.title': 'Sign report - {element}',
-  'report.endReport.referee': 'Referee'
+  'report.endReport.referee': 'Referee',
 
+  // Incidences
+  'report.incidences.incidencesUpdated': 'Incidences updated',
+  'report.incidences.addIncidences': 'Add incidences',
+  'report.incidences.modifyIncidences': 'Modify incidences',
+
+  // Sign
+  'report.sign.emptySignList': 'There\'s no one that can sign',
+  'report.sign.button.sign': 'Sign',
+  'report.sign.insertPin': 'Insert your PIN',
+  'report.sign.signReport': 'Sign report',
+  'report.sign.signatures': 'Signatures'
 }

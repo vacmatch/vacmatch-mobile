@@ -47,6 +47,19 @@ export default {
   'report.endMatchDialog.button.endGame': 'Terminar partido',
   'report.endReport.events': 'Eventos',
   'report.endReport.signTab.title': 'Firmar acta - {element}',
-  'report.endReport.referee': 'Árbitro'
+  'report.endReport.referee': 'Árbitro',
+
+  // Incidences
+  'report.incidences.incidencesUpdated': 'Incidencias actualizadas',
+  'report.incidences.addIncidences': 'Añadir incidencias',
+  'report.incidences.modifyIncidences': 'Modificar incidencias',
+  'report.incidences.modifyIncidences.short': 'Modif. incidencias',
+
+  // Sign
+  'report.sign.emptySignList': 'No hay nadie que pueda firmar',
+  'report.sign.button.sign': 'Firmar',
+  'report.sign.insertPin': 'Inserta tu PIN',
+  'report.sign.signReport': 'Firmar acta',
+  'report.sign.signatures': 'Firmas'
 
 }
