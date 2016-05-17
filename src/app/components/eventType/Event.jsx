@@ -1,6 +1,7 @@
 import React from 'react'
 import mui from 'material-ui'
 import style from '../../../assets/style/generic-style'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 // Components
 let Dialog = mui.Dialog
@@ -64,12 +65,12 @@ let Event = React.createClass({
           [
             <FlatButton
             key={'dialog-cancel-' + this.props.person._id}
-            label='Cancel'
+            label={<FormattedMessage id='button.cancel' />}
             secondary={true}
             onTouchTap={this.toggleDialog}/>,
             <FlatButton
             key={'dialog-acept-' + this.props.person._id}
-            label='Accept'
+            label={<FormattedMessage id='button.accept' />}
             primary={true}
             onTouchTap={this._onDialogSubmit}/>
           ]
@@ -77,8 +78,17 @@ let Event = React.createClass({
         actionFocus='submit'>
         <hr/>
         <p>
-          You are going to add a <b>{this.props.eventSubtitle}</b> to:</p>
-        <h4>Dorsal: {personDorsal}</h4>
+          <FormattedMessage
+              id='eventType.addEventMessage'
+              values={{event: this.props.eventSubtitle}}
+          />
+        </p>
+        <h4>
+          <FormattedMessage
+              id='eventType.dorsal'
+              values={{element: personDorsal}}
+          />
+        </h4>
         <h4>{personName}</h4>
       </Dialog>
       <ListItem key={'listItem-' + this.props.person._id}
@@ -91,4 +101,4 @@ let Event = React.createClass({
   }
 })
 
-module.exports = Event
+module.exports = injectIntl(Event)

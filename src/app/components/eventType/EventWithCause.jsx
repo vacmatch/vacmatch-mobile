@@ -1,6 +1,7 @@
 import React from 'react'
 import Reflux from 'reflux'
 import mui from 'material-ui'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 import EventStore from '../../stores/EventStore'
 import style from '../../../assets/style/generic-style'
@@ -64,9 +65,21 @@ let EventWithCause = React.createClass({
   render: function () {
     let personName = this.props.person.name
     let personDorsal = this.props.person.dorsal
-    let staffLabel = <span style={style.secondaryColor}>Player</span>
+    let staffLabel = <span style={style.secondaryColor}>
+      <FormattedMessage
+          id='eventType.player'
+          description='Player text for items in list'
+          defaultMessage='Player'
+      />
+    </span>
     if (this.props.person.isStaff) {
-      staffLabel = <span style={style.primaryColor}>Staff</span>
+      staffLabel = <span style={style.primaryColor}>
+        <FormattedMessage
+            id='eventType.staff'
+            description='Staff text for items in list'
+            defaultMessage='Staff'
+        />
+      </span>
     }
     let secondaryText = (
       <div>
@@ -88,12 +101,12 @@ let EventWithCause = React.createClass({
           [
             <FlatButton
             key={'dialog-cancel-' + this.props.person._id}
-            label='Cancel'
+            label={<FormattedMessage id='button.cancel' />}
             secondary={true}
             onTouchTap={this.toggleDialog}/>,
             <FlatButton
             key={'dialog-acept-' + this.props.person._id}
-            label='Accept'
+            label={<FormattedMessage id='button.accept' />}
             primary={true}
             onTouchTap={this._onDialogSubmit}/>
           ]
@@ -101,12 +114,30 @@ let EventWithCause = React.createClass({
         actionFocus='submit'>
         <hr/>
         <p>
-          You are going to add a <b>{this.props.eventSubtitle}</b> to:</p>
-        <h4>Dorsal: {personDorsal}</h4>
+          <FormattedMessage
+              id='eventType.addEventMessage'
+              description='Text about add an event in add event modal'
+              defaultMessage='You are going to add a {event} to:'
+              values={{event: this.props.eventSubtitle}}
+          />
+        </p>
+        <h4>
+          <FormattedMessage
+              id='eventType.dorsal'
+              description='Dorsal label for text in add event modal'
+              defaultMessage='Dorsal: {element}'
+              values={{element: personDorsal}}
+          />
+        </h4>
         <h4>{personName}</h4>
         <SelectField
-          ref='test'
-          floatingLabelText='Select cause'
+          floatingLabelText={
+            <FormattedMessage
+                id='eventType.selectCause'
+                description='Select cause input text'
+                defaultMessage='Select cause'
+            />
+          }
           menuItems={menuItems}
           selectedIndex={this.state.causeIndex}
           onChange={this._handleSelectValueChange} />
@@ -121,4 +152,4 @@ let EventWithCause = React.createClass({
   }
 })
 
-module.exports = EventWithCause
+module.exports = injectIntl(EventWithCause)

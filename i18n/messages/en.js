@@ -69,5 +69,17 @@ export default {
   'report.editReport.insertDate': 'Insert date',
   'report.editReport.modifyDate': 'Modify date',
   'report.editReport.insertLocation': 'Insert location',
-  'report.editReport.modifyLocation': 'Modify location'
+  'report.editReport.modifyLocation': 'Modify location',
+
+  // Event type
+  'eventType.selectCause': 'Select cause',
+  'eventType.player': 'Player',
+  'eventType.staff': 'Staff',
+  'eventType.addEventMessage': 'You are going to add a {event} to:',
+  'eventType.dorsal': 'Dorsal: {element}',
+
+  // Events
+  'event.foul.lowercase': 'foul',
+  'event.foul': 'Foul'
+
 }

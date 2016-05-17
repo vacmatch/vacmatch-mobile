@@ -70,6 +70,17 @@ export default {
   'report.editReport.insertDate': 'Añadir fecha',
   'report.editReport.modifyDate': 'Modificar fecha',
   'report.editReport.insertLocation': 'Añadir localización',
-  'report.editReport.modifyLocation': 'Modificar localización'
+  'report.editReport.modifyLocation': 'Modificar localización',
+
+  // Event type
+  'eventType.selectCause': 'Seleccionar causa',
+  'eventType.player': 'Jugador',
+  'eventType.staff': 'Personal',
+  'eventType.addEventMessage': 'Vas a añadir un {event} a:',
+  'eventType.dorsal': 'Dorsal: {element}',
+
+  // Events
+  'event.foul.lowercase': 'falta',
+  'event.foul': 'Falta'
 
 }
