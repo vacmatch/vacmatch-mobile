@@ -24,6 +24,16 @@ export default {
   'report.edit.modifyTerm.input': 'Insertar nuevo período',
   'report.edit.modifyTerm.button': 'Modificar período',
 
+  // Show report
+  'report.show.snackbar.matchStarted': 'Partido comenzado',
+  'report.show.startMatch': 'Empezar partido',
+  'report.show.stop': 'Stop',
+  'report.show.play': 'Play',
+  'report.show.matchFinished': 'Partido terminado',
+  'report.show.term': 'Periodo',
+  'report.show.fouls': 'Faltas',
+  'report.show.events': 'Eventos',
+
   // End match
   'report.endMatchDialog.endMatch': 'Terminar partido',
   'report.endMatchDialog.confirmDialog': '¿Seguro que desea terminar este partido?',

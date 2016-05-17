@@ -24,6 +24,16 @@ export default {
   'report.edit.modifyTerm.input': 'Insert new term',
   'report.edit.modifyTerm.button': 'Modify term',
 
+  // Show report
+  'report.show.snackbar.matchStarted': 'Match started',
+  'report.show.startMatch': 'Start match',
+  'report.show.stop': 'Stop',
+  'report.show.play': 'Play',
+  'report.show.matchFinished': 'Match finisehd',
+  'report.show.term': 'Term',
+  'report.show.fouls': 'Fouls',
+  'report.show.events': 'Events',
+
   // End match
   'report.endMatchDialog.endMatch': 'End match',
   'report.endMatchDialog.confirmDialog': 'Do you want to end this match?',

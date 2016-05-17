@@ -20,6 +20,11 @@ const messages = defineMessages({
     id: 'button.edit',
     description: 'Edit button in right top menu',
     defaultMessage: 'Edit'
+  },
+  editReportLabel: {
+    id: 'report.edit',
+    description: 'Edit report dialog title',
+    defaultMessage: 'Edit report'
   }
 })
 
@@ -89,6 +94,8 @@ let EditReport = React.createClass({
         onTouchTap={this.toggleDialog} />
     ]
 
+    let titleLabel = this.props.intl.formatMessage(messages.editReportLabel)
+
     return (
       <div key={'dialog-div'}>
         <FlatButton label={
@@ -98,13 +105,7 @@ let EditReport = React.createClass({
         } primary={true} onClick={this.toggleDialog} />
         <Dialog key={'dialog-edit-report'}
           ref='editDialog'
-          title={
-            <FormattedMessage
-                id='report.edit'
-                description='Edit report dialog title'
-                defaultMessage='Edit report'
-            />
-          }
+          title={titleLabel}
           actions={customActions}
           open={this.state.dialogIsOpen}>
           <div style={style.containerDialog}>
