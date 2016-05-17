@@ -59,5 +59,15 @@ export default {
   'report.sign.button.sign': 'Sign',
   'report.sign.insertPin': 'Insert your PIN',
   'report.sign.signReport': 'Sign report',
-  'report.sign.signatures': 'Signatures'
+  'report.sign.signatures': 'Signatures',
+
+  // Add report (edit report component)
+  'report.editReport.insertLocalTeam': 'Insert local team',
+  'report.editReport.modifyLocalTeam': 'Modify local team',
+  'report.editReport.insertVisitorTeam': 'Insert visitor team',
+  'report.editReport.modifyVisitorTeam': 'Modify visitor team',
+  'report.editReport.insertDate': 'Insert date',
+  'report.editReport.modifyDate': 'Modify date',
+  'report.editReport.insertLocation': 'Insert location',
+  'report.editReport.modifyLocation': 'Modify location'
 }

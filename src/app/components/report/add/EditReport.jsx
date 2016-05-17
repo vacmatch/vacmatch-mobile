@@ -1,6 +1,7 @@
 import React from 'react'
 import mui from 'material-ui'
 const Dialog = require('material-ui/lib/dialog')
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 let FlatButton = mui.FlatButton
 let TextField = mui.TextField
@@ -37,12 +38,12 @@ let EditReport = React.createClass({
     let customActions = [
       <FlatButton
         key={'dialog-cancel'}
-        label='Cancel'
+        label={<FormattedMessage id='button.cancel'/>}
         secondary={true}
         onTouchTap={this.props.toggleDialog} />,
       <FlatButton
         key={'dialog-accept'}
-        label='Modify'
+        label={<FormattedMessage id='button.modify'/>}
         primary={true}
         onTouchTap={this.handleUpdate} />
     ]
@@ -57,23 +58,71 @@ let EditReport = React.createClass({
             <div>
               <TextField ref='localTeam'
                 key={'dialog-localTeam-field'}
-                hintText='Insert local team'
-                floatingLabelText='Modify local team'
+                hintText={
+                  <FormattedMessage
+                      id='report.editReport.insertLocalTeam'
+                      description='Insert visitor team text for input element'
+                      defaultMessage='Insert local team'
+                  />
+                }
+                floatingLabelText={
+                  <FormattedMessage
+                      id='report.editReport.modifyLocalTeam'
+                      description='Modify local team text for input element'
+                      defaultMessage='Modify local team'
+                  />
+                }
                 defaultValue={this.props.report.localTeam ? this.props.report.localTeam.name : ''}/>
               <TextField ref='visitorTeam'
                 key={'dialog-visitorTeam-field'}
-                hintText='Insert visitor team'
-                floatingLabelText='Modify visitor team'
+                hintText={
+                  <FormattedMessage
+                      id='report.editReport.insertVisitorTeam'
+                      description='Insert visitor team text for input element'
+                      defaultMessage='Insert visitor team'
+                  />
+                }
+                floatingLabelText={
+                  <FormattedMessage
+                      id='report.editReport.modifyVisitorTeam'
+                      description='Modify visitor team text for input element'
+                      defaultMessage='Modify visitor team'
+                  />
+                }
                 defaultValue={this.props.report.visitorTeam ? this.props.report.visitorTeam.name : ''}/>
               <TextField ref='date'
                 key={'dialog-date-field'}
-                hintText='Insert date'
-                floatingLabelText='Modify date'
+                hintText={
+                  <FormattedMessage
+                      id='report.editReport.insertDate'
+                      description='Insert date text for input element'
+                      defaultMessage='Insert date'
+                  />
+                }
+                floatingLabelText={
+                  <FormattedMessage
+                      id='report.editReport.modifyDate'
+                      description='Modify date text for input element'
+                      defaultMessage='Modify date'
+                  />
+                }
                 defaultValue={this.props.report.date}/>
               <TextField ref='location'
                 key={'dialog-place-field'}
-                hintText='Insert location'
-                floatingLabelText='Modify location'
+                hintText={
+                  <FormattedMessage
+                      id='report.editReport.insertLocation'
+                      description='Insert location text for input element'
+                      defaultMessage='Insert location'
+                  />
+                }
+                floatingLabelText={
+                  <FormattedMessage
+                      id='report.editReport.modifyLocation'
+                      description='Modify location text for input element'
+                      defaultMessage='Modify location'
+                  />
+                }
                 defaultValue={this.props.report.location}/>
             </div>
         </Dialog>
@@ -83,4 +132,4 @@ let EditReport = React.createClass({
 
 })
 
-module.exports = EditReport
+module.exports = injectIntl(EditReport)

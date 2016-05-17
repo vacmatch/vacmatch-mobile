@@ -60,6 +60,16 @@ export default {
   'report.sign.button.sign': 'Firmar',
   'report.sign.insertPin': 'Inserta tu PIN',
   'report.sign.signReport': 'Firmar acta',
-  'report.sign.signatures': 'Firmas'
+  'report.sign.signatures': 'Firmas',
+
+  // Add report (edit report component)
+  'report.editReport.insertLocalTeam': 'Añadir equipo local',
+  'report.editReport.modifyLocalTeam': 'Modificar equipo local',
+  'report.editReport.insertVisitorTeam': 'Añadir equipo visitante',
+  'report.editReport.modifyVisitorTeam': 'Modificar equipo visitante',
+  'report.editReport.insertDate': 'Añadir fecha',
+  'report.editReport.modifyDate': 'Modificar fecha',
+  'report.editReport.insertLocation': 'Añadir localización',
+  'report.editReport.modifyLocation': 'Modificar localización'
 
 }

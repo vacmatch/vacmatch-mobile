@@ -9,13 +9,13 @@ class Report {
     this.location = location
     this.localTeam = {
       _id: localTeam ? localTeam._id : null,
-      name: localTeam ? localTeam.name : 'Local',
+      name: localTeam ? localTeam.name : '',
       result: localTeam ? localTeam.result : '0',
       secondaryField: localTeam ? localTeam.secondaryField : '0'
     }
     this.visitorTeam = {
       _id: visitorTeam ? visitorTeam._id : null,
-      name: visitorTeam ? visitorTeam.name : 'Visitor',
+      name: visitorTeam ? visitorTeam.name : '',
       result: visitorTeam ? visitorTeam.result : '0',
       secondaryField: visitorTeam ? visitorTeam.secondaryField : '0'
     }
