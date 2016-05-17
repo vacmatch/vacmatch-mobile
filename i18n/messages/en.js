@@ -17,6 +17,7 @@ export default {
   'button.modify': 'Modify',
   'button.accept': 'Accept',
   'button.delete': 'Delete',
+  'tooltip.delete': 'Delete',
 
   // Report
   'report.edit': 'Edit report',

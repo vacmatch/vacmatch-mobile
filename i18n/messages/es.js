@@ -17,6 +17,7 @@ export default {
   'button.modify': 'Modificar',
   'button.accept': 'Aceptar',
   'button.delete': 'Borrar',
+  'tooltip.delete': 'Borrar',
 
   // Report
   'report.edit': 'Editar acta',
