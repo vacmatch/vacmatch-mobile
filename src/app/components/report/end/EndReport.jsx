@@ -12,6 +12,7 @@ import SignActions from '../../../actions/SignActions'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 import { History } from 'react-router'
+import {intlShape, injectIntl, defineMessages} from 'react-intl'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 import Incidences from './Incidences'
@@ -20,6 +21,24 @@ import urls from '../../../api/urls'
 
 let Tabs = mui.Tabs
 let Tab = mui.Tab
+
+const messages = defineMessages({
+  eventsItem: {
+    id: 'report.endReport.events',
+    description: 'Events text for option in right menu',
+    defaultMessage: 'Events'
+  },
+  signTabTitle: {
+    id: 'report.endReport.signTab.title',
+    description: 'Text title in tabs for sign reports',
+    defaultMessage: 'Sign report {element}'
+  },
+  refereeLabel: {
+    id: 'report.endReport.referee',
+    description: 'Referee text to show as title in sign tab',
+    defaultMessage: 'Referee'
+  }
+})
 
 let EndReport = React.createClass({
   mixins: [
@@ -34,7 +53,8 @@ let EndReport = React.createClass({
   propTypes: {
     params: React.PropTypes.shape({
       reportId: React.PropTypes.string
-    })
+    }),
+    intl: intlShape.isRequired
   },
 
   _handleBackEvent: function () {
@@ -43,7 +63,7 @@ let EndReport = React.createClass({
 
   componentWillMount: function () {
     let rightMenuElements = [
-      {text: 'Events', url: urls.event.list(this.props.params.reportId)}
+      {text: this.props.intl.formatMessage(messages.eventsItem), url: urls.event.list(this.props.params.reportId)}
     ]
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
@@ -76,11 +96,13 @@ let EndReport = React.createClass({
   },
 
   render: function () {
-    let refereeTitle = 'Sign report referee'
-    let localTitle = 'Sign report ' + this.state.report.report.localTeam.name
-    let visitorTitle = 'Sign report ' + this.state.report.report.visitorTeam.name
+    let refereeTitle = this.props.intl.formatMessage(messages.signTabTitle, {element: this.props.intl.formatMessage(messages.refereeLabel)})
+    let localTitle = this.props.intl.formatMessage(messages.signTabTitle, {element: this.state.report.report.localTeam.name})
+    let visitorTitle = this.props.intl.formatMessage(messages.signTabTitle, {element: this.state.report.report.visitorTeam.name})
+    let refereeLabel = this.props.intl.formatMessage(messages.refereeLabel)
+
     return <Tabs>
-      <Tab label='Referee'>
+      <Tab label={refereeLabel}>
         <Incidences handleAddIncidences={this.handleAddIncidences}/>
         <Sign title={refereeTitle}
           personList={this.state.report.report.refereeList}
@@ -104,4 +126,4 @@ let EndReport = React.createClass({
 
 })
 
-module.exports = AuthenticatedComponent(EndReport)
+module.exports = AuthenticatedComponent(injectIntl(EndReport))

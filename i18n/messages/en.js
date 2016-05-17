@@ -44,6 +44,9 @@ export default {
   // End match
   'report.endMatchDialog.endMatch': 'End match',
   'report.endMatchDialog.confirmDialog': 'Do you want to end this match?',
-  'report.endMatchDialog.button.endGame': 'End match'
+  'report.endMatchDialog.button.endGame': 'End match',
+  'report.endReport.events': 'Events',
+  'report.endReport.signTab.title': 'Sign report - {element}',
+  'report.endReport.referee': 'Referee'
 
 }

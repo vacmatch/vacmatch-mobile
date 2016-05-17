@@ -44,6 +44,9 @@ export default {
   // End match
   'report.endMatchDialog.endMatch': 'Terminar partido',
   'report.endMatchDialog.confirmDialog': '¿Seguro que desea terminar este partido?',
-  'report.endMatchDialog.button.endGame': 'Terminar partido'
+  'report.endMatchDialog.button.endGame': 'Terminar partido',
+  'report.endReport.events': 'Eventos',
+  'report.endReport.signTab.title': 'Firmar acta - {element}',
+  'report.endReport.referee': 'Árbitro'
 
 }
