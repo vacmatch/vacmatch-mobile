@@ -16,6 +16,7 @@ export default {
   'button.edit': 'Editar',
   'button.modify': 'Modificar',
   'button.accept': 'Aceptar',
+  'button.delete': 'Borrar',
 
   // Report
   'report.edit': 'Editar acta',
