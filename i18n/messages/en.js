@@ -34,6 +34,12 @@ export default {
   'report.show.fouls': 'Fouls',
   'report.show.events': 'Events',
 
+  // List reports
+  'report.list.nextReports': 'Next reports',
+  'report.list.lastReports': 'Last reports',
+  'report.list.editReport': 'Edit report',
+  'report.list.createReport': 'Create report',
+
   // End match
   'report.endMatchDialog.endMatch': 'End match',
   'report.endMatchDialog.confirmDialog': 'Do you want to end this match?',

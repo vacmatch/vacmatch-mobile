@@ -34,6 +34,12 @@ export default {
   'report.show.fouls': 'Faltas',
   'report.show.events': 'Eventos',
 
+  // List reports
+  'report.list.nextReports': 'Próximos partidos',
+  'report.list.lastReports': 'Partidos anteriores',
+  'report.list.editReport': 'Editar acta',
+  'report.list.createReport': 'Crear acta',
+
   // End match
   'report.endMatchDialog.endMatch': 'Terminar partido',
   'report.endMatchDialog.confirmDialog': '¿Seguro que desea terminar este partido?',
