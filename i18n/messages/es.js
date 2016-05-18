@@ -92,6 +92,30 @@ export default {
   'call.editPerson.modifyName': 'Modificar nombre',
   'call.editPerson.insertDorsal': 'Añadir dorsal',
   'call.editPerson.modifyDorsal': 'Modificar dorsal',
-  'call.editPerson.isStaff': 'Personal'
+  'call.editPerson.isStaff': 'Personal',
 
+  // Edit user
+  'auth.editUser.insertUsername': 'Añadir nombre de usuario',
+  'auth.editUser.username': 'Nombre de usuario',
+  'auth.editUser.insertPassword': 'Añadir contraseña',
+  'auth.editUser.password': 'Contraseña',
+  'auth.editUser.confirmPassword': 'Confirmar contraseña',
+  'auth.editUser.insertPin': 'Añadir PIN',
+  'auth.editUser.pin': 'PIN',
+  'auth.editUser.confirmPin': 'Confirmar PIN',
+  'auth.editUser.insertName': 'Añadir nombre',
+  'auth.editUser.name': 'Nombre',
+  'auth.editUser.insertSurnames': 'Añadir apellidos',
+  'auth.editUser.surnames': 'Apellidos',
+  'auth.editUser.insertEmail': 'Añadir email',
+  'auth.editUser.email': 'Email',
+  'auth.editUser.insertCardId': 'Añadir NIF',
+  'auth.editUser.cardId': 'NIF',
+
+  // Login
+  'auth.login.signupTitle': 'Registrarse',
+  'auth.login.username': 'Nombre de usuario',
+  'auth.login.password': 'Contraseña',
+  'auth.login.signup': 'Registrarse',
+  'auth.login.login': 'Iniciar sesión'
 }

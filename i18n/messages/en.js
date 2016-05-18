@@ -91,5 +91,30 @@ export default {
   'call.editPerson.modifyName': 'Modify name',
   'call.editPerson.insertDorsal': 'Insert dorsal',
   'call.editPerson.modifyDorsal': 'Modify dorsal',
-  'call.editPerson.isStaff': 'Staff'
+  'call.editPerson.isStaff': 'Staff',
+
+  // Edit user
+  'auth.editUser.insertUsername': 'Insert username',
+  'auth.editUser.username': 'Username',
+  'auth.editUser.insertPassword': 'Insert password',
+  'auth.editUser.password': 'Password',
+  'auth.editUser.confirmPassword': 'Confirm password',
+  'auth.editUser.insertPin': 'Insert PIN',
+  'auth.editUser.pin': 'PIN',
+  'auth.editUser.confirmPin': 'Confirm PIN',
+  'auth.editUser.insertName': 'Insert name',
+  'auth.editUser.name': 'Name',
+  'auth.editUser.insertSurnames': 'Insert surnames',
+  'auth.editUser.surnames': 'Surnames',
+  'auth.editUser.insertEmail': 'Insert email',
+  'auth.editUser.email': 'Email',
+  'auth.editUser.insertCardId': 'Insert card id',
+  'auth.editUser.cardId': 'Card id',
+
+  // Login
+  'auth.login.signupTitle': 'Sign up',
+  'auth.login.username': 'Username',
+  'auth.login.password': 'Password',
+  'auth.login.signup': 'Sign up',
+  'auth.login.login': 'Log in'
 }
