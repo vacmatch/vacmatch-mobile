@@ -117,5 +117,19 @@ export default {
   'auth.login.username': 'Nombre de usuario',
   'auth.login.password': 'Contraseña',
   'auth.login.signup': 'Registrarse',
-  'auth.login.login': 'Iniciar sesión'
+  'auth.login.login': 'Iniciar sesión',
+
+  // Settings
+  'settings.settingsTitle': 'Opciones',
+  'settings.english': 'Inglés',
+  'settings.language': 'Idioma',
+
+  // About
+  'about.title': 'Acerca de',
+  'about.contactSection': 'Contacto',
+  'about.contactSection.email': 'Email',
+  'about.contactSection.phoneNumber': 'Teléfono',
+  'about.socialSection': 'Social',
+  'about.socialSection.blog': 'Blog'
+
 }

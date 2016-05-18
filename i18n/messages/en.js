@@ -116,5 +116,19 @@ export default {
   'auth.login.username': 'Username',
   'auth.login.password': 'Password',
   'auth.login.signup': 'Sign up',
-  'auth.login.login': 'Log in'
+  'auth.login.login': 'Log in',
+
+  // Settings
+  'settings.settingsTitle': 'Settings',
+  'settings.english': 'English',
+  'settings.language': 'Language',
+
+  // About
+  'about.title': 'About',
+  'about.contactSection': 'Contact',
+  'about.contactSection.email': 'Email',
+  'about.contactSection.phoneNumber': 'Phone number',
+  'about.socialSection': 'Social',
+  'about.socialSection.blog': 'Blog'
+
 }
