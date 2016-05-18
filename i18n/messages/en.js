@@ -17,6 +17,7 @@ export default {
   'button.modify': 'Modify',
   'button.accept': 'Accept',
   'button.delete': 'Delete',
+  'tooltip.edit': 'Edit',
   'tooltip.delete': 'Delete',
 
   // Report
@@ -81,6 +82,14 @@ export default {
 
   // Events
   'event.foul.lowercase': 'foul',
-  'event.foul': 'Foul'
+  'event.foul': 'Foul',
 
+  // Call
+  'call.editPerson': 'Edit person',
+  'call.createPerson': 'Create person',
+  'call.editPerson.insertName': 'Insert name',
+  'call.editPerson.modifyName': 'Modify name',
+  'call.editPerson.insertDorsal': 'Insert dorsal',
+  'call.editPerson.modifyDorsal': 'Modify dorsal',
+  'call.editPerson.isStaff': 'Staff'
 }

@@ -17,6 +17,7 @@ import TabList from '../generic/TabList'
 import CallItem from './CallItem'
 import EditPerson from './EditPerson'
 import Person from '../../models/person/Person'
+import {defineMessages, intlShape, injectIntl} from 'react-intl'
 
 import AuthenticatedComponent from '../generic/AuthenticatedComponent'
 import urls from '../../api/urls'
@@ -24,6 +25,19 @@ import urls from '../../api/urls'
 let FloatingActionButton = mui.FloatingActionButton
 
 import style from '../../../assets/style/generic-style'
+
+const messages = defineMessages({
+  editPersonTitle: {
+    id: 'call.editPerson',
+    description: 'Edit person title for edit person dialog',
+    defaultMessage: 'Edit person'
+  },
+  createPersonTitle: {
+    id: 'call.createPerson',
+    description: 'Create person title for edit person dialog',
+    defaultMessage: 'Create person'
+  }
+})
 
 let CallList = React.createClass({
   mixins: [
@@ -38,7 +52,8 @@ let CallList = React.createClass({
   propTypes: {
     params: React.PropTypes.shape({
       reportId: React.PropTypes.string
-    })
+    }),
+    intl: intlShape.isRequired
   },
 
   getInitialState: function () {
@@ -194,16 +209,18 @@ let CallList = React.createClass({
         {payload: 2, text: this.state.report.report.visitorTeam.name, value: this.state.report.report.visitorTeam._id}
       ]
 
+    let editTitle = this.props.intl.formatMessage(messages.editPersonTitle)
+    let createTitle = this.props.intl.formatMessage(messages.createPersonTitle)
     return (
       <div>
         <EditPerson person={this.state.person}
-          title='Edit person'
+          title={editTitle}
           dialogIsOpen={this.state.editDialogIsOpen}
           toggleDialog={this.toggleEditDialog}
           handleUpdate={this.handleEditConfirm}
           teams={teams}/>
         <EditPerson person={emptyPerson}
-          title='Create person'
+          title={createTitle}
           dialogIsOpen={this.state.createDialogIsOpen}
           toggleDialog={this.toggleCreateDialog}
           handleUpdate={this.handleCreateConfirm}
@@ -218,4 +235,4 @@ let CallList = React.createClass({
 
 })
 
-module.exports = AuthenticatedComponent(CallList)
+module.exports = AuthenticatedComponent(injectIntl(CallList))

@@ -17,6 +17,7 @@ export default {
   'button.modify': 'Modificar',
   'button.accept': 'Aceptar',
   'button.delete': 'Borrar',
+  'tooltip.edit': 'Editar',
   'tooltip.delete': 'Borrar',
 
   // Report
@@ -82,6 +83,15 @@ export default {
 
   // Events
   'event.foul.lowercase': 'falta',
-  'event.foul': 'Falta'
+  'event.foul': 'Falta',
+
+  // Call
+  'call.editPerson': 'Editar persona',
+  'call.createPerson': 'Crear persona',
+  'call.editPerson.insertName': 'Añadir nombre',
+  'call.editPerson.modifyName': 'Modificar nombre',
+  'call.editPerson.insertDorsal': 'Añadir dorsal',
+  'call.editPerson.modifyDorsal': 'Modificar dorsal',
+  'call.editPerson.isStaff': 'Personal'
 
 }

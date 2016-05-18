@@ -1,5 +1,6 @@
 import React from 'react'
 import mui from 'material-ui'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 // Components
 let Avatar = mui.Avatar
@@ -46,11 +47,11 @@ let Event = React.createClass({
     )
     let avatarUrl = this.props.person.avatarUrl
     let menuElements = [
-      <MenuItem key={'edit'} index={0} primaryText={'Edit'}
+      <MenuItem key={'edit'} index={0} primaryText={<FormattedMessage id='button.edit'/>}
         onClick={
           this.props.editDialog.bind(null, this.props.person._id, this.props.person.reportId, this.props.person.teamId)
         }/>,
-      <MenuItem key={'delete'} index={1} primaryText={'Delete'}
+      <MenuItem key={'delete'} index={1} primaryText={<FormattedMessage id='button.delete'/>}
         onClick={
           this.props.deleteDialog.bind(null, this.props.person._id, this.props.person.reportId, this.props.person.teamId)
         }/>
@@ -78,7 +79,7 @@ let Event = React.createClass({
               <br/>
               <IconMenu
                 iconButtonElement={
-                  <IconButton tooltip='Edit'>
+                  <IconButton tooltip={<FormattedMessage id='tooltip.edit'/>}>
                     <i className='material-icons'>more_vert</i>
                   </IconButton>
                 }>
@@ -91,4 +92,4 @@ let Event = React.createClass({
   }
 })
 
-module.exports = Event
+module.exports = injectIntl(Event)
