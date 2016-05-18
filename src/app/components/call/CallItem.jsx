@@ -34,9 +34,17 @@ let Event = React.createClass({
 
   render: function () {
     let personName = this.props.person.name
-    let staffLabel = <span style={style.secondaryColor}>Player</span>
+    let staffLabel = <span style={style.secondaryColor}>
+      <FormattedMessage
+          id='eventType.player'
+      />
+    </span>
     if (this.props.person.isStaff) {
-      staffLabel = <span style={style.primaryColor}>Staff</span>
+      staffLabel = <span style={style.primaryColor}>
+        <FormattedMessage
+            id='eventType.staff'
+        />
+      </span>
     }
     let personDorsal = (
       <div>
