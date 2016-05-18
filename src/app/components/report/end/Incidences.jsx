@@ -8,9 +8,18 @@ import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 import SnackBarActions from '../../../actions/SnackBarActions'
 import SnackBarStore from '../../../stores/SnackBarStore'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 let RaisedButton = mui.RaisedButton
 let TextField = mui.TextField
+
+const messages = defineMessages({
+  incidencesUpdated: {
+    id: 'report.incidences.incidencesUpdated',
+    description: 'Message for snack bar to be showed when incidences were updated',
+    defaultMessage: 'Report incidences updated'
+  }
+})
 
 let Incidences = React.createClass({
   mixins: [
@@ -18,6 +27,10 @@ let Incidences = React.createClass({
     Reflux.connect(ErrorHandlerStore, 'error'),
     Reflux.connect(SnackBarStore, 'snack')
   ],
+
+  propTypes: {
+    intl: intlShape.isRequired
+  },
 
   componentWillUpdate: function () {
     // Update new incidences value
@@ -33,7 +46,7 @@ let Incidences = React.createClass({
         if (err !== null) {
           ErrorActions.setError(err)
         } else {
-          SnackBarActions.setElement('Report incidences updated')
+          SnackBarActions.setElement(this.props.intl.formatMessage(messages.incidencesUpdated))
         }
       })
   },
@@ -42,17 +55,32 @@ let Incidences = React.createClass({
     return <div style={style.center}>
       <TextField ref='incidences'
         key={'incidences-field'}
-        hintText='Add incidences'
-        floatingLabelText='Modify incidences'
+        hintText={
+          <FormattedMessage
+              id='report.incidences.addIncidences'
+              description='Text input to add incidences to this match'
+              defaultMessage='Add incidences'
+          />
+        }
+        floatingLabelText={
+          <FormattedMessage
+              id='report.incidences.modifyIncidences.short'
+              description='Text input to modify incidences to this match'
+              defaultMessage='Modify incidences'
+          />
+        }
         multiLine={true}
         defaultValue={this.state.report.report.incidences}/>
       <br/>
-      <RaisedButton label='Modify incidences'
-        primary={true}
+      <RaisedButton label={
+        <FormattedMessage
+            id='report.incidences.modifyIncidences'
+        />
+      } primary={true}
         onClick={this.handleAddIncidences} />
     </div>
   }
 
 })
 
-module.exports = Incidences
+module.exports = injectIntl(Incidences)

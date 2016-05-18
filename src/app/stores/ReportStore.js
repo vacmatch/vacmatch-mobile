@@ -29,6 +29,9 @@ let ReportStore = Reflux.createStore({
   },
 
   getInitialState: function () {
+    this.state.report.localTeam.name = 'Local'
+    this.state.report.visitorTeam.name = 'Visitor'
+    this.trigger(this.state)
     return this.state
   },
 

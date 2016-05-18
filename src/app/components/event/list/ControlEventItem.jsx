@@ -1,5 +1,6 @@
 import React from 'react'
 import mui from 'material-ui'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 let ListItem = mui.ListItem
 let FontIcon = mui.FontIcon
@@ -30,11 +31,13 @@ let ControlEventItem = React.createClass({
       </b>}
       secondaryText={this.props.event.text}
       rightIconButton={
-        <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
+        <IconButton tooltip={
+          <FormattedMessage id='tooltip.delete' />
+        } onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
           <i className='material-icons'>delete</i>
         </IconButton>
       } />
   }
 })
 
-module.exports = ControlEventItem
+module.exports = injectIntl(ControlEventItem)

@@ -13,6 +13,20 @@ import EndReport from './components/report/end/EndReport'
 import PersonList from './components/event/add/PersonList'
 import EventList from './components/event/list/EventList'
 import CallList from './components/call/CallList'
+import {addLocaleData, IntlProvider} from 'react-intl'
+import en from 'react-intl/locale-data/en'
+import es from 'react-intl/locale-data/es'
+import esMessages from '../../i18n/messages/es'
+import enMessages from '../../i18n/messages/en'
+
+addLocaleData([...en, ...es])
+
+let locale = navigator.language
+
+let messages = enMessages
+if (locale === 'es') {
+  messages = esMessages
+}
 
 // Routes
 let routes = (
@@ -32,5 +46,11 @@ let routes = (
 )
 
 exports.start = function () {
-  ReactDOM.render((<Router>{routes}</Router>), document.getElementById('container'))
+  ReactDOM.render(
+    <IntlProvider locale={locale} messages={messages}>
+      <Router>
+        {routes}
+      </Router>
+    </IntlProvider>,
+    document.getElementById('container'))
 }

@@ -1,5 +1,6 @@
 import React from 'react'
 import mui from 'material-ui'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 import CronoUtils from '../../../stores/CronoUtils'
 
@@ -42,11 +43,17 @@ let SportEventItem = React.createClass({
         </p>
       }
       rightIconButton={
-        <IconButton tooltip='Delete' onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
+        <IconButton tooltip={
+          <FormattedMessage
+              id='tooltip.delete'
+              description='Delete tooltip in right button in each list element'
+              defaultMessage='Delete'
+          />
+        } onClick={this.props.handleDeleteEvent.bind(null, this.props.event)}>
           <i className='material-icons'>delete</i>
         </IconButton>
       } />
   }
 })
 
-module.exports = SportEventItem
+module.exports = injectIntl(SportEventItem)

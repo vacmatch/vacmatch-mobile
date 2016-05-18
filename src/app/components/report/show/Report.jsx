@@ -21,11 +21,30 @@ import SnackBarActions from '../../../actions/SnackBarActions'
 import SnackBarStore from '../../../stores/SnackBarStore'
 import ReportStatus from '../../../models/report/ReportStatus'
 import { History } from 'react-router'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
 let FlatButton = mui.FlatButton
 let RaisedButton = mui.RaisedButton
+
+const messages = defineMessages({
+  matchStarted: {
+    id: 'report.show.snackbar.matchStarted',
+    description: 'Match started message for snack bar',
+    defaultMessage: 'Match started'
+  },
+  termLabel: {
+    id: 'report.show.term',
+    description: 'Term label',
+    defaultMessage: 'Term'
+  },
+  foulsLabel: {
+    id: 'report.show.fouls',
+    description: 'Fouls label',
+    defaultMessage: 'Fouls'
+  }
+})
 
 let Report = React.createClass({
   mixins: [
@@ -40,7 +59,8 @@ let Report = React.createClass({
   propTypes: {
     params: React.PropTypes.shape({
       reportId: React.PropTypes.string
-    })
+    }),
+    intl: intlShape.isRequired
   },
 
   // Add elements to the rigth menu in the AppBar
@@ -76,7 +96,7 @@ let Report = React.createClass({
       } else {
         // Set match has started in state
         ReportActions.toggleStartMatch()
-        SnackBarActions.setElement('Match started')
+        SnackBarActions.setElement(this.props.intl.formatMessage(messages.matchStarted))
       }
     })
   },
@@ -87,21 +107,46 @@ let Report = React.createClass({
 
   render: function () {
     // For start match event creation
-    let playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
+    let playButton = <RaisedButton label={
+      <FormattedMessage
+          id='report.show.startMatch'
+          description='Start match button title'
+          defaultMessage='Start match'
+      />
+    } primary={true} onClick={this._handleStartMatch} />
 
     // Check match state to set button
     switch (this.state.report.report.status) {
       case ReportStatus.READY: {
-        playButton = <RaisedButton label='Start match' primary={true} onClick={this._handleStartMatch} />
+        playButton = <RaisedButton label={
+          <FormattedMessage
+              id='report.show.startMatch'
+          />
+        } primary={true} onClick={this._handleStartMatch} />
         break
       }
       case ReportStatus.STARTED: {
-        let playButtonLabel = this.state.report.isPlaying ? 'Stop' : 'Play'
+        let playButtonLabel = (
+          this.state.report.isPlaying ? <FormattedMessage
+              id='report.show.stop'
+              description='Stop button for match time'
+              defaultMessage='Stop'/>
+          : <FormattedMessage
+              id='report.show.play'
+              description='Start button for match time'
+              defaultMessage='Play'/>
+        )
         playButton = <FlatButton label={playButtonLabel} primary={true} onClick={ReportActions.updateTime} />
         break
       }
       case ReportStatus.FINISHED: {
-        playButton = <RaisedButton label='Match finished' primary={true} onClick={this._handleFinishedMatch} />
+        playButton = <RaisedButton label={
+          <FormattedMessage
+             id='report.show.matchFinished'
+             description='Match finisehd button'
+             defaultMessage='Match finisehd'
+         />
+        } primary={true} onClick={this._handleFinishedMatch} />
         break
       }
       default:
@@ -124,6 +169,9 @@ let Report = React.createClass({
       })
     )
 
+    let termLabel = this.props.intl.formatMessage(messages.termLabel)
+    let foulsLabel = this.props.intl.formatMessage(messages.foulsLabel)
+
     return <div style={style.content}>
       <div style={style.center}>
         <Link to={urls.call.list(this.props.params.reportId)}>
@@ -137,8 +185,8 @@ let Report = React.createClass({
           isTitle={true} />
       </div>
       <div style={style.container}>
-        <ReportProperty name={'Term'} value={this.state.report.term} isPrimary={false} />
-        <ReportProperty name={'Fouls'}
+        <ReportProperty name={termLabel} value={this.state.report.term} isPrimary={false} />
+        <ReportProperty name={foulsLabel}
           value={this.state.report.report.localTeam.secondaryField + ' - ' + this.state.report.report.visitorTeam.secondaryField}
           isPrimary={false} />
       </div>
@@ -148,7 +196,13 @@ let Report = React.createClass({
         <EditReport reportId={this.props.params.reportId} cronoUpdate={ReportActions.resetTime} time={this.state.report.time}
            termUpdate={ReportActions.updateTerm} term={this.state.report.term} addMenuElements={this.addRigthMenuElements}/>
          <Link to={urls.event.list(this.props.params.reportId)}>
-          <RaisedButton label='Events' secondary={true} style={style.button}/>
+          <RaisedButton label={
+            <FormattedMessage
+               id='report.show.events'
+               description='Events button'
+               defaultMessage='Events'
+           />
+          } secondary={true} style={style.button}/>
         </Link>
       </div>
       <hr/>
@@ -164,4 +218,4 @@ let Report = React.createClass({
 
 })
 
-module.exports = AuthenticatedComponent(Report)
+module.exports = AuthenticatedComponent(injectIntl(Report))

@@ -11,6 +11,7 @@ import dateFormat from 'dateformat'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 import SnackBarActions from '../../../actions/SnackBarActions'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 let RaisedButton = mui.RaisedButton
 let Dialog = mui.Dialog
@@ -18,6 +19,14 @@ let FlatButton = mui.FlatButton
 let TextField = mui.TextField
 let SelectField = require('material-ui/lib/select-field')
 let Avatar = mui.Avatar
+
+const messages = defineMessages({
+  emptySignList: {
+    id: 'report.sign.emptySignList',
+    description: 'No one can sign message for snack bar',
+    defaultMessage: 'There\'s no one that can sign'
+  }
+})
 
 let Sign = React.createClass({
   mixins: [
@@ -29,7 +38,8 @@ let Sign = React.createClass({
     personList: React.PropTypes.array,
     title: React.PropTypes.string,
     reportId: React.PropTypes.string,
-    teamId: React.PropTypes.string
+    teamId: React.PropTypes.string,
+    intl: intlShape.isRequired
   },
 
   getInitialState: function () {
@@ -50,7 +60,7 @@ let Sign = React.createClass({
         userId: this.props.personList[this.state.index].userId
       })
     } else {
-      SnackBarActions.setElement({name: 'Mensaje', message: 'Empty people list'})
+      SnackBarActions.setElement({name: '', message: this.props.intl.formatMessage(messages.emptySignList)})
     }
   },
 
@@ -92,12 +102,20 @@ let Sign = React.createClass({
     let customActions = [
       <FlatButton
         key={'dialog-cancel'}
-        label='Cancel'
+        label={
+          <FormattedMessage id='button.cancel' />
+        }
         secondary={true}
         onTouchTap={this.toggleDialog} />,
       <FlatButton
         key={'dialog-accept'}
-        label='Sign'
+        label={
+          <FormattedMessage
+              id='report.sign.button.sign'
+              description='Sign button text'
+              defaultMessage='Sign'
+          />
+        }
         primary={true}
         onTouchTap={this.handleSign} />
     ]
@@ -107,7 +125,12 @@ let Sign = React.createClass({
       pinComponent = (
         <TextField ref='pin'
           key={'dialog-pin-field'}
-          hintText='Insert your PIN'
+          hintText={
+            <FormattedMessage
+                id='report.sign.insertPin'
+                description='Insert pin code in input tag'
+                defaultMessage='Insert your PIN' />
+          }
           type='password'/>
       )
     }
@@ -145,14 +168,23 @@ let Sign = React.createClass({
           </div>
         </Dialog>
         <div style={genericStyle.center}>
-          <RaisedButton label='Sign report'
-            primary={true}
+          <RaisedButton label={
+            <FormattedMessage
+                id='report.sign.signReport'
+                description='Sign report button'
+                defaultMessage='Sign report' />
+          } primary={true}
             onClick={this.toggleDialog} />
         </div>
         <div style={genericStyle.container}>
           <Card initiallyExpanded={true}>
             <CardHeader
-            title='Signatures'
+            title={
+              <FormattedMessage
+                  id='report.sign.signatures'
+                  description='Signatures title in card header where all signatures are listed'
+                  defaultMessage='Signatures' />
+            }
             avatar={
               <Avatar icon={<i className='material-icons'>mode_edit</i>}/>
             }/>
@@ -167,4 +199,4 @@ let Sign = React.createClass({
 
 })
 
-module.exports = Sign
+module.exports = injectIntl(Sign)

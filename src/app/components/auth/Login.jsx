@@ -2,6 +2,7 @@ import React from 'react'
 import Reflux from 'reflux'
 import mui from 'material-ui'
 import { History } from 'react-router'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 import EditUser from './EditUser'
 import AuthStore from '../../stores/AuthStore'
@@ -17,12 +18,24 @@ let RaisedButton = mui.RaisedButton
 let Avatar = mui.Avatar
 let FlatButton = mui.FlatButton
 
+const messages = defineMessages({
+  signupTitle: {
+    id: 'auth.login.signupTitle',
+    description: 'Sign up text for dialog title',
+    defaultMessage: 'Sign up'
+  }
+})
+
 let Login = React.createClass({
   mixins: [
     Reflux.connect(AuthStore, 'auth'),
     Reflux.connect(ErrorHandlerStore, 'error'),
     History
   ],
+
+  propTypes: {
+    intl: intlShape.isRequired
+  },
 
   getInitialState: function () {
     return {
@@ -62,10 +75,11 @@ let Login = React.createClass({
   },
 
   render: function () {
+    let title = this.props.intl.formatMessage(messages.signupTitle)
     return (
       <div style={style.center} >
         <EditUser
-          title='Sign up'
+          title={title}
           dialogIsOpen={this.state.dialogIsOpen}
           handleToggleDialog={this.toggleSignUpDialog}
           handleUpdate={this.handleSignUp}
@@ -74,15 +88,39 @@ let Login = React.createClass({
         <div>
           <br/>
           <TextField ref='username'
-            hintText='Username' />
+            hintText={
+              <FormattedMessage
+                  id='auth.login.username'
+                  description='Username text for input tag'
+                  defaultMessage='Username'
+              />
+            } />
           <br/>
           <TextField ref='password'
-            hintText='Password'
+            hintText={
+              <FormattedMessage
+                  id='auth.login.password'
+                  description='Password text for input tag'
+                  defaultMessage='Password'
+              />
+            }
             type='password' />
           <br/>
           <div style={style.buttonRow}>
-            <FlatButton style={style.button} label='Sign up' onClick={this.toggleSignUpDialog}/>
-            <RaisedButton style={style.button} label='Login' primary={true} onClick={this.handleLogin} />
+            <FlatButton style={style.button} label={
+              <FormattedMessage
+                  id='auth.login.signup'
+                  description='Sign in text for button'
+                  defaultMessage='Sign up'
+              />
+            } onClick={this.toggleSignUpDialog}/>
+            <RaisedButton style={style.button} label={
+              <FormattedMessage
+                  id='auth.login.login'
+                  description='Log in text for button'
+                  defaultMessage='Login'
+              />
+            } primary={true} onClick={this.handleLogin} />
           </div>
         </div>
       </div>
@@ -90,4 +128,4 @@ let Login = React.createClass({
   }
 })
 
-module.exports = Login
+module.exports = injectIntl(Login)

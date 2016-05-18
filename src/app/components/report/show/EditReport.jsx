@@ -9,10 +9,24 @@ import ChangeTermEvent from '../../../models/web/event/control/ChangeTermEvent'
 import EventActions from '../../../actions/EventActions'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 let FlatButton = mui.FlatButton
 let Dialog = mui.Dialog
 let TextField = mui.TextField
+
+const messages = defineMessages({
+  edit: {
+    id: 'button.edit',
+    description: 'Edit button in right top menu',
+    defaultMessage: 'Edit'
+  },
+  editReportLabel: {
+    id: 'report.edit',
+    description: 'Edit report dialog title',
+    defaultMessage: 'Edit report'
+  }
+})
 
 let EditReport = React.createClass({
   mixins: [
@@ -25,7 +39,8 @@ let EditReport = React.createClass({
     termUpdate: React.PropTypes.func,
     time: React.PropTypes.string,
     term: React.PropTypes.string,
-    addMenuElements: React.PropTypes.func
+    addMenuElements: React.PropTypes.func,
+    intl: intlShape.isRequired
   },
 
   getInitialState: function () {
@@ -36,7 +51,7 @@ let EditReport = React.createClass({
 
   componentWillMount: function () {
     let elements = [
-      {text: 'Edit', callback: this.toggleDialog}
+      {text: this.props.intl.formatMessage(messages.edit), callback: this.toggleDialog}
     ]
     this.props.addMenuElements(elements)
   },
@@ -68,39 +83,87 @@ let EditReport = React.createClass({
     let customActions = [
       <FlatButton
         key={'dialog-cancel'}
-        label='Cancel'
+        label={
+          <FormattedMessage
+              id='button.cancel'
+              description='Cancel button text'
+              defaultMessage='Cancel'
+          />
+        }
         secondary={true}
         onTouchTap={this.toggleDialog} />
     ]
 
+    let titleLabel = this.props.intl.formatMessage(messages.editReportLabel)
+
     return (
       <div key={'dialog-div'}>
-        <FlatButton label='Edit' primary={true} onClick={this.toggleDialog} />
+        <FlatButton label={
+          <FormattedMessage
+              id='button.edit'
+          />
+        } primary={true} onClick={this.toggleDialog} />
         <Dialog key={'dialog-edit-report'}
           ref='editDialog'
-          title='Edit report'
+          title={titleLabel}
           actions={customActions}
           open={this.state.dialogIsOpen}>
           <div style={style.containerDialog}>
             <TextField ref='time'
               key={'dialog-time-field'}
-              hintText='Insert time'
-              floatingLabelText='Reset match time'
+              hintText={
+                <FormattedMessage
+                    id='report.edit.insertTime'
+                    description='Insert time text in text field'
+                    defaultMessage='Insert time'
+                />
+              }
+              floatingLabelText={
+                <FormattedMessage
+                    id='report.edit.modifyTime'
+                    description='Modify time text in text field'
+                    defaultMessage='Modify time'
+                />
+              }
               defaultValue={this.props.time} />
             <FlatButton
               key={'dialog-time'}
-              label='Modify time'
+              label={
+                <FormattedMessage
+                    id='button.modify'
+                    description='Modify button'
+                    defaultMessage='Modify'
+                />
+              }
               primary={true}
               onTouchTap={this._handleCronoUpdate} />
             <br/>
             <TextField ref='term'
               key={'dialog-term-field'}
-              hintText='Insert new term'
-              floatingLabelText='Modify term'
+              hintText={
+                <FormattedMessage
+                    id='report.edit.modifyTerm.input'
+                    description='Modify term text in text field'
+                    defaultMessage='Insert new term'
+                />
+              }
+              floatingLabelText={
+                <FormattedMessage
+                    id='report.edit.modifyTerm.button'
+                    description='Modify term button'
+                    defaultMessage='Modify term'
+                />
+              }
               defaultValue={this.props.term} />
             <FlatButton
               key={'dialog-term'}
-              label='Modify term'
+              label={
+                <FormattedMessage
+                    id='button.modify'
+                    description='Modify button'
+                    defaultMessage='Modify'
+                />
+              }
               primary={true}
               onTouchTap={this._handleModifyTerm} />
           </div>
@@ -111,4 +174,4 @@ let EditReport = React.createClass({
 
 })
 
-module.exports = EditReport
+module.exports = injectIntl(EditReport)

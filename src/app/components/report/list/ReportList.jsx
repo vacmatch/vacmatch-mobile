@@ -17,12 +17,26 @@ import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
 import TabList from '../../generic/TabList'
 import EditReport from '../add/EditReport'
 import Report from '../../../models/report/Report'
+import {FormattedMessage, intlShape, injectIntl, defineMessages} from 'react-intl'
 
 import style from '../../../../assets/style/generic-style'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
 let FloatingActionButton = mui.FloatingActionButton
+
+const messages = defineMessages({
+  editReport: {
+    id: 'report.list.editReport',
+    description: 'Edit report title label for edit report dialog',
+    defaultMessage: 'Edit report'
+  },
+  createReport: {
+    id: 'report.list.createReport',
+    description: 'Create report title label for edit report dialog',
+    defaultMessage: 'Create report'
+  }
+})
 
 let ReportList = React.createClass({
   mixins: [
@@ -33,6 +47,13 @@ let ReportList = React.createClass({
     Reflux.connect(AuthStore, 'auth'),
     Reflux.connect(ErrorHandlerStore, 'error')
   ],
+
+  propTypes: {
+    params: React.PropTypes.shape({
+      reportId: React.PropTypes.string
+    }),
+    intl: intlShape.isRequired
+  },
 
   getInitialState: function () {
     return {
@@ -138,8 +159,16 @@ let ReportList = React.createClass({
   render: function () {
     let tabs =
       [
-        'Next reports',
-        'Last reports'
+        <FormattedMessage
+            id='report.list.nextReports'
+            description='Next reports tab name'
+            defaultMessage='Next reports'
+        />,
+        <FormattedMessage
+            id='report.list.lastReports'
+            description='Last reports tab name'
+            defaultMessage='Last reports'
+        />
       ]
 
     let items = [
@@ -163,19 +192,21 @@ let ReportList = React.createClass({
 
     // Empty report to host a new report
     let emptyReport = new Report()
+    let titleEdit = this.props.intl.formatMessage(messages.editReport)
+    let titleCreate = this.props.intl.formatMessage(messages.createReport)
 
     return (
       <div>
         <TabList tabsNames={tabs} tabsItems={items}/>
         <EditReport
           report={this.state.report.report}
-          title='Edit report'
+          title={titleEdit}
           dialogIsOpen={this.state.editDialogIsOpen}
           toggleDialog={this.toggleEditDialog}
           handleUpdate={this.handleEditConfirm} />
         <EditReport
           report={emptyReport}
-          title='Create report'
+          title={titleCreate}
           dialogIsOpen={this.state.createDialogIsOpen}
           toggleDialog={this.toggleCreateDialog}
           handleUpdate={this.handleCreateConfirm} />
@@ -187,4 +218,4 @@ let ReportList = React.createClass({
   }
 })
 
-module.exports = AuthenticatedComponent(ReportList)
+module.exports = AuthenticatedComponent(injectIntl(ReportList))
