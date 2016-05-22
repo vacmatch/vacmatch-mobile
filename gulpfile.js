@@ -54,6 +54,8 @@ gulp.task('build', ['stylus'], function () {
   .pipe(gulp.dest('./build/app'))
   gulp.src('./src/app/**/*.js')
   .pipe(gulp.dest('./build/app'))
+  gulp.src('./src/app/**/*.json')
+  .pipe(gulp.dest('./build/app'))
 })
 
 gulp.task('clean', function () {

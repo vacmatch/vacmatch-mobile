@@ -1,13 +1,29 @@
 
 {
   "production" : {
+    "db": {
+      "host": "192.168.1.101",
+      "port": "5983",
+      "username": "admin",
+      "password": "admin",
+      "urls": {
+        "auth": "_users",
+        "generic": "mobile"
+      }
+    }
   },
   "development" : {
     "db": {
+      "host": "localhost",
+      "port": "5984",
       "username": "admin",
-      "password": "admin"
+      "password": "admin",
+      "urls": {
+        "auth": "_users",
+        "generic": "mobile"
+      }
     }
   },
 
-  "_env": "development"
+  "_env": "production"
 }
