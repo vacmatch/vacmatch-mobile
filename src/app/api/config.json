@@ -24,6 +24,13 @@
       }
     }
   },
+  "mobile": {
+    "deviceEvent": true
+  },
+  "web": {
+    "deviceEvent": false
+  },
 
+  "_type": "web",
   "_env": "production"
 }

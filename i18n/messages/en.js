@@ -32,7 +32,7 @@ export default {
   'report.show.startMatch': 'Start match',
   'report.show.stop': 'Stop',
   'report.show.play': 'Play',
-  'report.show.matchFinished': 'Match finisehd',
+  'report.show.matchFinished': 'Match finished',
   'report.show.term': 'Term',
   'report.show.fouls': 'Fouls',
   'report.show.events': 'Events',
