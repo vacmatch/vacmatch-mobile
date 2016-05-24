@@ -54,10 +54,18 @@ gulp.task('build', ['stylus'], function () {
   .pipe(gulp.dest('./build/app'))
   gulp.src('./src/app/**/*.js')
   .pipe(gulp.dest('./build/app'))
+  gulp.src('./src/app/**/*.json')
+  .pipe(gulp.dest('./build/app'))
+})
+
+gulp.task('cordova', function () {
+  gulp.src('./build/**/*')
+  .pipe(gulp.dest('./cordova-app/www/'))
 })
 
 gulp.task('clean', function () {
   del('./build/**/*')
+  del('./cordova-app/www/**/*')
 })
 
 gulp.task('watch', function () {
@@ -69,4 +77,6 @@ gulp.task('default', ['server', 'watch'])
 
 gulp.task('run', ['build', 'server', 'watch'])
 
-gulp.task('deploy', ['build', 'test', 'server'])
+gulp.task('fastDeploy', ['build', 'cordova'])
+
+gulp.task('deploy', ['build', 'test', 'cordova'])

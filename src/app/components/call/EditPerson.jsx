@@ -1,5 +1,6 @@
 import React from 'react'
 import mui from 'material-ui'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 import style from './call-style'
 
@@ -69,12 +70,12 @@ let EditPerson = React.createClass({
     let customActions = [
       <FlatButton
         key={'dialog-cancel'}
-        label='Cancel'
+        label={<FormattedMessage id='button.cancel'/>}
         secondary={true}
         onTouchTap={this.props.toggleDialog} />,
       <FlatButton
         key={'dialog-accept'}
-        label='Modify'
+        label={<FormattedMessage id='button.modify'/>}
         primary={true}
         onTouchTap={this.handleUpdate} />
     ]
@@ -89,14 +90,38 @@ let EditPerson = React.createClass({
           <div style={style.containerDialog}>
             <TextField ref='name'
               key={'dialog-name-field'}
-              hintText='Insert name'
-              floatingLabelText='Modify name'
+              hintText={
+                <FormattedMessage
+                    id='call.editPerson.insertName'
+                    description='Insert name input text'
+                    defaultMessage='Insert name'
+                />
+              }
+              floatingLabelText={
+                <FormattedMessage
+                    id='call.editPerson.modifyName'
+                    description='Modify name input text'
+                    defaultMessage='Modify name'
+                />
+              }
               defaultValue={this.props.person.name}/>
             <br/>
             <TextField ref='dorsal'
               key={'dialog-dorsal-field'}
-              hintText='Insert dorsal'
-              floatingLabelText='Modify dorsal'
+              hintText={
+                <FormattedMessage
+                    id='call.editPerson.insertDorsal'
+                    description='Insert dorsal input text'
+                    defaultMessage='Insert dorsal'
+                />
+              }
+              floatingLabelText={
+                <FormattedMessage
+                    id='call.editPerson.modifyDorsal'
+                    description='Modify dorsal input text'
+                    defaultMessage='Modify dorsal'
+                />
+              }
               defaultValue={this.props.person.dorsal}/>
               <br/>
             <SelectField
@@ -107,7 +132,13 @@ let EditPerson = React.createClass({
               onChange={this._handleSelectValueChange} />
             <Checkbox
               ref='isStaff'
-              label='Is staff'
+              label={
+                <FormattedMessage
+                    id='call.editPerson.isStaff'
+                    description='Is staff checkbox'
+                    defaultMessage='Is staff'
+                />
+              }
               defaultChecked={this.props.person.isStaff}/>
           </div>
         </Dialog>
@@ -117,4 +148,4 @@ let EditPerson = React.createClass({
 
 })
 
-module.exports = EditPerson
+module.exports = injectIntl(EditPerson)

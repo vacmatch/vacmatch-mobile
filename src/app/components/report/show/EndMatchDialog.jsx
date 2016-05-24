@@ -8,12 +8,26 @@ import EventActions from '../../../actions/EventActions'
 import EndMatchEvent from '../../../models/web/event/control/EndMatchEvent'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
 
 // Components
 let Dialog = mui.Dialog
 let FlatButton = mui.FlatButton
 
-let Event = React.createClass({
+const messages = defineMessages({
+  endGame: {
+    id: 'report.endMatchDialog.button.endGame',
+    description: 'End match button in right top menu',
+    defaultMessage: 'End match'
+  },
+  endMatchTitle: {
+    id: 'report.endMatchDialog.endMatch',
+    description: 'End match dialog title',
+    defaultMessage: 'End match'
+  }
+})
+
+let EndMatchDialog = React.createClass({
   mixins: [
     History,
     Reflux.connect(ErrorHandlerStore, 'error')
@@ -22,7 +36,8 @@ let Event = React.createClass({
   propTypes: {
     reportId: React.PropTypes.string,
     matchTime: React.PropTypes.number,
-    addMenuElements: React.PropTypes.func
+    addMenuElements: React.PropTypes.func,
+    intl: intlShape.isRequired
   },
 
   getInitialState: function () {
@@ -33,7 +48,7 @@ let Event = React.createClass({
 
   componentWillMount: function () {
     let elements = [
-      {text: 'End game', callback: this.toggleDialog}
+      {text: this.props.intl.formatMessage(messages.endGame), callback: this.toggleDialog}
     ]
     this.props.addMenuElements(elements)
   },
@@ -72,22 +87,35 @@ let Event = React.createClass({
   },
 
   render: function () {
+    let title = this.props.intl.formatMessage(messages.endMatchTitle)
     return (
     <div key={'EndMatchDialog'}>
       <Dialog
         ref='eventDialog'
-        title='End match'
+        title={title}
         open={this.state.dialogIsOpen}
         actions={
           [
             <FlatButton
             key={'dialog-cancel'}
-            label='Cancel'
+            label={
+              <FormattedMessage
+                  id='button.cancel'
+                  description='Cancel dialog button'
+                  defaultMessage='Cancel'
+              />
+            }
             secondary={true}
             onTouchTap={this.toggleDialog}/>,
             <FlatButton
             key={'dialog-acept'}
-            label='Accept'
+            label={
+              <FormattedMessage
+                  id='button.accept'
+                  description='Accept dialog button'
+                  defaultMessage='Accept'
+              />
+            }
             primary={true}
             onTouchTap={this._onDialogSubmit}/>
           ]
@@ -95,11 +123,16 @@ let Event = React.createClass({
         actionFocus='submit'>
         <hr/>
         <p>
-          Do you want to end this match?</p>
+          <FormattedMessage
+              id='report.endMatchDialog.confirmDialog'
+              description='Confirm end match text'
+              defaultMessage='Do you want to end this match?'
+          />
+          </p>
       </Dialog>
     </div>
     )
   }
 })
 
-module.exports = Event
+module.exports = injectIntl(EndMatchDialog)

@@ -71,7 +71,6 @@ let EventDao = {
         let elements = events.filter((value, index, array) => {
           return (value.person) && (value.person._id === personId)
         })
-        console.log(elements)
         callback(elements, null)
       }
     })

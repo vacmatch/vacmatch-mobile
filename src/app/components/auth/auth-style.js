@@ -7,7 +7,7 @@ module.exports =
 
   center: {
     marginTop: '15%',
-    marginLeft: '15%',
+    marginLeft: '7%',
     textAlign: 'center'
   },
 

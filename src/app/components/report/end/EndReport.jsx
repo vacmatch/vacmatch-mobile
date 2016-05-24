@@ -11,13 +11,34 @@ import SignStore from '../../../stores/SignStore'
 import SignActions from '../../../actions/SignActions'
 import ErrorActions from '../../../actions/ErrorActions'
 import ErrorHandlerStore from '../../../stores/utils/ErrorHandlerStore'
+import { History } from 'react-router'
+import {intlShape, injectIntl, defineMessages} from 'react-intl'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 import Incidences from './Incidences'
 import Sign from './Sign'
+import urls from '../../../api/urls'
 
 let Tabs = mui.Tabs
 let Tab = mui.Tab
+
+const messages = defineMessages({
+  eventsItem: {
+    id: 'report.endReport.events',
+    description: 'Events text for option in right menu',
+    defaultMessage: 'Events'
+  },
+  signTabTitle: {
+    id: 'report.endReport.signTab.title',
+    description: 'Text title in tabs for sign reports',
+    defaultMessage: 'Sign report {element}'
+  },
+  refereeLabel: {
+    id: 'report.endReport.referee',
+    description: 'Referee text to show as title in sign tab',
+    defaultMessage: 'Referee'
+  }
+})
 
 let EndReport = React.createClass({
   mixins: [
@@ -25,19 +46,30 @@ let EndReport = React.createClass({
     Reflux.connect(PersonListStore, 'personLists'),
     Reflux.connect(SignStore, 'signatures'),
     Reflux.connect(MenuStore, 'menu'),
-    Reflux.connect(ErrorHandlerStore, 'error')
+    Reflux.connect(ErrorHandlerStore, 'error'),
+    History
   ],
 
   propTypes: {
     params: React.PropTypes.shape({
       reportId: React.PropTypes.string
-    })
+    }),
+    intl: intlShape.isRequired
+  },
+
+  _handleBackEvent: function () {
+    this.history.pushState(null, urls.report.show(this.props.params.reportId))
   },
 
   componentWillMount: function () {
-    let rightMenuElements = []
+    let rightMenuElements = [
+      {text: this.props.intl.formatMessage(messages.eventsItem), url: urls.event.list(this.props.params.reportId)}
+    ]
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
+
+    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
       if (err !== null) {
@@ -58,12 +90,19 @@ let EndReport = React.createClass({
     })
   },
 
+  componentWillUnmount: function () {
+    MenuActions.clearRightMenu()
+    MenuActions.resetLeftMenu()
+  },
+
   render: function () {
-    let refereeTitle = 'Sign report referee'
-    let localTitle = 'Sign report ' + this.state.report.report.localTeam.name
-    let visitorTitle = 'Sign report ' + this.state.report.report.visitorTeam.name
+    let refereeTitle = this.props.intl.formatMessage(messages.signTabTitle, {element: this.props.intl.formatMessage(messages.refereeLabel)})
+    let localTitle = this.props.intl.formatMessage(messages.signTabTitle, {element: this.state.report.report.localTeam.name})
+    let visitorTitle = this.props.intl.formatMessage(messages.signTabTitle, {element: this.state.report.report.visitorTeam.name})
+    let refereeLabel = this.props.intl.formatMessage(messages.refereeLabel)
+
     return <Tabs>
-      <Tab label='Referee'>
+      <Tab label={refereeLabel}>
         <Incidences handleAddIncidences={this.handleAddIncidences}/>
         <Sign title={refereeTitle}
           personList={this.state.report.report.refereeList}
@@ -87,4 +126,4 @@ let EndReport = React.createClass({
 
 })
 
-module.exports = AuthenticatedComponent(EndReport)
+module.exports = AuthenticatedComponent(injectIntl(EndReport))

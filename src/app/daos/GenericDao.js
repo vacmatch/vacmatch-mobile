@@ -3,7 +3,8 @@ import Exception from '../models/exception/Exception'
 PouchDB.plugin(require('pouchdb-find'))
 
 import config from '../api/config'
-let remoteUrl = 'http://' + config[config._env].db.username + ':' + config[config._env].db.password + '@localhost:5984/mobile'
+let remoteUrl = 'http://' + config[config._env].db.username + ':' + config[config._env].db.password +
+  '@' + config[config._env].db.host + ':' + config[config._env].db.port + '/' + config[config._env].db.urls.generic
 
 var db = new PouchDB('mobile')
 db.sync(remoteUrl, {live: true})

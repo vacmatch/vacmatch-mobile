@@ -25,7 +25,7 @@ let AuthStore = Reflux.createStore({
   onLogIn: function (username, password, callback) {
     ServiceFactory.getService('AuthService').login(username, password, (user, err) => {
       if (err === null) {
-        this.setUser(user, function () {
+        this.setUser(user, () => {
           callback(user, err)
         })
       } else {
@@ -55,7 +55,7 @@ let AuthStore = Reflux.createStore({
         if (err !== null) {
           callback(user, err)
         } else {
-          this.onLogIn(username, password, callback(user, err))
+          this.onLogIn(username, password, callback)
         }
       })
   },

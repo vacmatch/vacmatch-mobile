@@ -20,5 +20,11 @@ module.exports =
 
   container: {
     marginTop: '10%'
+  },
+
+  addButton: {
+    marginTop: '80%',
+    marginLeft: '85%'
   }
+
 }

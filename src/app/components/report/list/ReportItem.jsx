@@ -2,6 +2,7 @@ import React from 'react'
 import mui from 'material-ui'
 import { History } from 'react-router'
 import urls from '../../../api/urls'
+import {FormattedMessage, injectIntl} from 'react-intl'
 
 let ListItem = mui.ListItem
 let IconButton = mui.IconButton
@@ -12,16 +13,16 @@ let ReportItem = React.createClass({
   mixins: [History],
 
   propTypes: {
-    key: React.PropTypes.number,
+    key: React.PropTypes.string,
     report: React.PropTypes.shape({
       _id: React.PropTypes.string,
       localTeam: React.PropTypes.shape({
         name: React.PropTypes.string,
-        result: React.PropTypes.number
+        result: React.PropTypes.string
       }),
       visitorTeam: React.PropTypes.shape({
         name: React.PropTypes.string,
-        result: React.PropTypes.number
+        result: React.PropTypes.string
       }),
       date: React.PropTypes.string,
       location: React.PropTypes.string,
@@ -37,8 +38,12 @@ let ReportItem = React.createClass({
 
   render: function () {
     let menuElements = [
-      <MenuItem key={'edit'} index={0} primaryText={'Edit'} onClick={this.props.editDialog.bind(null, this.props.report._id)}/>,
-      <MenuItem key={'delete'} index={1} primaryText={'Delete'} onClick={this.props.deleteDialog.bind(null, this.props.report._id)}/>
+      <MenuItem key={'edit'} index={0} primaryText={
+        <FormattedMessage id='button.edit' />
+      } onClick={this.props.editDialog.bind(null, this.props.report._id)}/>,
+      <MenuItem key={'delete'} index={1} primaryText={
+        <FormattedMessage id='button.delete' />
+      } onClick={this.props.deleteDialog.bind(null, this.props.report._id)}/>
 
     ]
 
@@ -51,7 +56,7 @@ let ReportItem = React.createClass({
           rightIconButton={
             <IconMenu
               iconButtonElement={
-                <IconButton tooltip='Edit'>
+                <IconButton>
                   <i className='material-icons'>more_vert</i>
                 </IconButton>
               }>
@@ -66,4 +71,4 @@ let ReportItem = React.createClass({
 
 })
 
-module.exports = ReportItem
+module.exports = injectIntl(ReportItem)
