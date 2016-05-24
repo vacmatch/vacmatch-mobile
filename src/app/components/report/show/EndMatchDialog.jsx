@@ -17,8 +17,13 @@ let FlatButton = mui.FlatButton
 const messages = defineMessages({
   endGame: {
     id: 'report.endMatchDialog.button.endGame',
-    description: 'End game button in right top menu',
-    defaultMessage: 'End game'
+    description: 'End match button in right top menu',
+    defaultMessage: 'End match'
+  },
+  endMatchTitle: {
+    id: 'report.endMatchDialog.endMatch',
+    description: 'End match dialog title',
+    defaultMessage: 'End match'
   }
 })
 
@@ -82,17 +87,12 @@ let EndMatchDialog = React.createClass({
   },
 
   render: function () {
+    let title = this.props.intl.formatMessage(messages.endMatchTitle)
     return (
     <div key={'EndMatchDialog'}>
       <Dialog
         ref='eventDialog'
-        title={
-          <FormattedMessage
-              id='report.endMatchDialog.endMatch'
-              description='End match dialog title'
-              defaultMessage='End match'
-          />
-        }
+        title={title}
         open={this.state.dialogIsOpen}
         actions={
           [

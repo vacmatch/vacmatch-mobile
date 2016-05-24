@@ -6,7 +6,9 @@ PouchDB.plugin(require('pouchdb-authentication'))
 
 import config from '../api/config'
 
-var db = new PouchDB('http://' + config[config._env].db.username + ':' + config[config._env].db.password + '@localhost:5984/_users')
+let url = 'http://' + config[config._env].db.username + ':' + config[config._env].db.password +
+  '@' + config[config._env].db.host + ':' + config[config._env].db.port + '/' + config[config._env].db.urls.auth
+let db = new PouchDB(url)
 
 let AuthDao = {
 
