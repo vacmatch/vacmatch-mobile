@@ -14,21 +14,48 @@ VACmatch mobile is a web app to manage match reports in sports from your mobile 
 
 ### Configuration
 
-Add your CouchDB login data in *src/app/api/config.json*
+Add your CouchDB login, host, port... in *src/app/api/config.json*
+
+And select environment in *_env*
 
 E.g.:
 ```json
-"production" : {
-},
-"development" : {
-  "db": {
-    "username": "admin",
-    "password": "admin"
-  }
-},
+  "production" : {
+    "db": {
+      "host": "192.168.1.1",
+      "port": "5983",
+      "username": "admin",
+      "password": "admin",
+      "urls": {
+        "auth": "_users",
+        "generic": "mobile"
+      }
+    }
+  },
+  "development" : {
+    "db": {
+      "host": "localhost",
+      "port": "5983",
+      "username": "admin",
+      "password": "admin",
+      "urls": {
+        "auth": "_users",
+        "generic": "mobile"
+      }
+    }
+  },
+  "mobile": {
+    "deviceEvent": true
+  },
+  "web": {
+    "deviceEvent": false
+  },
 
-"_env": "development"
+  "_type": "web",
+  "_env": "production"
 ```
+
+[Setup CouchDB using Docker](https://github.com/vacmatch/vacmatch-mobile/wiki/Setup-CouchDB-remote-database)
 
 ### Execution
 
