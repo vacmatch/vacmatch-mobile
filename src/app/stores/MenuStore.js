@@ -7,11 +7,12 @@ let MenuStore = Reflux.createStore({
 
   init: function () {
     this.state = {
-      resetLeftMenuFunction: null,
       leftMenu: {
         icon: '',
+        actionType: '',
         action: '',
-        elements: []
+        elements: [],
+        avaliablesActions: new Map()
       },
       rightMenu: []
     }
@@ -44,23 +45,26 @@ let MenuStore = Reflux.createStore({
     this.trigger(this.state)
   },
 
-  onSetLeftMenu: function (icon, actionFunction, elements) {
+  onAddActionFunction: function (actionName, actionFunction, callback) {
+    this.state.leftMenu.avaliablesActions.set(actionName, actionFunction)
+    this.trigger(this.state)
+    callback()
+  },
+
+  onSetLeftMenu: function (icon, actionFunctionName, elements) {
+    // Add the new action
+    let actionFunction = this.state.leftMenu.avaliablesActions.get(actionFunctionName)
+    // Set actual values
     this.state.leftMenu = {
       icon: icon,
+      actionType: actionFunctionName,
       action: actionFunction,
-      elements: elements
+      elements: elements,
+      avaliablesActions: this.state.leftMenu.avaliablesActions
     }
     this.trigger(this.state)
-  },
-
-  onSetResetLeftMenuFunction: function (action) {
-    this.state.resetLeftMenuFunction = action
-    this.trigger(this.state)
-  },
-
-  onResetLeftMenu: function () {
-    this.state.resetLeftMenuFunction()
   }
+
 })
 
 module.exports = MenuStore
