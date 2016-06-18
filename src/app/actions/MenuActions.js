@@ -2,9 +2,8 @@ import Reflux from 'reflux'
 
 let MenuActions = Reflux.createActions([
   'setRightMenu',
+  'addActionFunction',
   'setLeftMenu',
-  'setResetLeftMenuFunction',
-  'resetLeftMenu',
   'clearRightMenu'
 ])
 

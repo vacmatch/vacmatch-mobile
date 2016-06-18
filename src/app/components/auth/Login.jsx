@@ -9,6 +9,7 @@ import AuthStore from '../../stores/AuthStore'
 import AuthActions from '../../actions/AuthActions'
 import ErrorActions from '../../actions/ErrorActions'
 import ErrorHandlerStore from '../../stores/utils/ErrorHandlerStore'
+import MenuStore from '../../stores/MenuStore'
 
 import urls from '../../api/urls'
 import style from './auth-style.js'
@@ -23,6 +24,16 @@ const messages = defineMessages({
     id: 'auth.login.signupTitle',
     description: 'Sign up text for dialog title',
     defaultMessage: 'Sign up'
+  },
+  report: {
+    id: 'leftnav.report',
+    description: 'Report divider in left menu',
+    defaultMessage: 'Report'
+  },
+  reportList: {
+    id: 'leftnav.reportList',
+    description: 'Report list section in left menu',
+    defaultMessage: 'Report list'
   }
 })
 
@@ -30,6 +41,7 @@ let Login = React.createClass({
   mixins: [
     Reflux.connect(AuthStore, 'auth'),
     Reflux.connect(ErrorHandlerStore, 'error'),
+    Reflux.connect(MenuStore, 'menu'),
     History
   ],
 

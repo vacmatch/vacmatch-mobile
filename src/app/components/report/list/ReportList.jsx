@@ -22,6 +22,7 @@ import {FormattedMessage, intlShape, injectIntl, defineMessages} from 'react-int
 import style from '../../../../assets/style/generic-style'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+import LeftMenuData from '../../../stores/utils/LeftMenuData'
 
 let FloatingActionButton = mui.FloatingActionButton
 
@@ -74,6 +75,12 @@ let ReportList = React.createClass({
     let rightMenuElements = []
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
+    // Set left menu buttons
+    let menuItems = LeftMenuData.loggedLeftMenuItems()
+    let toggleActionName = LeftMenuData.getToggleActionName()
+    let icon = LeftMenuData.getMenuIcon()
+    MenuActions.setLeftMenu(icon, toggleActionName, menuItems)
+
     // Update report lists
     ReportActions.updateLists((events, err) => {
       if (err !== null) {

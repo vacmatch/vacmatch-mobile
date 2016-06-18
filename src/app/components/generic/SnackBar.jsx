@@ -6,7 +6,7 @@ import SnackBarStore from '../../stores/SnackBarStore'
 
 let Snackbar = mui.Snackbar
 
-let Item = React.createClass({
+let SnackBarItem = React.createClass({
   mixins: [
     Reflux.connect(SnackBarStore, 'snackBar')
   ],
@@ -27,4 +27,4 @@ let Item = React.createClass({
   }
 })
 
-module.exports = Item
+module.exports = SnackBarItem
