@@ -17,9 +17,9 @@ let ServiceFactory = {
     this._personService = new PersonService()
     this._reportService = new ReportService()
     this._refereeService = new RefereeService()
+    this._signService = new SignService()
 
     // With No dependencies
-    this._signService = new SignService()
     this._teamService = new TeamService()
 
     // Inject dependencies
@@ -40,6 +40,12 @@ let ServiceFactory = {
     this._reportService.TeamService = this._teamService
     this._reportService.EventService = this._eventService
     this._reportService.SignService = this._signService
+
+    this._signService.AuthService = this._authService
+    this._signService.ReportService = this._reportService
+    this._signService.PersonService = this._personService
+    this._signService.TeamService = this._teamService
+    this._signService.RefereeService = this._refereeService
 
     // Add services to the exposed list
     this._servicesList.set('ReportService', this._reportService)

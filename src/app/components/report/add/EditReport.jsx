@@ -43,7 +43,7 @@ let EditReport = React.createClass({
         onTouchTap={this.props.toggleDialog} />,
       <FlatButton
         key={'dialog-accept'}
-        label={<FormattedMessage id='button.modify'/>}
+        label={<FormattedMessage id='button.accept'/>}
         primary={true}
         onTouchTap={this.handleUpdate} />
     ]

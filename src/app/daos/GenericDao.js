@@ -24,7 +24,7 @@ let GenericDao = {
     */
   findById: function (id, callback) {
     db.get(id).then(function (doc) {
-      callback(doc, null)
+      return callback(doc, null)
     }).catch(function (err) {
       console.log('err: ', err)
       callback(id, err)
@@ -37,8 +37,8 @@ let GenericDao = {
     * @param {genericCallback} callback A callback that returns the object if it's added
     */
   create: function (object, callback) {
-    if (!object.databaseType) {
-      callback(null, new Exception('Object with no type', 'object', object))
+    if (object.databaseType === null || object.databaseType === undefined) {
+      return callback(null, new Exception('Object with no type', 'object', object))
     }
     db.post(object).then(function (response) {
       db.allDocs({key: response.id, include_docs: true}).then(function (doc) {

@@ -201,7 +201,7 @@ let CallList = React.createClass({
       ]
     ]
 
-    let emptyPerson = new Person(undefined, '', '', '', '', false, false, this.state.report.report._id, this.state.report.report.localTeam._id, '')
+    let emptyPerson = new Person(undefined, '', '', '', '', false, false, this.state.report.report._id, this.state.report.report.localTeam._id, null)
 
     let teams =
       [
