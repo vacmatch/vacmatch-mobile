@@ -3,7 +3,7 @@ class Referee {
 
   constructor (id, name, cardId, avatarUrl, userId) {
     this._id = id
-    this.type = 'referee'
+    this.databaseType = 'referee'
     this.name = name
     this.cardId = cardId
     this.avatarUrl = avatarUrl
