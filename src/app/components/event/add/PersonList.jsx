@@ -17,6 +17,7 @@ import urls from '../../../api/urls'
 import SportStore from '../../../stores/SportStore'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+import LeftMenuData from '../../../stores/utils/LeftMenuData'
 
 let PersonList = React.createClass({
   mixins: [
@@ -59,7 +60,14 @@ let PersonList = React.createClass({
   },
 
   componentWillMount: function () {
-    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+    let menuItems = []
+    let backActionName = LeftMenuData.getBackActionName()
+    let icon = LeftMenuData.getBackIcon()
+    // Add menu default action
+    MenuActions.addActionFunction(backActionName, this._handleBackEvent, () => {
+      // Set left menu buttons
+      MenuActions.setLeftMenu(icon, backActionName, menuItems)
+    })
 
     // Update teams from this report
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
@@ -79,7 +87,6 @@ let PersonList = React.createClass({
 
   componentWillUnmount: function () {
     MenuActions.clearRightMenu()
-    MenuActions.resetLeftMenu()
   },
 
   render: function () {
