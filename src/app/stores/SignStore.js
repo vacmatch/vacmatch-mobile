@@ -2,6 +2,7 @@ import Reflux from 'reflux'
 
 import SignActions from '../actions/SignActions'
 import ServiceFactory from '../api/ServiceFactory'
+import AuthStore from './AuthStore'
 
 let SignStore = Reflux.createStore({
   listenables: SignActions,
@@ -46,7 +47,8 @@ let SignStore = Reflux.createStore({
   onNonUserSignReport: function (reportId, identifier, name, teamId, callback) {
     let stringToHash = '' // TODO: Add report info
     let timestamp = Date.now()
-    ServiceFactory.getService('SignService').createWithoutUser(reportId, stringToHash, timestamp, identifier, name, teamId, null, (data, err) => {
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('SignService').createWithoutUser(userId, reportId, stringToHash, timestamp, identifier, name, teamId, null, (data, err) => {
       if (err === null) {
         this.state.push(data)
         this.trigger(this.state)

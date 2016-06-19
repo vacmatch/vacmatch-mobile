@@ -28,8 +28,8 @@ class SignService {
     SignDao.findAllByReportId(reportId, callback)
   }
 
-  createWithoutUser (reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
-    this.ReportService.findById(reportId, (data, err) => {
+  createWithoutUser (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
+    this.ReportService.findById(userId, reportId, (data, err) => {
       if (err !== null) {
         return callback(null, err)
       }
@@ -64,7 +64,7 @@ class SignService {
       if (err !== null) {
         return callback(null, err)
       }
-      this.ReportService.findById(reportId, (data, err) => {
+      this.ReportService.findById(userId, reportId, (data, err) => {
         if (err !== null) {
           return callback(null, err)
         }

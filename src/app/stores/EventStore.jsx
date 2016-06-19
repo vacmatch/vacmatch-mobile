@@ -3,6 +3,7 @@ import Reflux from 'reflux'
 import EventActions from '../actions/EventActions'
 import ReportActions from '../actions/ReportActions'
 import ServiceFactory from '../api/ServiceFactory'
+import AuthStore from './AuthStore'
 
 let EventStore = Reflux.createStore({
   listenables: EventActions,
@@ -32,16 +33,19 @@ let EventStore = Reflux.createStore({
 
   onAddEvent: function (reportId, person, team, eventType, matchTime, cause, callback) {
     let timestamp = Date.now()
-    ServiceFactory.getService('EventService').create(reportId, person, team, eventType, matchTime, cause, timestamp, callback)
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('EventService').create(userId, reportId, person, team, eventType, matchTime, cause, timestamp, callback)
   },
 
   onAddControlEvent: function (reportId, eventType, matchTime, text, callback) {
     let timestamp = Date.now()
-    ServiceFactory.getService('EventService').createControl(reportId, eventType, matchTime, text, timestamp, callback)
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('EventService').createControl(userId, reportId, eventType, matchTime, text, timestamp, callback)
   },
 
   onDeleteEvent: function (event, callback) {
-    ServiceFactory.getService('EventService').deleteEvent(event._id, (e, err) => {
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('EventService').deleteEvent(userId, event._id, (e, err) => {
       if (err !== null) {
         return callback(e, err)
       }
