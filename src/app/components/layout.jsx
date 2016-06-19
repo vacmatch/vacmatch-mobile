@@ -46,15 +46,7 @@ let Layout = React.createClass({
   },
 
   componentWillMount: function () {
-    // Get default left menu items
-    let menuItems = LeftMenuData.defaultLeftMenuItems()
-    let toggleActionName = LeftMenuData.getToggleActionName()
-    let icon = LeftMenuData.getMenuIcon()
-    // Add menu default action
-    MenuActions.addActionFunction(toggleActionName, this._handleLeftNavToggle, () => {
-      // Set left menu
-      MenuActions.setLeftMenu(icon, toggleActionName, menuItems)
-    })
+    this._setLeftMenuItems()
   },
 
   _getRightMenuItems: function () {
@@ -91,6 +83,18 @@ let Layout = React.createClass({
         this._setLeftMenuItems()
         this.history.pushState(null, urls.login.show)
       }
+    })
+  },
+
+  _setLeftMenuItems: function () {
+    // Get default left menu items
+    let menuItems = LeftMenuData.defaultLeftMenuItems()
+    let toggleActionName = LeftMenuData.getToggleActionName()
+    let icon = LeftMenuData.getMenuIcon()
+    // Add menu default action
+    MenuActions.addActionFunction(toggleActionName, this._handleLeftNavToggle, () => {
+      // Set left menu
+      MenuActions.setLeftMenu(icon, toggleActionName, menuItems)
     })
   },
 

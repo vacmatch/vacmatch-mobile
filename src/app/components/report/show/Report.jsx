@@ -82,9 +82,12 @@ let Report = React.createClass({
     let icon = LeftMenuData.getMenuIcon()
     MenuActions.setLeftMenu(icon, toggleActionName, menuItems)
     // Update report state
-    ReportActions.updateReport(this.props.params.reportId, function (report, err) {
+    ReportActions.updateReport(this.props.params.reportId, (report, err) => {
       if (err !== null) {
         ErrorActions.setError(err)
+        if (err.name === 'InstanceNotFoundException') {
+          this.history.pushState(null, urls.report.list)
+        }
       }
     })
   },
