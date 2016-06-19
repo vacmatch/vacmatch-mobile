@@ -60,9 +60,9 @@ class EventService {
     * @param {Number} timestamp Real time when the event happened in miliseconds
     * @param {eventCallback} callback A callback that returns the created element or error
     */
-  create (reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
+  create (userId, reportId, person, team, eventType, matchTime, cause, timestamp, callback) {
     // Check if report exists
-    this.ReportService.findById(reportId, (anyReport, err) => {
+    this.ReportService.findById(userId, reportId, (anyReport, err) => {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent report', 'event.reportId', reportId))
       }
@@ -92,9 +92,9 @@ class EventService {
     * @param {Number} timestamp Real time when the event happened in miliseconds
     * @param {eventCallback} callback A callback that returns the created element or error
     */
-  createControl (reportId, eventType, matchTime, text, timestamp, callback) {
+  createControl (userId, reportId, eventType, matchTime, text, timestamp, callback) {
     // Get report and status
-    this.ReportService.findById(reportId, (report, err) => {
+    this.ReportService.findById(userId, reportId, (report, err) => {
       if (err !== null) {
         return callback(report, err)
       }
@@ -109,7 +109,7 @@ class EventService {
           return callback(eventType, newStatus)
         }
 
-        this.ReportService.update(report._id, report.date, report.location, newStatus,
+        this.ReportService.update(userId, report._id, report.date, report.location, newStatus,
           report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
             if (err !== null) {
               return callback(null, err)
@@ -128,12 +128,12 @@ class EventService {
     * @param {eventCallback} callback A callback that returns an object with
     * the deleted eventId if the event was deleted
     */
-  deleteEvent (eventId, callback) {
+  deleteEvent (userId, eventId, callback) {
     // Get the event
     this.findById(eventId, (event, err) => {
       if (err === null) {
         // Get report and status
-        this.ReportService.findById(event.reportId, (report, err) => {
+        this.ReportService.findById(userId, event.reportId, (report, err) => {
           if (err !== null) {
             return callback(report, err)
           }
@@ -147,7 +147,7 @@ class EventService {
             if (newStatus.name === new ReportStatusException().name) {
               return callback(event.type, newStatus)
             }
-            this.ReportService.update(report._id, report.date, report.location, newStatus,
+            this.ReportService.update(userId, report._id, report.date, report.location, newStatus,
               report.localTeam, report.visitorTeam, report.incidences, function (report, err) {
                 if (err !== null) {
                   return callback(null, err)

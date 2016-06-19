@@ -8,17 +8,16 @@ import MenuActions from '../actions/MenuActions'
 import AuthStore from '../stores/AuthStore'
 import AuthActions from '../actions/AuthActions'
 import ErrorActions from '../actions/ErrorActions'
-import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
-
+import {FormattedMessage, injectIntl, intlShape} from 'react-intl'
 import urls from '../api/urls'
 
+import LeftMenuData from '../stores/utils/LeftMenuData'
 // Components
 let AppBar = mui.AppBar
 let Avatar = mui.Avatar
 let LeftNav = mui.LeftNav
 let IconMenu = mui.IconMenu
 let MenuItem = require('material-ui/lib/menus/menu-item')
-let MenuItemTemp = mui.MenuItem
 let IconButton = mui.IconButton
 let FlatButton = mui.FlatButton
 import SnackBar from './generic/SnackBar'
@@ -30,29 +29,6 @@ import style from '../../assets/style/generic-style'
 // Check this repo:
 // https://ADFgithub.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin()
-
-const messages = defineMessages({
-  settings: {
-    id: 'leftnav.settings',
-    description: 'Settings divider in left menu',
-    defaultMessage: 'Settings'
-  },
-  about: {
-    id: 'leftnav.about',
-    description: 'About section in left menu',
-    defaultMessage: 'About'
-  },
-  report: {
-    id: 'leftnav.report',
-    description: 'Report divider in left menu',
-    defaultMessage: 'Report'
-  },
-  reportList: {
-    id: 'leftnav.reportList',
-    description: 'Report list section in left menu',
-    defaultMessage: 'Report list'
-  }
-})
 
 /*
  * Layout component
@@ -71,21 +47,6 @@ let Layout = React.createClass({
 
   componentWillMount: function () {
     this._setLeftMenuItems()
-    // Save reset function in store to reset left menu from other places in the APP
-    MenuActions.setResetLeftMenuFunction(this._setLeftMenuItems)
-  },
-
-  _setLeftMenuItems: function () {
-    let menuItems = [
-      {type: MenuItemTemp.Types.SUBHEADER, text: this.props.intl.formatMessage(messages.settings)},
-      {route: 'about', text: this.props.intl.formatMessage(messages.about)},
-      {route: '#settings', text: this.props.intl.formatMessage(messages.settings)}
-    ]
-    if (AuthStore.isLoggedIn()) {
-      menuItems.unshift({route: '/reports', text: this.props.intl.formatMessage(messages.reportList)})
-      menuItems.unshift({type: MenuItemTemp.Types.SUBHEADER, text: this.props.intl.formatMessage(messages.report)})
-    }
-    MenuActions.setLeftMenu('menu', this._handleLeftNavToggle, menuItems)
   },
 
   _getRightMenuItems: function () {
@@ -118,8 +79,22 @@ let Layout = React.createClass({
         ErrorActions.setError(err)
       } else {
         this._handleLeftNavToggle()
+        // Reset left menu items
+        this._setLeftMenuItems()
         this.history.pushState(null, urls.login.show)
       }
+    })
+  },
+
+  _setLeftMenuItems: function () {
+    // Get default left menu items
+    let menuItems = LeftMenuData.defaultLeftMenuItems()
+    let toggleActionName = LeftMenuData.getToggleActionName()
+    let icon = LeftMenuData.getMenuIcon()
+    // Add menu default action
+    MenuActions.addActionFunction(toggleActionName, this._handleLeftNavToggle, () => {
+      // Set left menu
+      MenuActions.setLeftMenu(icon, toggleActionName, menuItems)
     })
   },
 

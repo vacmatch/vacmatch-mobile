@@ -1,5 +1,6 @@
 import GenericDao from './GenericDao'
 import Referee from '../models/referee/Referee'
+import InstanceNotFoundException from '../models/exception/InstanceNotFoundException'
 
 let RefereeDao = {
 
@@ -24,8 +25,10 @@ let RefereeDao = {
       let value = null
       if (result.docs.length > 0) {
         value = result.docs[0]
+        callback(value, null)
+      } else {
+        callback(null, new InstanceNotFoundException('This user is not a referee', 'userId', userId))
       }
-      callback(value, null)
     }).catch(function (err) {
       console.log('err: ', err)
       callback(userId, err)

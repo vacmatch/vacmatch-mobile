@@ -74,7 +74,7 @@ let Sign = React.createClass({
 
   handleSign: function () {
     // Players created in this APP (without user)
-    if (this.state.userId === null) {
+    if (this.state.userId === null || this.state.userId === undefined) {
       SignActions.nonUserSignReport(this.props.reportId, this.state.value._id,
         this.state.value.name, this.state.value.teamId, (data, err) => {
           if (err !== null) {

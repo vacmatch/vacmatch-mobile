@@ -3,6 +3,7 @@ import Reflux from 'reflux'
 import PersonActions from '../actions/PersonActions'
 import Person from '../models/person/Person'
 import ServiceFactory from '../api/ServiceFactory'
+import AuthStore from './AuthStore'
 
 let PersonStore = Reflux.createStore({
   listenables: PersonActions,
@@ -26,7 +27,8 @@ let PersonStore = Reflux.createStore({
   },
 
   onAddPerson: function (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
-    ServiceFactory.getService('PersonService').create(name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, (person, err) => {
+    let refereeUserId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('PersonService').create(refereeUserId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, (person, err) => {
       if (err === null) {
         this.state = person
         this.trigger(this.state)

@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import { default as Router, Route, IndexRoute } from 'react-router'
 
 import Layout from './components/layout'
-import Home from './components/home'
 import About from './components/app/About'
 import Settings from './components/app/Settings'
 import Login from './components/auth/Login'
@@ -31,8 +30,7 @@ if (locale === 'es') {
 // Routes
 let routes = (
   <Route path='/' component={Layout}>
-    <IndexRoute component={Home} />
-    <Route path='/home' component={Home}/>
+    <IndexRoute component={Login} />
     <Route path='/about' component={About}/>
     <Route path='/settings' component={Settings}/>
     <Route path='/login' component={Login}/>

@@ -54,9 +54,9 @@ class PersonService {
     * @param {String} userId The user identifier
     * @param {personCallback} callback A callback that returns an element
     */
-  create (name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
+  create (refereeUserId, name, cardId, dorsal, avatarUrl, isCalled, isStaff, reportId, teamId, userId, callback) {
     // Check if the Report exists
-    this.ReportService.findById(reportId, (report, err) => {
+    this.ReportService.findById(refereeUserId, reportId, (report, err) => {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent report', 'person.reportId', reportId))
       }

@@ -17,6 +17,7 @@ import ControlEventItem from './ControlEventItem'
 import SportEventItem from './SportEventItem'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
+import LeftMenuData from '../../../stores/utils/LeftMenuData'
 
 let List = mui.List
 
@@ -40,7 +41,14 @@ let PersonList = React.createClass({
   },
 
   componentWillMount: function () {
-    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+    let menuItems = []
+    let backActionName = LeftMenuData.getBackActionName()
+    let icon = LeftMenuData.getBackIcon()
+    // Add menu default action
+    MenuActions.addActionFunction(backActionName, this._handleBackEvent, () => {
+      // Set left menu buttons
+      MenuActions.setLeftMenu(icon, backActionName, menuItems)
+    })
 
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
@@ -58,7 +66,6 @@ let PersonList = React.createClass({
 
   componentWillUnmount: function () {
     MenuActions.clearRightMenu()
-    MenuActions.resetLeftMenu()
   },
 
   handleDeleteEvent: function (event) {

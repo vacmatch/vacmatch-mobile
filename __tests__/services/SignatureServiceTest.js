@@ -54,7 +54,7 @@ describe('Create Signature', function () {
       callback(user, null)
     })
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(report, null)
     })
 
@@ -123,7 +123,7 @@ describe('Create Signature', function () {
       callback(user, null)
     })
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(null, error)
     })
 
@@ -155,7 +155,7 @@ describe('Create Signature', function () {
       callback(user, null)
     })
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(report, null)
     })
 
@@ -190,7 +190,7 @@ describe('Create Signature', function () {
       callback(user, null)
     })
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(report, null)
     })
 

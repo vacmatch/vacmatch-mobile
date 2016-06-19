@@ -53,8 +53,9 @@ describe('Create Person', function () {
 
     // A valid Person
     let person = defaultPerson
+    let refereeUserId = 1
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(defaultReport, null)
     })
 
@@ -70,7 +71,7 @@ describe('Create Person', function () {
       callback(person, null)
     })
 
-    personService.create(person.name, person.cardId, person.dorsal,
+    personService.create(refereeUserId, person.name, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff,
       person.reportId, person.teamId, person.userId,
       (p, err) => {
@@ -90,6 +91,7 @@ describe('Create Person', function () {
   it('A Person cant be created with non existing Report', function () {
 
     let nonExistingReportId = 1
+    let refereeUserId = 1
 
     // Person with non existing Report
     let person = defaultPerson
@@ -98,7 +100,7 @@ describe('Create Person', function () {
     // An error
     let nonExistingReportException = new InstanceNotFoundException('Non existent report', 'person.reportId', person.reportId)
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(null, nonExistingReportException)
     })
 
@@ -108,7 +110,7 @@ describe('Create Person', function () {
 
     spyOn(PersonDao, 'create')
 
-    personService.create(person.mame, person.cardId, person.dorsal,
+    personService.create(refereeUserId, person.mame, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff,
       person.reportId, person.teamId, person.userId,
       (person, err) => {
@@ -127,6 +129,7 @@ describe('Create Person', function () {
   it('A Person cant be created with non existing Team', function () {
 
     let nonExistingTeamId = 1
+    let refereeUserId = 1
 
     // Person with non existing Report
     let person = defaultPerson
@@ -135,7 +138,7 @@ describe('Create Person', function () {
     // An error
     let nonExistingTeamException = new InstanceNotFoundException('Non existent team', 'person.teamId', person.teamId)
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(defaultReport, null)
     })
 
@@ -147,7 +150,7 @@ describe('Create Person', function () {
 
     spyOn(PersonDao, 'create')
 
-    personService.create(person.mame, person.cardId, person.dorsal,
+    personService.create(refereeUserId, person.mame, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff,
       person.reportId, person.teamId, person.userId,
       (person, err) => {
@@ -166,6 +169,7 @@ describe('Create Person', function () {
   it('A Person cant be created with non existing User', function () {
 
         let nonExistingUserId = 1
+        let refereeUserId = 1
 
         // Person with non existing User
         let person = defaultPerson
@@ -174,7 +178,7 @@ describe('Create Person', function () {
         // An error
         let nonExistingUserException = new InstanceNotFoundException('Non existent user', 'person.userId', person.userId)
 
-        spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+        spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
           callback(defaultReport, null)
         })
 
@@ -188,7 +192,7 @@ describe('Create Person', function () {
 
         spyOn(PersonDao, 'create')
 
-        personService.create(person.mame, person.cardId, person.dorsal,
+        personService.create(refereeUserId, person.mame, person.cardId, person.dorsal,
           person.avatarUrl, person.isCalled, person.isStaff,
           person.reportId, person.teamId, person.userId,
           (person, err) => {
@@ -206,12 +210,13 @@ describe('Create Person', function () {
   it('A Person can be created with a null userId as a temporal Person', function () {
 
     let nullUserId = null
+    let refereeUserId = 1
 
     // Person with null userId
     let person = defaultPerson
     person.userId = nullUserId
 
-    spyOn(reportService, 'findById').andCallFake(function (anyReportId, callback) {
+    spyOn(reportService, 'findById').andCallFake(function (anyUserId, anyReportId, callback) {
       callback(defaultReport, null)
     })
 
@@ -225,7 +230,7 @@ describe('Create Person', function () {
       callback(person, null)
     })
 
-    personService.create(person.mame, person.cardId, person.dorsal,
+    personService.create(refereeUserId, person.mame, person.cardId, person.dorsal,
       person.avatarUrl, person.isCalled, person.isStaff,
       person.reportId, person.teamId, person.userId,
       (p, err) => {

@@ -3,6 +3,7 @@ import Reflux from 'reflux'
 import ReportActions from '../actions/ReportActions'
 import ServiceFactory from '../api/ServiceFactory'
 import ReportStatus from '../models/report/ReportStatus'
+import AuthStore from '../stores/AuthStore'
 
 let ReportListStore = Reflux.createStore({
   listenables: ReportActions,
@@ -19,11 +20,12 @@ let ReportListStore = Reflux.createStore({
   },
 
   onUpdateLists: function (callback) {
-    ServiceFactory.getService('ReportService').findAllByStatus(ReportStatus.READY, (readyEvents, err) => {
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('ReportService').findAllByStatus(userId, ReportStatus.READY, (readyEvents, err) => {
       if (err !== null) {
         return callback(readyEvents, err)
       }
-      ServiceFactory.getService('ReportService').findAllByStatus(ReportStatus.STARTED, (startedEvents, err) => {
+      ServiceFactory.getService('ReportService').findAllByStatus(userId, ReportStatus.STARTED, (startedEvents, err) => {
         if (err !== null) {
           return callback(startedEvents, err)
         }
@@ -31,7 +33,7 @@ let ReportListStore = Reflux.createStore({
         this.trigger(this.state)
       })
     })
-    ServiceFactory.getService('ReportService').findAllByStatus(ReportStatus.FINISHED, (events, err) => {
+    ServiceFactory.getService('ReportService').findAllByStatus(userId, ReportStatus.FINISHED, (events, err) => {
       if (err !== null) {
         return callback(events, err)
       }
@@ -52,7 +54,8 @@ let ReportListStore = Reflux.createStore({
   },
 
   onDeleteReport: function (id, callback) {
-    ServiceFactory.getService('ReportService').delete(id, (res, err) => {
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('ReportService').delete(userId, id, (res, err) => {
       if (err !== null) {
         return callback(res, err)
       } else {

@@ -21,6 +21,7 @@ import {defineMessages, intlShape, injectIntl} from 'react-intl'
 
 import AuthenticatedComponent from '../generic/AuthenticatedComponent'
 import urls from '../../api/urls'
+import LeftMenuData from '../../stores/utils/LeftMenuData'
 
 let FloatingActionButton = mui.FloatingActionButton
 
@@ -76,7 +77,14 @@ let CallList = React.createClass({
   },
 
   componentWillMount: function () {
-    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+    let menuItems = []
+    let backActionName = LeftMenuData.getBackActionName()
+    let icon = LeftMenuData.getBackIcon()
+    // Add menu default action
+    MenuActions.addActionFunction(backActionName, this._handleBackEvent, () => {
+      // Set left menu buttons
+      MenuActions.setLeftMenu(icon, backActionName, menuItems)
+    })
 
     // Update team names from this report
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
@@ -96,7 +104,6 @@ let CallList = React.createClass({
 
   componentWillUnmount: function () {
     MenuActions.clearRightMenu()
-    MenuActions.resetLeftMenu()
   },
 
   callToggle: function (personId, teamId, toggleEvent, newValue) {
@@ -201,7 +208,7 @@ let CallList = React.createClass({
       ]
     ]
 
-    let emptyPerson = new Person(undefined, '', '', '', '', false, false, this.state.report.report._id, this.state.report.report.localTeam._id, '')
+    let emptyPerson = new Person(undefined, '', '', '', '', false, false, this.state.report.report._id, this.state.report.report.localTeam._id, null)
 
     let teams =
       [

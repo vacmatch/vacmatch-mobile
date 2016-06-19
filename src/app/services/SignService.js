@@ -2,11 +2,12 @@ import SignDao from '../daos/SignDao'
 
 class SignService {
 
-  constructor (authService, reportService, personService, teamService) {
+  constructor (authService, reportService, personService, teamService, refereeService) {
     this.AuthService = authService
     this.ReportService = reportService
     this.PersonService = personService
     this.TeamService = teamService
+    this.RefereeService = refereeService
   }
 
   /**
@@ -27,6 +28,25 @@ class SignService {
     SignDao.findAllByReportId(reportId, callback)
   }
 
+  createWithoutUser (userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback) {
+    this.ReportService.findById(userId, reportId, (data, err) => {
+      if (err !== null) {
+        return callback(null, err)
+      }
+      this.PersonService.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (data, err) => {
+        if (err !== null) {
+          return callback(null, err)
+        }
+        this.TeamService.findById(teamId, (data, err) => {
+          if (err !== null) {
+            return callback(null, err)
+          }
+          SignDao.create(null, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
+        })
+      })
+    })
+  }
+
   /**
    * Create a Signature
    * @param {String} userId User identifier that creates the signature
@@ -44,21 +64,31 @@ class SignService {
       if (err !== null) {
         return callback(null, err)
       }
-      this.ReportService.findById(reportId, (data, err) => {
+      this.ReportService.findById(userId, reportId, (data, err) => {
         if (err !== null) {
           return callback(null, err)
         }
-        this.PersonService.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (data, err) => {
-          if (err !== null) {
-            return callback(null, err)
-          }
-          this.TeamService.findById(teamId, (data, err) => {
+        // If it's a Referee
+        if (teamId === null || teamId === undefined) {
+          this.RefereeService.findById(personId, (data, err) => {
             if (err !== null) {
               return callback(null, err)
             }
             SignDao.create(userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
           })
-        })
+        } else {
+          this.PersonService.findByPersonIdReportIdAndTeamId(personId, reportId, teamId, (data, err) => {
+            if (err !== null) {
+              return callback(null, err)
+            }
+            this.TeamService.findById(teamId, (data, err) => {
+              if (err !== null) {
+                return callback(null, err)
+              }
+              SignDao.create(userId, reportId, stringToHash, timeStamp, personId, name, teamId, fedId, callback)
+            })
+          })
+        }
       })
     })
   }

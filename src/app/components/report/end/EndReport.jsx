@@ -18,6 +18,7 @@ import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 import Incidences from './Incidences'
 import Sign from './Sign'
 import urls from '../../../api/urls'
+import LeftMenuData from '../../../stores/utils/LeftMenuData'
 
 let Tabs = mui.Tabs
 let Tab = mui.Tab
@@ -68,7 +69,14 @@ let EndReport = React.createClass({
     // Set right menu buttons in AppBar
     MenuActions.setRightMenu(rightMenuElements)
 
-    MenuActions.setLeftMenu('chevron_left', this._handleBackEvent, [])
+    let menuItems = []
+    let backActionName = LeftMenuData.getBackActionName()
+    let icon = LeftMenuData.getBackIcon()
+    // Add menu default action
+    MenuActions.addActionFunction(backActionName, this._handleBackEvent, () => {
+      // Set left menu buttons
+      MenuActions.setLeftMenu(icon, backActionName, menuItems)
+    })
 
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, (report, err) => {
@@ -92,7 +100,6 @@ let EndReport = React.createClass({
 
   componentWillUnmount: function () {
     MenuActions.clearRightMenu()
-    MenuActions.resetLeftMenu()
   },
 
   render: function () {

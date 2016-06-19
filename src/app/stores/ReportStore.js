@@ -9,6 +9,7 @@ import EndMatchEvent from '../models/web/event/control/EndMatchEvent'
 import GoalEvent from '../models/web/event/GoalEvent'
 import FoulEvent from '../models/web/event/FoulEvent'
 import ReportStatus from '../models/report/ReportStatus'
+import AuthStore from '../stores/AuthStore'
 
 import CronoUtils from './CronoUtils'
 import Report from '../models/report/Report'
@@ -29,8 +30,8 @@ let ReportStore = Reflux.createStore({
   },
 
   getInitialState: function () {
-    this.state.report.localTeam.name = 'Local'
-    this.state.report.visitorTeam.name = 'Visitor'
+//    this.state.report.localTeam.name = 'Local'
+//    this.state.report.visitorTeam.name = 'Visitor'
     this.trigger(this.state)
     return this.state
   },
@@ -39,8 +40,9 @@ let ReportStore = Reflux.createStore({
     let termEvent = new ChangeTermEvent()
     let startEvent = new StartMatchEvent()
     let endEvent = new EndMatchEvent()
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
     // Update Teams
-    ServiceFactory.getService('ReportService').findById(reportId, (report, err) => {
+    ServiceFactory.getService('ReportService').findById(userId, reportId, (report, err) => {
       // TODO: Handle error
       if (err !== null) {
         return callback(report, err)
@@ -117,7 +119,8 @@ let ReportStore = Reflux.createStore({
       this.state.report.visitorTeam = newTeam
     }
     // Update result in DB
-    ServiceFactory.getService('ReportService').update(reportId, this.state.report.date, this.state.report.location, this.state.report.status,
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('ReportService').update(userId, reportId, this.state.report.date, this.state.report.location, this.state.report.status,
       this.state.report.localTeam, this.state.report.visitorTeam, this.state.report.incidences, (newReport, err) => {
         if (err === null) {
           // Update state
@@ -167,7 +170,8 @@ let ReportStore = Reflux.createStore({
   },
 
   onEditReport: function (reportId, date, location, status, localTeam, visitorTeam, incidences, callback) {
-    ServiceFactory.getService('ReportService').update(reportId, date, location, status, localTeam, visitorTeam, incidences, (report, err) => {
+    let userId = AuthStore.state.user ? AuthStore.state.user._id : null
+    ServiceFactory.getService('ReportService').update(userId, reportId, date, location, status, localTeam, visitorTeam, incidences, (report, err) => {
       if (err !== null) {
         return callback(report, err)
       }
