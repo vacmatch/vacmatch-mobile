@@ -22,6 +22,7 @@ import SnackBarStore from '../../../stores/SnackBarStore'
 import ReportStatus from '../../../models/report/ReportStatus'
 import { History } from 'react-router'
 import {FormattedMessage, injectIntl, intlShape, defineMessages} from 'react-intl'
+import LeftMenuData from '../../../stores/utils/LeftMenuData'
 
 import AuthenticatedComponent from '../../generic/AuthenticatedComponent'
 
@@ -75,6 +76,11 @@ let Report = React.createClass({
     let rightMenuElements = []
     // Set right menu buttons in AppBar
     this.addRigthMenuElements(rightMenuElements)
+    // Set left menu buttons
+    let menuItems = LeftMenuData.loggedLeftMenuItems()
+    let toggleActionName = LeftMenuData.getToggleActionName()
+    let icon = LeftMenuData.getMenuIcon()
+    MenuActions.setLeftMenu(icon, toggleActionName, menuItems)
     // Update report state
     ReportActions.updateReport(this.props.params.reportId, function (report, err) {
       if (err !== null) {
