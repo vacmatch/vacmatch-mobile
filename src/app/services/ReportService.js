@@ -12,20 +12,22 @@ class ReportService {
 
   /**
    * Find a Report by id
+   * @param {String} userId User identifier logged in the application
    * @param {String} reportId Report identifier
    * @param {reportCallback} callback A callback that returns the Report element or error
    */
-  findById (reportId, callback) {
-    ReportDao.findById(reportId, callback)
+  findById (userId, reportId, callback) {
+    ReportDao.findById(userId, reportId, callback)
   }
 
   /**
     * Find Reports by status
+    * @param {String} userId User identifier logged in the application
     * @param {Integer} status Check if the game was finished and a EndGame event was added or not
     * @param {reportListCallback} callback A callback that returns the a list of Reports
     */
-  findAllByStatus (status, callback) {
-    ReportDao.findAllByStatus(status, callback)
+  findAllByStatus (userId, status, callback) {
+    ReportDao.findAllByStatus(userId, status, callback)
   }
 
   /**
@@ -60,6 +62,7 @@ class ReportService {
 
   /**
     * Update a Report
+    * @param {String} userId User identifier logged in the application
     * @param {String} reportId The report identifier
     * @param {String} date A string with the date when the game is played
     * @param {String} location The place where the game is played
@@ -69,9 +72,9 @@ class ReportService {
     * @param {String} incidences Text field to write incidences and other information in the game
     * @param {reportCallback} callback A callback that returns the updated Report or error
     */
-  update (reportId, date, location, status, localTeam, visitorTeam, incidences, callback) {
+  update (userId, reportId, date, location, status, localTeam, visitorTeam, incidences, callback) {
     // Check if report exists
-    this.findById(reportId, (oldReport, err) => {
+    this.findById(userId, reportId, (oldReport, err) => {
       if (err !== null) {
         return callback(null, err)
       }
@@ -86,7 +89,7 @@ class ReportService {
             return callback(null, new InstanceNotFoundException('Non existent visitor team', 'report.visitorTeam._id', visitorTeam._id))
           }
           // Save it
-          ReportDao.update(reportId, date, location, status, localTeam, visitorTeam, incidences, oldReport, callback)
+          ReportDao.update(userId, reportId, date, location, status, localTeam, visitorTeam, incidences, oldReport, callback)
         })
       })
     })
@@ -95,12 +98,13 @@ class ReportService {
   /**
     * Delete a Report by identifier
     * It delete all Events, Person, Teams an Signatures from this Report too
+    * @param {String} userId User identifier logged in the application
     * @param {String} reportId, The Report identifier
     * @param {reportCallback} callback A callback that returns an object with
     * the deleted reportId if the report was deleted
     */
-  delete (reportId, callback) {
-    this.findById(reportId, (report, err) => {
+  delete (userId, reportId, callback) {
+    this.findById(userId, reportId, (report, err) => {
       if (err !== null) {
         return callback(null, new InstanceNotFoundException('Non existent report', 'reportId', reportId))
       }
@@ -110,7 +114,7 @@ class ReportService {
           this.TeamService.delete(report.localTeam._id, (res, err) => {
             this.TeamService.delete(report.visitorTeam._id, (res, err) => {
               this.SignService.deleteAllSignaturesByReportId(reportId, (res, err) => {
-                ReportDao.delete(report, callback)
+                ReportDao.delete(userId, report, callback)
               })
             })
           })
