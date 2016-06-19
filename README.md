@@ -57,6 +57,18 @@ E.g.:
 
 [Setup CouchDB using Docker](https://github.com/vacmatch/vacmatch-mobile/wiki/Setup-CouchDB-remote-database)
 
+If you download the project from a release, you should add a ```.babelrc``` file like this:
+```
+{
+  "presets": ["react", "es2015"],
+  "plugins": [
+    ["react-intl", {
+        "messagesDir": "./i18n/descriptors",
+        "enforceDescriptions": true
+    }]
+  ]
+}
+```
 ### Execution
 
 Install all dependencies
